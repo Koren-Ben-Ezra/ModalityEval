@@ -50,7 +50,8 @@ class Text2ImageDefault(AbstractText2Image):
     
     
 class Text2ImageCustomBackground(AbstractText2Image):
-    Text2ImageDefault/create_image(self, text: str, background_image: Image):
+    Text2ImageDefault 
+    create_image(self, text: str, background_image: Image):
 
 
 
