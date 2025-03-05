@@ -85,3 +85,10 @@ class GSM8kWrapper(AbstractDatasetWrapper):
         sample["answer"] = sample["answer"].split("####")[1].strip()
         sample["question_image"] = self._text2image.create_image(sample["question"])
         return sample
+    
+# TODO: Implement wrappers for other datasets
+# class SQuADWrapper(AbstractDatasetWrapper):
+#     pass    
+
+# class TriviaQAWrapper(AbstractDatasetWrapper):
+#     pass

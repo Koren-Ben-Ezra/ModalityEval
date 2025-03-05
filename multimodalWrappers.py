@@ -2,6 +2,8 @@ from transformers import MllamaForConditionalGeneration, AutoProcessor
 from PIL import Image
 import torch
 
+INSTRUCTION = "[INSTRUCTION] Answer the following question using only the final numerical or textual result. No explanations. No extra words."
+MAX_OUTPUT_TOKENS = 10
 
 class MultimodalWrapper:
     def generate_ans_from_image(self, img: Image):
@@ -32,15 +34,14 @@ class LlamaWrapper(MultimodalWrapper):
         self._processor = AutoProcessor.from_pretrained(self._model_id)
         
     def generate_ans_from_image(self, img: Image):
-        prompt = "<|image|><|begin_of_text|>"
+        prompt = "<|image|><|begin_of_text|>" + INSTRUCTION
         inputs = self._processor(img, prompt, return_tensors="pt").to(self._model.device)
-        output = self._model.generate(**inputs, max_new_tokens=30)
+        output = self._model.generate(**inputs, max_new_tokens=MAX_OUTPUT_TOKENS)
         return output
     
     def generate_ans_from_text(self, text: str):
         img = Image.new(mode="RGB", size=(2, 2), color="white")
-        text = "<|image|><|begin_of_text|>" + text
+        text = "<|image|><|begin_of_text|>" + INSTRUCTION + "\n[QUESTION]" + text
         inputs = self._processor(img, text, return_tensors="pt").to(self._model.device)
-        output = self._model.generate(**inputs, max_new_tokens=30)
+        output = self._model.generate(**inputs, max_new_tokens=MAX_OUTPUT_TOKENS)
         return output
-
