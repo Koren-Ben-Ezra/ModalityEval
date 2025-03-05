@@ -7,9 +7,9 @@
 
 ```
 conda env create -f environment/environment.yml
-- In case of errors, try using "pip3 install <package-name>" to install the problematic packages
-
 ```
+- In case of errors, try using "pip install <package-name>" to install the problematic packages
+
 
 2. Active the environment:
 

@@ -6,7 +6,7 @@ class AbstractText2Image:
         return None
     
 class Text2ImageDefault(AbstractText2Image):
-    def __init__(self, font_name: str, background_image=None, font_size=20, padding=10, background_color="white", text_color="black"):
+    def __init__(self, font_name: str, background_image: Image=None, font_size=20, padding=10, background_color="white", text_color="black"):
         self.font_name = font_name
         self.font_size = font_size
         self.padding = padding
@@ -27,7 +27,7 @@ class Text2ImageDefault(AbstractText2Image):
         # Calculate image width more accurately
         image_width = max(font.getbbox(line)[2] for line in lines) + self.padding
         # Create an image
-        img = self._create_fit_background(image_width, image_height)
+        img = bg = Image.new("RGB", (image_width, image_height), self.background_color)
         draw = ImageDraw.Draw(img)
 
         # Draw the text
@@ -39,20 +39,19 @@ class Text2ImageDefault(AbstractText2Image):
         return img
     
     
-    def _create_fit_background(self, width, height):
-        if self.background_image:
-            bg = Image.open(self.background_image).convert("RGB")
-            bg = bg.resize((width, height), Image.LANCZOS)  # Resize to fit text
-        else:
-            bg = Image.new("RGB", (width, height), self.background_color)
+    # def _create_fit_background(self, width, height):
+    #     if self.background_image:
+    #         bg = Image.open(self.background_image).convert("RGB")
+    #         bg = bg.resize((width, height), Image.LANCZOS)  # Resize to fit text
+    #     else:
+    #         bg = Image.new("RGB", (width, height), self.background_color)
         
-        return bg
+    #     return bg
     
     
-class Text2ImageCustomBackground(AbstractText2Image):
-    Text2ImageDefault 
-    create_image(self, text: str, background_image: Image):
-
+# class Text2ImageCustomBackground(AbstractText2Image):
+#     def create_image(self, text: str, background_image: Image = None):
+#         return Text2ImageDefault.create_image(text, background_image) 
 
 
 class AbstractDatasetWrapper:

@@ -1,38 +1,40 @@
-# from benchmarkManager import BenchmarkManager
-# import matplotlib.pyplot as plt
-from transformers import AutoTokenizer, AutoModelForCausalLM
-import torch
+from transformers import pipeline
 from PIL import Image
-from torchvision import transforms
 
 def main():
-    model_name = "meta-llama/Llama-Guard-3-11B-Vision"  # Replace with your model's repo name
-    tokenizer = AutoTokenizer.from_pretrained(model_name)
-    model = AutoModelForCausalLM.from_pretrained(model_name, torch_dtype=torch.float16, device_map="auto")
-    model.eval()
+    # Hypothetical model repository that supports image-to-text
+    model_name = "meta-llama/Llama-Guard-3-11B-Vision"
     
-    image_transform = transforms.Compose([
-    transforms.Resize((224, 224)),  # adjust size if needed
-    transforms.ToTensor(),
-    transforms.Normalize(mean=[0.485, 0.456, 0.406], 
-                         std=[0.229, 0.224, 0.225])  # common normalization for vision models
-])
-
-    image = Image.open("my_image.jpg")
-    image_tensor = image_transform(image).unsqueeze(0).to("cuda")
+    # If the model has custom code, you may need 'trust_remote_code=True'
+    # and a local GPU to load large models efficiently (e.g., device_map="auto").
+    # Example:
+    # image_to_text_pipe = pipeline(
+    #     "image-to-text",
+    #     model=model_name,
+    #     trust_remote_code=True,
+    #     device_map="auto"
+    # )
     
-    prompt = "The rickest rick"
-    inputs = tokenizer(prompt, return_tensors="pt").to("cuda")
-
-    # Here, we assume the model accepts an argument for image inputs.
-    # Check your model’s documentation for the exact argument name.
-    outputs = model.generate(
-        **inputs, 
-        image_inputs=image_tensor,  # This argument may differ
-        max_new_tokens=100
+    # If no custom code is needed, you could try:
+    image_to_text_pipe = pipeline(
+        "image-to-text",
+        model=model_name,
+        device_map="auto"     # Requires 'accelerate' or 'bitsandbytes' installed for large models
     )
-    response = tokenizer.decode(outputs[0], skip_special_tokens=True)
-    print(response)
+
+    # Load the image using PIL
+    image_path = "my_image.jpg"  # Replace with your image
+    image = Image.open(image_path)
+    
+    # Provide the image and optionally a prompt
+    prompt = "Describe the image in detail."
+    
+    # The pipeline call can take either a dict or just the image directly,
+    # depending on how the model’s forward is implemented.
+    # The simplest approach is just to call:
+    result = image_to_text_pipe(image, prompt=prompt)
+    
+    print("Generated text:", result)
 
 if __name__ == "__main__":
     main()

@@ -2,6 +2,8 @@ name: ModalityEval
 channels:
   - defaults
   - conda-forge
+envs_dirs:
+  - D:/conda_envs
 dependencies:
   - python=3.10
   - pip:
