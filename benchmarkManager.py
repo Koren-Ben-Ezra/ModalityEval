@@ -18,19 +18,17 @@ class BenchmarkManager:
         for sample in tqdm(self._datasetWrapper.dataset):
             self._execute_single_prompt(sample, category)
             
-        return self._eval(category)
+        return category.eval()
     
     def _execute_single_prompt(self, sample, category: Category):
-        filtered_image = category.img_f.apply_filter(sample["question"])
-        filtered_text = category.text_f.apply_filter(sample["question_image"])
-        answers = self._model_manager.separate_forward(filtered_text, filtered_image, sample["answer"])
         
-        if answers[0] == filtered_text:
+        filtered_text = category.text_f.apply_filter(sample["question"])
+        filtered_image = category.img_f.apply_filter(sample["question_image"])
+        
+        answers = self._model_manager.separate_forward(filtered_text, filtered_image)
+        true_answer = sample['answer']
+        
+        if answers[0] == true_answer:
             category.text_stats += 1
-        if answers[1] == filtered_image:
+        if answers[1] == true_answer:
             category.img_stats += 1
-    
-    def _eval(self, category: Category):
-        eval_text = category.text_stats.success / (category.text_stats.success + category.text_stats.failures)
-        eval_img = category.img_stats.success / (category.img_stats.success + category.img_stats.failures)
-        return eval_text, eval_img

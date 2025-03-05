@@ -1,7 +1,7 @@
 from benchmarkManager import BenchmarkManager
 from filters import IdentityTextFilter, IdentityImageFilter, GaussianImageFilter, ContrastStretchingImageFilter, HistogramEqualizationImageFilter, TextBackgroundReplacementFilter, ScrambleLetterInWordsTextFilter, ScrambleWordsInSentenceTextFilter, PushFrontPhraseTextFilter
 from datasetWrapper import GSM8kWrapper
-from multimodalWrappers import ModelManager, Llama32_11B_visionWrapper
+from multimodalWrappers import ModelManager, LlamaWrapper
 import pandas as pd
 
 class Filters:
@@ -44,9 +44,8 @@ def eval_Llama32vision_gsm8k():
     }
     
     filters = Filters()
-    model_manager = Llama32_11B_visionWrapper()
+    model_manager = ModelManager(LlamaWrapper())
     benchmark_manager = BenchmarkManager(GSM8kWrapper(), model_manager)
-        
     df = pd.DataFrame(columns=["Text Filter", "Image Filter", "Text Accuracy", "Image Accuracy"])
     
     # identity filters, just to check if the benchmark is working

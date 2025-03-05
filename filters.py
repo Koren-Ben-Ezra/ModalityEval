@@ -25,6 +25,11 @@ class Category:
         self.img_f = img_f
         self.text_stats = Category.Statistics()
         self.img_stats = Category.Statistics()
+    
+    def eval(self):
+        eval_text = self.text_stats.success / (self.text_stats.success + self.text_stats.failures)
+        eval_img = self.img_stats.success / (self.img_stats.success + self.img_stats.failures)
+        return eval_text, eval_img
 
 
 class IdentityTextFilter(AbstractTextFilter):

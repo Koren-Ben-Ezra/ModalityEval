@@ -80,7 +80,7 @@ class GSM8kWrapper(AbstractDatasetWrapper):
         self._text2image = text2image
         self.dataset = load_dataset("gsm8k", "main")["test"]
         self.dataset = self.dataset.map(self._map_sample)
-    
+        
     def _map_sample(self, sample):
         sample["answer"] = sample["answer"].split("####")[1].strip()
         sample["question_image"] = self._text2image.create_image(sample["question"])
