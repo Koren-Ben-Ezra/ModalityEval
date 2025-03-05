@@ -1,19 +1,23 @@
 from typing import List
-from PIL import Image
+from tqdm import tqdm
 
-from utils import ModelManager, AbstractImageFilter, AbstractTextFilter, Category, TextQuestion, ImageQuestion
+from filters import AbstractImageFilter, AbstractTextFilter, Category
 from datasetWrapper import AbstractDatasetWrapper
+from multimodalWrappers import ModelManager
 
 class BenchmarkManager:
     def __init__(self, datasetWrapper: AbstractDatasetWrapper, model_manager: ModelManager):
         self._datasetWrapper = datasetWrapper
-        self._model_manager= model_manager
+        self._model_manager = model_manager
         self._categories: List[Category] = []
         
     def execute_test(self, text_f: AbstractTextFilter, img_f: AbstractImageFilter):
         category = Category(text_f, img_f)
         self._categories.append(category)
-        self._datasetWrapper.dataset.map(lambda s: self._execute_single_prompt(s, category))
+        
+        for sample in tqdm(self._datasetWrapper.dataset):
+            self._execute_single_prompt(sample, category)
+            
         return self._eval(category)
     
     def _execute_single_prompt(self, sample, category: Category):

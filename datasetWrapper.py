@@ -6,7 +6,7 @@ class AbstractText2Image:
         return None
     
 class Text2ImageDefault(AbstractText2Image):
-    def __init__(self, font_name: str, background_image: Image=None, font_size=20, padding=10, background_color="white", text_color="black"):
+    def __init__(self, font_name: str="ariel.ttf", background_image: Image=None, font_size=20, padding=10, background_color="white", text_color="black"):
         self.font_name = font_name
         self.font_size = font_size
         self.padding = padding
@@ -76,7 +76,7 @@ class GSM8kWrapper(AbstractDatasetWrapper):
                 #### 18'
     '''
     
-    def __init__(self, text2image: AbstractText2Image):
+    def __init__(self, text2image: AbstractText2Image=Text2ImageDefault()):
         self._text2image = text2image
         self.dataset = load_dataset("gsm8k", "main")["test"]
         self.dataset = self.dataset.map(self._map_sample)
