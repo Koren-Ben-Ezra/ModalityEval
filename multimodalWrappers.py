@@ -8,6 +8,9 @@ IMG_INSTRUCTION = "[INSTRUCTION] The question is displayed within the provided i
 MAX_NEW_TOKENS = 10
 
 class MultimodalWrapper:
+    def __init__(self):
+        self.model_id = None
+    
     def generate_ans_from_image(self, img: Image):
         return None
     
@@ -18,6 +21,7 @@ class MultimodalWrapper:
 class ModelManager:
     def __init__(self, multimodal: MultimodalWrapper):
         self._multimodal = multimodal
+        self.model_id = self._multimodal.model_id
 
     def separate_forward(self, text_q: str, img_q: Image):
         answer_text_q = self._multimodal.generate_ans_from_text(text_q)
@@ -27,13 +31,13 @@ class ModelManager:
 
 class LlamaWrapper(MultimodalWrapper):
     def __init__(self, model_id: str="meta-llama/Llama-3.2-11B-Vision-Instruct"):
-        self._model_id = model_id
+        self.model_id = model_id
         self._model = MllamaForConditionalGeneration.from_pretrained(
-            self._model_id,
+            self.model_id,
             torch_dtype=torch.bfloat16,
             device_map="auto",
         )
-        self._processor = AutoProcessor.from_pretrained(self._model_id)
+        self._processor = AutoProcessor.from_pretrained(self.model_id)
         
     def generate_ans_from_image(self, image: Image):
         messages = [

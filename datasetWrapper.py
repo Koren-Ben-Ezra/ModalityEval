@@ -8,6 +8,7 @@ class AbstractDatasetWrapper:
     """
     def __init__(self, text2image: AbstractText2Image):
         self.dataset: Dataset = None  # Should be implemented in subclasses
+        self.dataset_id = None
         self._text2image = text2image
     
 class GSM8kWrapper(AbstractDatasetWrapper):
@@ -24,6 +25,7 @@ class GSM8kWrapper(AbstractDatasetWrapper):
     '''
     
     def __init__(self, text2image: AbstractText2Image=Text2ImageDefault()):
+        self.dataset_id = "GSM8k"
         self._text2image = text2image
         self.dataset = load_dataset("gsm8k", "main")["test"].select(range(1))
         self.dataset = self.dataset.map(self._map_sample)

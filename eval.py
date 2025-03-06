@@ -38,13 +38,12 @@ class Filters:
 
 def eval_Llama32vision_gsm8k():
     # prepare the benchmark
-    metadata = {
-        "Multimodal": "Llama-3.2-11B-Vision",
-        "Dataset": "GSM8k"
-    }
     model_manager = ModelManager(LlamaWrapper())
     datasetWrapper = GSM8kWrapper()
-    
+    metadata = {
+        "Multimodal": model_manager.model_id,
+        "Dataset": datasetWrapper.dataset_id,
+    }
     # create the benchmark
     benchmark_manager = BenchmarkManager(datasetWrapper, model_manager, metadata, save_predictions=True)
 
