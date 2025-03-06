@@ -1,48 +1,49 @@
+import random
+import numpy as np
 import cv2
 from PIL import Image
-import numpy as np
-import random
+
 
 class AbstractImageFilter:
+    def __init__(self, filter_name: str):
+        self.filter_name = filter_name
+    
     def apply_filter(self, input: Image):
         return None
 
 
 class AbstractTextFilter:
+    
+    def __init__(self, filter_name: str):
+        self.filter_name = filter_name
+    
     def apply_filter(self, input: str):
         return None
 
 
-class Category:
-    class Statistics:
-        def __init__(self):
-            self.success = 0
-            self.failures = 0
-
-
-    def __init__(self, text_f: AbstractTextFilter, img_f: AbstractImageFilter):
-        self.text_f = text_f
-        self.img_f = img_f
-        self.text_stats = Category.Statistics()
-        self.img_stats = Category.Statistics()
-    
-    def eval(self):
-        eval_text = self.text_stats.success / (self.text_stats.success + self.text_stats.failures)
-        eval_img = self.img_stats.success / (self.img_stats.success + self.img_stats.failures)
-        return eval_text, eval_img
-
-
 class IdentityTextFilter(AbstractTextFilter):
+    
+    def __init__(self, filter_name:str="IdentityTextFilter"):
+        super().__init__(filter_name)
+    
     def apply_filter(self, input: str):
         return input
 
 
 class IdentityImageFilter(AbstractImageFilter):
+    
+    def __init__(self, filter_name:str="IdentityImageFilter"):
+        super().__init__(filter_name)
+        
     def apply_filter(self, input: Image):
         return input
 
 
 class GaussianImageFilter(AbstractImageFilter):
+    
+    def __init__(self, filter_name:str="GaussianImageFilter"):
+        super().__init__(filter_name)
+        
     def apply_filter(self, input: Image, kernel_size: int=5, sigma: float=1.0):
         image_array = np.array(input)
         blurred_array = cv2.GaussianBlur(image_array, (kernel_size, kernel_size), sigma)
@@ -50,6 +51,10 @@ class GaussianImageFilter(AbstractImageFilter):
 
 
 class ContrastStretchingImageFilter(AbstractImageFilter):
+    
+    def __init__(self, filter_name:str="ContrastStretchingImageFilter"):
+        super().__init__(filter_name)
+        
     def apply_filter(self, input: Image):
         image_array = np.array(input)
         min_pixel = np.min(image_array)
@@ -59,6 +64,10 @@ class ContrastStretchingImageFilter(AbstractImageFilter):
 
 
 class HistogramEqualizationImageFilter(AbstractImageFilter):
+    
+    def __init__(self, filter_name:str="HistogramEqualizationImageFilter"):
+        super().__init__(filter_name)
+        
     def apply_filter(self, input: Image):
         image_array = np.array(input)
         equalized_array = cv2.equalizeHist(image_array)
@@ -66,6 +75,10 @@ class HistogramEqualizationImageFilter(AbstractImageFilter):
 
 
 class TextBackgroundReplacementFilter(AbstractImageFilter):
+    
+    def __init__(self, filter_name:str="TextBackgroundReplacementFilter"):
+        super().__init__(filter_name)
+    
     def apply_filter(self, text_image: Image, background_image: Image):
         text_array = np.array(text_image.convert("L"))  
         bg_array = np.array(background_image.convert("RGB")) 
@@ -77,6 +90,10 @@ class TextBackgroundReplacementFilter(AbstractImageFilter):
 
 
 class ScrambleLetterInWordsTextFilter(AbstractTextFilter):
+    
+    def __init__(self, filter_name:str="ScrambleLetterInWordsTextFilter"):
+        super().__init__(filter_name)
+        
     def apply_filter(self, input: str, scramble_probability: float=0.2):
         def scramble_word(word):
             if len(word) <= 1 or random.random() > scramble_probability:  
@@ -89,6 +106,10 @@ class ScrambleLetterInWordsTextFilter(AbstractTextFilter):
 
 
 class ScrambleWordsInSentenceTextFilter(AbstractTextFilter):
+    
+    def __init__(self, filter_name:str="ScrambleWordsInSentenceTextFilter"):
+        super().__init__(filter_name)
+        
     def apply_filter(self, input: str, scramble_probability: float=0.2):
         words = input.split()
         num_words = len(words)
@@ -103,6 +124,10 @@ class ScrambleWordsInSentenceTextFilter(AbstractTextFilter):
 
 
 class PushFrontPhraseTextFilter(AbstractTextFilter):
+    
+    def __init__(self, filter_name:str="PushFrontPhraseTextFilter"):
+        super().__init__(filter_name)
+        
     def __init__(self, phrase: str):
         self.phrase = phrase
         

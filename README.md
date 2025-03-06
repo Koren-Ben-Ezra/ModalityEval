@@ -27,7 +27,8 @@ pip install -r environment\requirements.txt
 4. tokens (model : token):
 hugginface-cli login
 hugginface-cli logout
-meta-llama/Llama-Guard-3-11B-Vision : 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
+Token: 
+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
     
 
 ## Miro (view only)

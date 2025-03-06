@@ -1,10 +1,18 @@
+import pandas as pd
+
 from benchmarkManager import BenchmarkManager
 from filters import IdentityTextFilter, IdentityImageFilter, GaussianImageFilter, ContrastStretchingImageFilter, HistogramEqualizationImageFilter, TextBackgroundReplacementFilter, ScrambleLetterInWordsTextFilter, ScrambleWordsInSentenceTextFilter, PushFrontPhraseTextFilter
 from datasetWrapper import GSM8kWrapper
 from multimodalWrappers import ModelManager, LlamaWrapper
-import pandas as pd
 
 class Filters:
+    """
+    Filters is a singleton class that manages a collection of text and image filters.
+    Attributes:
+        img_filters (list): A list of image filter instances.
+        text_filters (list): A list of text filter instances.
+    """
+    
     _instance = None
     def __new__(cls):
         if cls._instance is None:
@@ -28,28 +36,21 @@ class Filters:
         self.img_filters.append(ContrastStretchingImageFilter())
         self.img_filters.append(HistogramEqualizationImageFilter())
 
-
-def write_csv_file(filename: str, df: pd.DataFrame, metadata: dict):
-# Save to CSV with metadata as a header
-    with open(filename, "w") as file:
-        for key, value in metadata.items():
-            file.write(f"# {key}: {value}\n")  # Writing metadata as comments
-        df.to_csv(file, index=False)
-
-
 def eval_Llama32vision_gsm8k():
+    # prepare the benchmark
     metadata = {
         "Multimodal": "Llama-3.2-11B-Vision",
         "Dataset": "GSM8k"
     }
-    
-    filters = Filters()
     model_manager = ModelManager(LlamaWrapper())
-    benchmark_manager = BenchmarkManager(GSM8kWrapper(), model_manager)
-    df = pd.DataFrame(columns=["Text Filter", "Image Filter", "Text Accuracy", "Image Accuracy"])
+    datasetWrapper = GSM8kWrapper()
+    
+    # create the benchmark
+    benchmark_manager = BenchmarkManager(datasetWrapper, model_manager, metadata, save_predictions=True)
+
+    filters = Filters()
     
     # identity filters, just to check if the benchmark is working
-    text_accuracy, img_accuracy = benchmark_manager.execute_test(filters.text_filters[0], filters.img_filters[0])
-    df = df.append({"Text Filter": "IdentityTextFilter", "Image Filter": "IdentityImageFilter", "Text Accuracy": text_accuracy, "Image Accuracy": img_accuracy}, ignore_index=True)
+    benchmark_manager.execute_test(filters.text_filters[0], filters.img_filters[0])
     
-    write_csv_file("results.csv", df, metadata)
+    benchmark_manager.write_summary()

@@ -1,0 +1,13 @@
+,answer,text_prediction,img_prediction
+0,18,"<|begin_of_text|><|start_header_id|>user<|end_header_id|>
+
+<|image|>[INSTRUCTION] Provide only the final answer in plain text. No explanations or additional words. For example, if the answer is 5, respond with $5$ only.
+[QUESTION] Janet’s ducks lay 16 eggs per day. She eats three for breakfast every morning and bakes muffins for her friends every day with four. She sells the remainder at the farmers' market daily for $2 per fresh duck egg. How much in dollars does she make every day at the farmers' market?<|eot_id|><|start_header_id|>assistant<|end_header_id|>
+
+The information in the question is:
+
+* Janet's","<|begin_of_text|><|start_header_id|>user<|end_header_id|>
+
+<|image|>[INSTRUCTION] The question is displayed within the provided image. Respond solely with the final answer in text form. No explanations or extra words. For example, if the answer is 5, respond with $5$ only.<|eot_id|><|start_header_id|>assistant<|end_header_id|>
+
+$2<|eot_id|>"
