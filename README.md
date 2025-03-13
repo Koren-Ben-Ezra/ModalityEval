@@ -24,8 +24,8 @@ pip install -r environment\requirements.txt
 
 ```
 
-4. tokens (model : token):
-hugginface-cli login
+4. login token for hugging face:
+huggingface-cli login
 
 Token: 
 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
