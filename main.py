@@ -1,4 +1,4 @@
-from eval import eval_Llama32vision_gsm8k
+from src.eval import eval_Llama32vision_gsm8k
 
 def main():
     eval_Llama32vision_gsm8k()
