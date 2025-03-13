@@ -78,3 +78,6 @@ class LlamaWrapper(MultimodalWrapper):
         output = self._model.generate(**inputs, max_new_tokens=MAX_NEW_TOKENS)
         output = self._processor.decode(output[0])
         return output
+    
+    # def _postprocess_output(self, output):
+    #     return output.split("####")[1].strip()
