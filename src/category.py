@@ -1,6 +1,6 @@
 import pandas as pd
 
-from filters import AbstractTextFilter, AbstractImageFilter
+from src.filters import AbstractTextFilter, AbstractImageFilter
 
 
 class Category:

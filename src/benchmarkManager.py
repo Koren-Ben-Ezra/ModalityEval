@@ -4,10 +4,10 @@ import os
 import pandas as pd
 from tqdm import tqdm
 
-from filters import AbstractImageFilter, AbstractTextFilter
-from category import Category
-from datasetWrapper import AbstractDatasetWrapper
-from multimodalWrappers import ModelManager
+from src.filters import AbstractImageFilter, AbstractTextFilter
+from src.category import Category
+from src.datasetWrapper import AbstractDatasetWrapper
+from src.multimodalWrappers import ModelManager
 
 BENCHMARKS_DIR = "benchmarks"
 

@@ -1,5 +1,5 @@
 from datasets import load_dataset, Dataset
-from text2image import AbstractText2Image, Text2ImageDefault
+from src.text2image import AbstractText2Image, Text2ImageDefault
 
 class AbstractDatasetWrapper:
     """

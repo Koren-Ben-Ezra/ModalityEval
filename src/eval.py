@@ -1,9 +1,9 @@
 import pandas as pd
 
-from benchmarkManager import BenchmarkManager
-from filters import IdentityTextFilter, IdentityImageFilter, GaussianImageFilter, ContrastStretchingImageFilter, HistogramEqualizationImageFilter, TextBackgroundReplacementFilter, ScrambleLetterInWordsTextFilter, ScrambleWordsInSentenceTextFilter, PushFrontPhraseTextFilter
-from datasetWrapper import GSM8kWrapper
-from multimodalWrappers import ModelManager, LlamaWrapper
+from src.benchmarkManager import BenchmarkManager
+from src.filters import IdentityTextFilter, IdentityImageFilter, GaussianImageFilter, ContrastStretchingImageFilter, HistogramEqualizationImageFilter, TextBackgroundReplacementFilter, ScrambleLetterInWordsTextFilter, ScrambleWordsInSentenceTextFilter, PushFrontPhraseTextFilter
+from src.datasetWrapper import GSM8kWrapper
+from src.multimodalWrappers import ModelManager, LlamaWrapper
 
 class Filters:
     """

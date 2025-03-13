@@ -9,7 +9,7 @@ MAX_NEW_TOKENS = 10
 
 class MultimodalWrapper:
     def __init__(self):
-        self.model_id = None
+        self.model_id: str = None
     
     def generate_ans_from_image(self, img: Image):
         return None
