@@ -1,5 +1,5 @@
 from PIL import Image, ImageDraw, ImageFont
-
+from src.filters import AbstractTextFilter
 
 MAX_WORDS_PER_LINE__IMG = 10
 
@@ -7,65 +7,190 @@ class AbstractText2Image:
     def create_image(self, text: str):
         return None
     
-class Text2ImageDefault(AbstractText2Image):
-    def __init__(self, font_name: str="ariel.ttf", background_image: Image=None, font_size=100, padding=5, background_color="white", text_color="black"):
-        self.font_name = font_name
-        self.font_size = font_size
-        self.padding = padding
-        self.background_color = background_color
-        self.text_color = text_color
-        self.background = background_image
+    @staticmethod
+    def _preprocess_text(text: str):
+        words = []
+        for line in text.split("\n"):
+            for word in line.split(" "):
+                words.append(word)
+        res = []
+        new_line = []
+        for word in words:
+            if len(new_line) == MAX_WORDS_PER_LINE__IMG:
+                res.append(" ".join(new_line))
+                new_line = []
+            
+            new_line.append(word)
         
-    def _preprocess_text(self, text: str):
-        lines = text.split("\n")
-        reshaped_lines = []
-        for line in lines:
-            words = line.split(" ")
-            while len(words) > MAX_WORDS_PER_LINE__IMG:
-                reshaped_lines.append(" ".join(words[:MAX_WORDS_PER_LINE__IMG]))
-                words = words[MAX_WORDS_PER_LINE__IMG:]
-            reshaped_lines.append(" ".join(words))
-        return reshaped_lines
+        return "\n".join(res)
+
+class FixedFontText2Image(AbstractText2Image):
+    """
+    Uses a fixed font size. The resulting image is sized exactly
+    to the text's bounding box and accounts for any offsets
+    so the text isn't clipped. Also supports optional padding.
+    """
+    def __init__(
+        self,
+        font_path="arial.ttf",
+        font_size=20,
+        text_color=(0, 0, 0),
+        bg_color=(255, 255, 255),
+        padding=0
+    ):
+        """
+        :param font_path: Path to the .ttf or .otf font file.
+        :param font_size: The fixed font size.
+        :param text_color: (R, G, B) tuple for text color.
+        :param bg_color: (R, G, B) tuple for background color.
+        :param padding: Integer number of pixels to pad on all sides.
+        """
+        self.font_path = font_path
+        self.font_size = font_size
+        self.text_color = text_color
+        self.bg_color = bg_color
+        self.padding = padding
 
     def create_image(self, text: str):
-        try:
-            font = ImageFont.truetype(self.font_name, self.font_size)
-        except:
-            font = ImageFont.load_default()
-    
-        # Calculate text size
-        lines = self._preprocess_text(text)
-        
-        ascent, descent = font.getmetrics()
-        line_height = ascent + descent
-        print(f"line_height: {line_height}")
-        
-        image_height = line_height * len(lines) + 2*self.padding
-        # Calculate image width more accurately
-        image_width = max(font.getbbox(line)[2] for line in lines) + 2 * self.padding
-        # Create an image
-        img = Image.new("RGB", (image_width, image_height), self.background_color)
-        draw = ImageDraw.Draw(img)
+        text = AbstractText2Image._preprocess_text(text)
+        # 1. Create a small image to measure the bounding box of the text
+        temp_img = Image.new("RGB", (1, 1), self.bg_color)
+        temp_draw = ImageDraw.Draw(temp_img)
+        font = ImageFont.truetype(self.font_path, self.font_size)
 
-        # Draw the text
-        y_text = self.padding
-        for line in lines:
-            draw.text((self.padding, y_text), line, self.text_color, font=font)
-            y_text += line_height
+        # textbbox returns (left, top, right, bottom)
+        left, top, right, bottom = temp_draw.textbbox((0, 0), text, font=font)
+
+        text_width = right - left
+        text_height = bottom - top
+
+        # 2. Create the final image sized to the text plus padding
+        width = text_width + 2 * self.padding
+        height = text_height + 2 * self.padding
+        image = Image.new("RGB", (width, height), self.bg_color)
+        draw = ImageDraw.Draw(image)
+
+        # 3. Draw text at a negative offset, plus the padding
+        #    This ensures the text isn't clipped and is padded
+        draw.text(
+            (self.padding - left, self.padding - top),
+            text,
+            font=font,
+            fill=self.text_color
+        )
+
+        return image
+
+
+class FixedSizeText2Image(AbstractText2Image):
+    """
+    Uses a fixed image size (width, height). Automatically adjusts the font size
+    so the text fits. The text is then centered within the final image, taking
+    bounding box offsets and padding into account to avoid clipping.
+    """
+    def __init__(
+        self,
+        width=400,
+        height=300,
+        font_path="arial.ttf",
+        text_color=(0, 0, 0),
+        bg_color=(255, 255, 255),
+        max_font_size=100,
+        padding=0
+    ):
+        """
+        :param width: Desired image width.
+        :param height: Desired image height.
+        :param font_path: Path to the .ttf or .otf font file.
+        :param text_color: (R, G, B) tuple for text color.
+        :param bg_color: (R, G, B) tuple for background color.
+        :param max_font_size: The maximum font size to try.
+        :param padding: Integer number of pixels to pad on all sides.
+        """
+        self.width = width
+        self.height = height
+        self.font_path = font_path
+        self.text_color = text_color
+        self.bg_color = bg_color
+        self.max_font_size = max_font_size
+        self.padding = padding
+
+    
+    
+    def create_image(self, text: str):
         
-        return img
-    
-    
-    # def _create_fit_background(self, width, height):
-    #     if self.background_image:
-    #         bg = Image.open(self.background_image).convert("RGB")
-    #         bg = bg.resize((width, height), Image.LANCZOS)  # Resize to fit text
-    #     else:
-    #         bg = Image.new("RGB", (width, height), self.background_color)
+        text = AbstractText2Image._preprocess_text(text)
         
-    #     return bg
+        chosen_font_size = 1
+
+        # Effective drawing area (subtract padding from each side)
+        effective_width = self.width - 2 * self.padding
+        effective_height = self.height - 2 * self.padding
+
+        # 1. Find the largest font size that fits the given dimensions minus padding
+        for size in range(self.max_font_size, 0, -1):
+            temp_img = Image.new("RGB", (1, 1), self.bg_color)
+            temp_draw = ImageDraw.Draw(temp_img)
+            font = ImageFont.truetype(self.font_path, size)
+            left, top, right, bottom = temp_draw.textbbox((0, 0), text, font=font)
+
+            text_width = right - left
+            text_height = bottom - top
+
+            if text_width <= effective_width and text_height <= effective_height:
+                chosen_font_size = size
+                break
+
+        # 2. Create the final image
+        image = Image.new("RGB", (self.width, self.height), self.bg_color)
+        draw = ImageDraw.Draw(image)
+        final_font = ImageFont.truetype(self.font_path, chosen_font_size)
+
+        # 3. Measure text with the chosen font, then center it in the padded area
+        left, top, right, bottom = draw.textbbox((0, 0), text, font=final_font)
+        text_width = right - left
+        text_height = bottom - top
+
+        # Center the text within the effective (padded) area
+        x_offset = self.padding + (effective_width - text_width) // 2 - left
+        y_offset = self.padding + (effective_height - text_height) // 2 - top
+
+        draw.text((x_offset, y_offset), text, font=final_font, fill=self.text_color)
+        return image
     
+class FilteredFixedSizeText2Image(FixedSizeText2Image):
+    def __init__(self, filter: AbstractTextFilter, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.filter = filter
     
-# class Text2ImageCustomBackground(AbstractText2Image):
-#     def create_image(self, text: str, background_image: Image = None):
-#         return Text2ImageDefault.create_image(text, background_image) 
+    def create_image(self, text: str):
+        text = self.filter.apply_filter(text)
+        return super().create_image(text)
+
+
+# if __name__ == "__main__":
+#     # Example usage:
+#     text = """Janet's ducks lay 16 eggs per day. She eats three for breakfast 
+# every morning and bakes muffins for her friends every day with four. 
+# She sells the remainder at the farmers' market daily for $2 per fresh duck egg. 
+# How much in dollars does she make every day at the farmers' market?"""
+
+#     # 1) Using the fixed font size with padding
+#     fixed_font_impl = FixedFontText2Image(
+#         font_path="arial.ttf",
+#         font_size=24,
+#         padding=10  # e.g. 10 px padding
+#     )
+#     img1 = fixed_font_impl.create_image(text)
+#     img1.save("text_image_fixed_font_padding.png")
+
+#     # 2) Using the fixed image size with padding
+#     fixed_size_impl = FixedSizeText2Image(
+#         width=400,
+#         height=300,
+#         font_path="arial.ttf",
+#         max_font_size=200,
+#         padding=5  # e.g. 20 px padding
+#     )
+#     img2 = fixed_size_impl.create_image(text)
+#     img2.save("text_image_fixed_size_padding.png")

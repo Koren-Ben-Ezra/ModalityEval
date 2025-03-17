@@ -33,8 +33,8 @@ class BenchmarkManager:
             
     def _execute_single_prompt(self, sample, category: Category):
         
-        filtered_text = category.text_f.apply_filter(sample["question"])
-        filtered_image = category.img_f.apply_filter(sample["question_image"])
+        filtered_text = category.text_f.apply_filter(sample["question"], sample["answer"])
+        filtered_image = category.img_f.apply_filter(sample["question_image"], sample["answer"])
         
         prediction_from_text, prediction_from_img = self._model_manager.separate_forward(filtered_text, filtered_image)
         
