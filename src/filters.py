@@ -2,6 +2,11 @@ import random
 import numpy as np
 import cv2
 from PIL import Image, ImageDraw, ImageFont
+from typing import List
+
+import matplotlib.pyplot as plt
+
+RANDOM_VALUES: List[str] = [str(random.randint(0, 10000)) for _ in range(100)]
 
 class AbstractImageFilter:
     def __init__(self, filter_name: str):
@@ -119,29 +124,22 @@ class SwapWordsTextFilter(AbstractTextFilter):
 
 
 # ---------- General Information Filters ---------- #
-class ReplaceBackgroundTextFilter(AbstractImageFilter):
+class ReplaceBackgroundImageFilter(AbstractImageFilter):
 
-    def __init__(self, background_image: Image , filter_name:str="ReplaceBackgroundTextFilter"):
+    def __init__(self, background_image: Image , alpha: float=0.5, filter_name:str="ReplaceBackgroundImageFilter"):
             super().__init__(filter_name)
-            self.background_image: Image = background_image
-
+            self.bg_image: Image = background_image
+            self.alpha = alpha
         
     def apply_filter(self, input: Image , answer: str=None):
-            input = np.array(input.convert("L"))  
-            bg_array = np.array(self.background_image.convert("RGB"))
-            bg_array = cv2.resize(bg_array, (input.size[1], input.size[0]))
-            _, mask = cv2.threshold(input, 200, 255, cv2.THRESH_BINARY_INV)  
-            mask_3ch = cv2.merge([mask, mask, mask])
-            result = np.where(mask_3ch == 255, (0, 0, 0), bg_array)  
-            return Image.fromarray(result)
+        bg_image_resized = self.bg_image.resize(input.size, Image.LANCZOS) 
+        return Image.blend(input.convert("RGB"), bg_image_resized.convert("RGB"), alpha=self.alpha)
 
 
 class PushFrontTextFilter(AbstractTextFilter):
     
-    def __init__(self, filter_name:str="PushFrontTextFilter"):
+    def __init__(self, phrase: str, filter_name:str="PushFrontTextFilter"):
         super().__init__(filter_name)
-        
-    def __init__(self, phrase: str):
         self.phrase = phrase
         
     def apply_filter(self, input: str , answer: str=None):
@@ -167,114 +165,160 @@ class PushTopImageFilter(AbstractImageFilter):
 
 # ---------- Personal Information Filters ---------- #
 class SurroundByCorrectAnsImageFilter(AbstractImageFilter):
-     def __init__(self, num_repeats: int = 10, filter_name: str="SurroundByCorrectAnsImageFilter"):
+     def __init__(
+         self, 
+         num_repeats: int = 5, 
+         alpha: float = 0.2, 
+         font_size: int = 40, 
+         font_type: str = "arial.ttf", 
+         font_color = "black", 
+         filter_name: str="SurroundByCorrectAnsImageFilter"):
+         
          super().__init__(filter_name)
          self.num_repeats = num_repeats
+         self.font_size = font_size
+         self.font_type = font_type
+         self.font_color = font_color
+         self.alpha = alpha
 
      def apply_filter(self, input: Image, answer: str):
         width, height = input.size
         background = Image.new("RGB", (width, height), "white")
         draw = ImageDraw.Draw(background)
-        font = ImageFont.load_default()
+        font = ImageFont.truetype(self.font_type, self.font_size)
         for _ in range(self.num_repeats):
             x = random.randint(0, width - 50)
             y = random.randint(0, height - 20)
-            draw.text((x, y), answer, font=font, fill= "black")
-        return Image.blend(input.convert("RGB"), background, alpha=0.2)
+            draw.text((x, y), answer, font=font, fill= self.font_color)
+        return Image.blend(input.convert("RGB"), background, alpha=self.alpha)
      
 
-class SurroundByWrogAnsImageFilter(AbstractImageFilter):
-    RANDOM_VALUES = [
-            "TRUE", 3.14, "FALSE", "Bob", 2.71, 99.99, 1492, "TRUE", "FALSE", "TRUE",
-            "FALSE", "Charlie", "TRUE", 21, 4096, "FALSE", "Quantum", 7, "FALSE",
-            35, 99, "TRUE", "Emma", 1.618, "FALSE", "TRUE", "FALSE", 6.626, "TRUE",
-            1969, "Omega", "Alice", "TRUE", "FALSE", 2012, "FALSE", "TRUE", "Delta",
-            "Matrix", 512, "TRUE", "FALSE", 99.99, "FALSE", "TRUE", 1999, 256, 1.414,
-            "TRUE", "FALSE", "TRUE", "FALSE", "David", "TRUE", "FALSE", "Echo", 13,
-            1776, "FALSE", "TRUE", "FALSE", 1865, "FALSE", "TRUE", "Ava", 35, 1789,
-            "FALSE", "TRUE", "FALSE", 2012, "FALSE", "TRUE", "Sigma", "FALSE", 1024,
-            "FALSE", "TRUE", "FALSE", 1955, "FALSE", "TRUE", "TRUE", 42.42, "FALSE",
-            1984, "FALSE", "TRUE", "FALSE", "Noah", "FALSE", "TRUE", "FALSE", 4.669,
-            "TRUE", "FALSE", 256, "TRUE", "FALSE", "TRUE", "FALSE", "Sophia", 1789,
-            "FALSE", "TRUE", "FALSE", 49, "Liam", 56, 2048, "TRUE", "FALSE", 1984,
-            "FALSE", "TRUE", "FALSE", "Blue", 2012, "FALSE", "TRUE", 78, "FALSE",
-            "TRUE", "FALSE", "TRUE", "FALSE", "FALSE", 9.81, "TRUE", "FALSE", "Alpha"
-        ]
-    def __init__(self, num_repeats: int = 10, filter_name: str="SurroundByCorrectAnsImageFilter"):
-         super().__init__(filter_name)
+class SurroundByWrongAnsImageFilter(AbstractImageFilter):
+
+    def __init__(
+            self, 
+            num_repeats: int = 5, 
+            alpha: float = 0.2, 
+            font_size: int = 40, 
+            font_type: str = "arial.ttf", 
+            font_color = "black", 
+            filter_name: str="SurroundByWrongAnsImageFilter"):
+        
+        super().__init__(filter_name)
+        self.num_repeats = num_repeats
+        self.font_size = font_size
+        self.font_type = font_type
+        self.font_color = font_color
+        self.alpha = alpha
          
     def apply_filter(self, input: Image , answer: str=None):
         width, height = input.size
         background = Image.new("RGB", (width, height), "white")
         draw = ImageDraw.Draw(background)
-        font = ImageFont.load_default()
+        font = ImageFont.truetype(self.font_type, self.font_size)
         for _ in range(self.num_repeats):
-            x = random.randint(0, width - 50)
-            y = random.randint(0, height - 20)
-            draw.text((x, y), random.shuffle(self.RANDOM_VALUES), font=font, fill= "black")
-        return Image.blend(input.convert("RGB"), background, alpha=0.2)
+            x = random.randint(0, width - 100)
+            y = random.randint(0, height - 50)
+            draw.text((x, y), random.choice(RANDOM_VALUES), font=font, fill= self.font_color)
+        return Image.blend(input.convert("RGB"), background, alpha=self.alpha)
 
 
 class SurroundByPartialCorrectAnsImageFilter(AbstractImageFilter):
-    def __init__(self, p: float = 0.2, num_repeats: int = 10, filter_name:str = "SurroundByPartialCorrectAnsImageFilter"):
+    def __init__(
+            self, 
+            p: float = 0.2,
+            num_repeats: int = 5, 
+            alpha: float = 0.2, 
+            font_size: int = 40, 
+            font_type: str = "arial.ttf", 
+            font_color = "black", 
+            filter_name: str="SurroundByPartialCorrectAnsImageFilter"):
+        
         super().__init__(filter_name)
-        self.RANDOM_VALUES = SurroundByWrogAnsImageFilter.RANDOM_VALUES
         self.p = p
         self.num_repeats = num_repeats
+        self.font_size = font_size
+        self.font_type = font_type
+        self.font_color = font_color
+        self.alpha = alpha
 
     def apply_filter(self, input: Image, answer: str):
         width, height = input.size
         background = Image.new("RGB", (width, height), "white")
         draw = ImageDraw.Draw(background)
-        font = ImageFont.load_default()
+        font = ImageFont.truetype(self.font_type, self.font_size)
         current_ans = ""
         for _ in range(self.num_repeats):
-            x = random.randint(0, width - 50)
-            y = random.randint(0, height - 20)
+            x = random.randint(0, width - 100)
+            y = random.randint(0, height - 50)
             if random.random() < self.p:  
-                current_ans = str(random.choice(self.RANDOM_VALUES))
+                current_ans = random.choice(RANDOM_VALUES) 
             else:
                 current_ans = answer
-            draw.text((x, y), current_ans, font=font, fill= "black")
-        return Image.blend(input.convert("RGB"), background, alpha=0.2)
+            draw.text((x, y), current_ans, font=font, fill= self.font_color)
+        return Image.blend(input.convert("RGB"), background, alpha=self.alpha)
     
         
 class SurroundByCorrectAnsTextFilter(AbstractTextFilter):
-    def __init__(self, padding_symbol: str = "*", num_repeats: int = 5, filter_name:str = "SurroundByCorrectAnsTextFilter"):
+    def __init__(self, padding_symbol: str = "*", num_repeats: int = 6, filter_name:str = "SurroundByCorrectAnsTextFilter"):
         super().__init__(filter_name)
         self.padding_symbol = padding_symbol
         self.num_repeats = num_repeats
 
     def apply_filter(self, input: str, answer: str ):
-        for _ in range(self.num_repeats):
-            input = f"{self.padding_symbol}{answer}{self.padding_symbol} {input} {self.padding_symbol}{answer}{self.padding_symbol}"
-        return input
+        prefix = []
+        postfix = []
+        for _ in range(self.num_repeats//2):
+            # prefix.append(random.choice(RANDOM_VALUES))
+            # postfix.append(random.choice(RANDOM_VALUES))
+            prefix.append(answer)
+            postfix.append(answer)
+        prefix = self.padding_symbol + " ".join(prefix) + self.padding_symbol
+        postfix = self.padding_symbol + " ".join(postfix) + self.padding_symbol
+        output = prefix + "\n" + input + "\n" + postfix
+        return output
     
 
 class SurroundByWrongAnsTextFilter(AbstractTextFilter):
-    def __init__(self, padding_symbol: str = "*", num_repeats: int = 5, filter_name:str = "SurroundByWrongAnsTextFilter"):
+    def __init__(self, padding_symbol: str = "*", num_repeats: int = 6, filter_name:str = "SurroundByWrongAnsTextFilter"):
         super().__init__(filter_name)
-        self.RANDOM_VALUES = SurroundByWrogAnsImageFilter.RANDOM_VALUES
         self.padding_symbol = padding_symbol
         self.num_repeats = num_repeats
 
     def apply_filter(self, input: str , answer: str=None):
-        for _ in range(self.num_repeats):
-            wrong_ans = str(random.choice(self.RANDOM_VALUES))
-            input = f"{self.padding_symbol}{wrong_ans}{self.padding_symbol} {input} {self.padding_symbol}{wrong_ans}{self.padding_symbol}"
-        return input
+        prefix = []
+        postfix = []
+        for _ in range(self.num_repeats//2):
+            prefix.append(random.choice(RANDOM_VALUES))
+            postfix.append(random.choice(RANDOM_VALUES))
+        prefix = self.padding_symbol + " ".join(prefix) + self.padding_symbol
+        postfix = self.padding_symbol + " ".join(postfix) + self.padding_symbol
+        output = prefix + "\n" + input + "\n" + postfix
+        return output
     
 
 class SurroundByPartialCorrectAnsTextFilter(AbstractTextFilter):
-    def __init__(self, p: float = 0.2, padding_symbol: str = "*", num_repeats: int = 5, filter_name:str = "SurroundByPartialCorrectAnsTextFilter"):
+    def __init__(self, p: float = 0.2, padding_symbol: str = "*", num_repeats: int = 6, filter_name:str = "SurroundByPartialCorrectAnsTextFilter"):
         super().__init__(filter_name)
-        self.RANDOM_VALUES = SurroundByWrogAnsImageFilter.RANDOM_VALUES
         self.p = p
         self.padding_symbol = padding_symbol
         self.num_repeats = num_repeats
 
     def apply_filter(self, input: str, answer: str):
-        for _ in range(self.num_repeats):
-            answer = str(random.choice(self.RANDOM_VALUES)) if random.random() < self.p else answer
-            input = f"{self.padding_symbol}{answer}{self.padding_symbol} {input} {self.padding_symbol}{answer}{self.padding_symbol}"
-        return input
+        prefix = []
+        postfix = []
+        for _ in range(self.num_repeats//2):
+            if random.random() < self.p:  
+                prefix.append(random.choice(RANDOM_VALUES))
+            else:
+                prefix.append(answer)
+                
+            if random.random() < self.p:  
+                postfix.append(random.choice(RANDOM_VALUES))
+            else:
+                postfix.append(answer)
+                
+        prefix = self.padding_symbol + " ".join(prefix) + self.padding_symbol
+        postfix = self.padding_symbol + " ".join(postfix) + self.padding_symbol
+        output = prefix + "\n" + input + "\n" + postfix
+        return output

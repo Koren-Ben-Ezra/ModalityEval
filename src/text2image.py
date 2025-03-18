@@ -90,13 +90,13 @@ class FixedSizeText2Image(AbstractText2Image):
     """
     def __init__(
         self,
-        width=400,
+        width=800,
         height=300,
         font_path="arial.ttf",
         text_color=(0, 0, 0),
         bg_color=(255, 255, 255),
         max_font_size=100,
-        padding=0
+        padding=20
     ):
         """
         :param width: Desired image width.
@@ -115,8 +115,6 @@ class FixedSizeText2Image(AbstractText2Image):
         self.max_font_size = max_font_size
         self.padding = padding
 
-    
-    
     def create_image(self, text: str):
         
         text = AbstractText2Image._preprocess_text(text)
@@ -167,30 +165,3 @@ class FilteredFixedSizeText2Image(FixedSizeText2Image):
         text = self.filter.apply_filter(text)
         return super().create_image(text)
 
-
-# if __name__ == "__main__":
-#     # Example usage:
-#     text = """Janet's ducks lay 16 eggs per day. She eats three for breakfast 
-# every morning and bakes muffins for her friends every day with four. 
-# She sells the remainder at the farmers' market daily for $2 per fresh duck egg. 
-# How much in dollars does she make every day at the farmers' market?"""
-
-#     # 1) Using the fixed font size with padding
-#     fixed_font_impl = FixedFontText2Image(
-#         font_path="arial.ttf",
-#         font_size=24,
-#         padding=10  # e.g. 10 px padding
-#     )
-#     img1 = fixed_font_impl.create_image(text)
-#     img1.save("text_image_fixed_font_padding.png")
-
-#     # 2) Using the fixed image size with padding
-#     fixed_size_impl = FixedSizeText2Image(
-#         width=400,
-#         height=300,
-#         font_path="arial.ttf",
-#         max_font_size=200,
-#         padding=5  # e.g. 20 px padding
-#     )
-#     img2 = fixed_size_impl.create_image(text)
-#     img2.save("text_image_fixed_size_padding.png")

@@ -1,11 +1,12 @@
 import os
 
 import matplotlib.pyplot as plt
+from PIL import Image
 
 from src.filters import *
 from src.text2image import *
 
-TEST_DIR = "test_output"
+TEST_DIR = "test_filters_output"
 
 def clear_test_dir():
     if not os.path.exists(TEST_DIR):
@@ -59,22 +60,30 @@ image_input = text2image.create_image(text_input)
 
 
 # Test identity filters
-# test_text_filter(IdentityTextFilter(), text_input, answer)
-# test_image_filter(IdentityImageFilter(), image_input, answer)
+test_text_filter(IdentityTextFilter(), text_input, answer)
+test_image_filter(IdentityImageFilter(), image_input, answer)
 
 
 # Test noise filters
-# test_image_filter(ContrastStretchingImageFilter(), image_input, answer)
-# test_image_filter(HistogramEqualizationImageFilter(), image_input, answer)
-# test_image_filter(GaussianImageFilter(), image_input, answer)
-# test_text_filter(ShuffleWordTextFilter(), text_input, answer)
-# test_text_filter(SwapWordsTextFilter(), text_input, answer)
+test_image_filter(ContrastStretchingImageFilter(), image_input, answer)
+test_image_filter(HistogramEqualizationImageFilter(), image_input, answer)
+test_image_filter(GaussianImageFilter(), image_input, answer)
+test_text_filter(ShuffleWordTextFilter(), text_input, answer)
+test_text_filter(SwapWordsTextFilter(), text_input, answer)
 
 
 # Test general information filters
-# img = Image.open("my_image.jpg")
-# test_text_filter(ReplaceBackgroundTextFilter(img), text_input, answer)
-# test_text_filter(PushFrontTextFilter(), text_input, answer)
-# test_text_filter(PushTopImageFilter(), text_input, answer)
+img = Image.open("my_image.jpg")
+phrase = "My name is John Doe. I live in New York City. I am a software engineer at Google."
+test_image_filter(ReplaceBackgroundImageFilter(img), image_input, answer)
+test_text_filter(PushFrontTextFilter(phrase), text_input, answer)
+test_image_filter(PushTopImageFilter(img), image_input, answer)
 
 # Test personal information filters
+test_image_filter(SurroundByCorrectAnsImageFilter(), image_input, answer)
+test_image_filter(SurroundByWrongAnsImageFilter(), image_input, answer)
+test_image_filter(SurroundByPartialCorrectAnsImageFilter(), image_input, answer)
+
+test_text_filter(SurroundByCorrectAnsTextFilter(), text_input, answer)
+test_text_filter(SurroundByWrongAnsTextFilter(), text_input, answer)
+test_text_filter(SurroundByPartialCorrectAnsTextFilter(), text_input, answer)

@@ -1,5 +1,5 @@
 from datasets import load_dataset, Dataset
-from src.text2image import AbstractText2Image, Text2ImageDefault
+from src.text2image import AbstractText2Image, FixedSizeText2Image
 
 class AbstractDatasetWrapper:
     """
@@ -24,10 +24,10 @@ class GSM8kWrapper(AbstractDatasetWrapper):
                 #### 18'
     '''
     
-    def __init__(self, text2image: AbstractText2Image=Text2ImageDefault()):
+    def __init__(self, text2image: AbstractText2Image=FixedSizeText2Image()):
         self.dataset_id = "GSM8k"
         self._text2image = text2image
-        self.dataset = load_dataset("gsm8k", "main")["test"].select(range(1))
+        self.dataset = load_dataset("gsm8k", "main")["test"]#.select(range(1))
         self.dataset = self.dataset.map(self._map_sample)
         
     def _map_sample(self, sample):
