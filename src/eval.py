@@ -1,7 +1,7 @@
 import pandas as pd
-
+from src.text2image import FixedSizeText2Image
 from src.benchmarkManager import BenchmarkManager
-from src.filters import IdentityTextFilter, IdentityImageFilter, GaussianImageFilter, ContrastStretchingImageFilter, HistogramEqualizationImageFilter, TextBackgroundReplacementFilter, ScrambleLetterInWordsTextFilter, ScrambleWordsInSentenceTextFilter, PushFrontPhraseTextFilter
+from src.filters import IdentityTextFilter, IdentityImageFilter
 from src.datasetWrapper import GSM8kWrapper
 from src.multimodalWrappers import ModelManager, LlamaWrapper
 
@@ -25,24 +25,18 @@ class Filters:
     
         # Text filters
         self.text_filters.append(IdentityTextFilter())
-        self.text_filters.append(TextBackgroundReplacementFilter())
-        self.text_filters.append(ScrambleLetterInWordsTextFilter())
-        self.text_filters.append(ScrambleWordsInSentenceTextFilter())
-        # self.text_filters.append(PushFrontPhraseTextFilter(phrase))
         
         # Image filters
         self.img_filters.append(IdentityImageFilter())
-        self.img_filters.append(GaussianImageFilter())
-        self.img_filters.append(ContrastStretchingImageFilter())
-        self.img_filters.append(HistogramEqualizationImageFilter())
 
 def eval_Llama32vision_gsm8k():
     # prepare the benchmark
     model_manager = ModelManager(LlamaWrapper())
-    datasetWrapper = GSM8kWrapper()
+    text2image=FixedSizeText2Image(font_path="/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf")
+    datasetWrapper = GSM8kWrapper(text2image)
     metadata = {
-        "Multimodal": model_manager.model_id,
-        "Dataset": datasetWrapper.dataset_id,
+        "Model": model_manager.model_name,
+        "Dataset": datasetWrapper.dataset_id
     }
     # create the benchmark
     benchmark_manager = BenchmarkManager(datasetWrapper, model_manager, metadata, save_predictions=True)

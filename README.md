@@ -25,11 +25,13 @@ pip install -r environment\requirements.txt
 ```
 
 4. login token for hugging face:
+```
 huggingface-cli login
-
-Token: 
+```
+5. Token: 
+```
 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
-
+```
 
 ## Miro (view only)
 https://miro.com/app/board/uXjVIWQC1F8=/

@@ -16,3 +16,4 @@ __pycache__/
 Thumbs.db
 
 test_filters_output/
+outputs/

@@ -27,11 +27,18 @@ class GSM8kWrapper(AbstractDatasetWrapper):
     def __init__(self, text2image: AbstractText2Image=FixedSizeText2Image()):
         self.dataset_id = "GSM8k"
         self._text2image = text2image
-        self.dataset = load_dataset("gsm8k", "main")["test"]#.select(range(1))
+        self.dataset = load_dataset("gsm8k", "main")["test"].select(range(10))
         self.dataset = self.dataset.map(self._map_sample)
-        
+    
+    #separete question, answer calculations and finel numerical answer
     def _map_sample(self, sample):
-        sample["answer"] = sample["answer"].split("####")[1].strip()
+        # Use the delimiter to extract the ground-truth number
+        print("Original sample:", sample,flush=True) 
+        parts = sample["answer"].split("####")
+        if len(parts) < 2:
+            sample["answer"] = sample["answer"].strip()
+        else:
+            sample["answer"] = parts[-1].strip()
         sample["question_image"] = self._text2image.create_image(sample["question"])
         return sample
     

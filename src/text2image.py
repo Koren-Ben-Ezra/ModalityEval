@@ -92,7 +92,7 @@ class FixedSizeText2Image(AbstractText2Image):
         self,
         width=800,
         height=300,
-        font_path="arial.ttf",
+        font_path="Arial.ttf",
         text_color=(0, 0, 0),
         bg_color=(255, 255, 255),
         max_font_size=100,
@@ -164,4 +164,3 @@ class FilteredFixedSizeText2Image(FixedSizeText2Image):
     def create_image(self, text: str):
         text = self.filter.apply_filter(text)
         return super().create_image(text)
-

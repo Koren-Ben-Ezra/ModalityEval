@@ -3,7 +3,6 @@ import numpy as np
 import cv2
 from PIL import Image, ImageDraw, ImageFont
 from typing import List
-
 import matplotlib.pyplot as plt
 
 RANDOM_VALUES: List[str] = [str(random.randint(0, 10000)) for _ in range(100)]
