@@ -1,4 +1,4 @@
 # Model: Llama-3.2-11B-Vision-Instruct
 # Dataset: GSM8k
 Text Filter,Image Filter,Total Samples,Text Correct,Image Correct
-IdentityTextFilter,IdentityImageFilter,10,0,0
+IdentityTextFilter,IdentityImageFilter,1319,81,49
