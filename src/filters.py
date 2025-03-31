@@ -2,54 +2,63 @@ import random
 import numpy as np
 import cv2
 from PIL import Image, ImageDraw, ImageFont
-from typing import List
-import matplotlib.pyplot as plt
 
-RANDOM_VALUES: List[str] = [str(random.randint(0, 10000)) for _ in range(100)]
+RANDOM_VALUES: list[str] = [str(random.randint(0, 10000)) for _ in range(100)]
 
 class AbstractImageFilter:
-    def __init__(self, filter_name: str):
-        self.filter_name = filter_name
+    filter_name = None
     
+    def __init_subclass__(cls, **kwargs):
+        super().__init_subclass__(**kwargs)
+        FilterLoader.register_image_filter(cls)
+        
     def apply_filter(self, input: Image, answer: str=None):
         return None
 
-
 class AbstractTextFilter:
+    filter_name = None
     
-    def __init__(self, filter_name: str):
-        self.filter_name = filter_name
+    def __init_subclass__(cls, **kwargs):
+        super().__init_subclass__(**kwargs)
+        FilterLoader.register_text_filter(cls)
     
     def apply_filter(self, input: str, answer: str=None):
         return None
+
+class FilterLoader:
+
+    image_filters: dict[type[AbstractImageFilter]] = {}
+    text_filters: dict[type[AbstractTextFilter]] = {}
+        
+    @classmethod
+    def register_image_filter(cls, image_filter_cls: AbstractImageFilter):
+        cls.image_filters[image_filter_cls.filter_name] = image_filter_cls
+                
+    @classmethod
+    def register_text_filter(cls, text_filter_cls: AbstractTextFilter):
+        cls.text_filters[text_filter_cls.filter_name] = text_filter_cls
 
 
 # ---------- Identity Filters ---------- #
 
 
 class IdentityTextFilter(AbstractTextFilter):
-    
-    def __init__(self, filter_name:str="IdentityTextFilter"):
-        super().__init__(filter_name)
-    
+    filter_name:str="IdentityTextFilter"
+
     def apply_filter(self, input: str , answer: str=None):
         return input
 
 
 class IdentityImageFilter(AbstractImageFilter):
+    filter_name:str="IdentityImageFilter"
     
-    def __init__(self, filter_name:str="IdentityImageFilter"):
-        super().__init__(filter_name)
-        
     def apply_filter(self, input: Image , answer: str=None):
         return input
 
 
 # ---------- Noise Filters ---------- #
 class ContrastStretchingImageFilter(AbstractImageFilter):
-    
-    def __init__(self, filter_name:str="ContrastStretchingImageFilter"):
-        super().__init__(filter_name)
+    filter_name:str="ContrastStretchingImageFilter"
         
     def apply_filter(self, input: Image , answer: str=None):
         image_array = np.array(input)
@@ -60,9 +69,7 @@ class ContrastStretchingImageFilter(AbstractImageFilter):
     
 
 class HistogramEqualizationImageFilter(AbstractImageFilter):
-    
-    def __init__(self, filter_name:str="HistogramEqualizationImageFilter"):
-        super().__init__(filter_name)
+    filter_name:str="HistogramEqualizationImageFilter"
         
     def apply_filter(self, input: Image , answer: str=None):
         gray_image = input.convert("L")
@@ -75,8 +82,9 @@ class HistogramEqualizationImageFilter(AbstractImageFilter):
 
 class GaussianImageFilter(AbstractImageFilter):
     
-    def __init__(self, kernel_size: int=5, sigma: float=1.0, filter_name:str="GaussianImageFilter"):
-        super().__init__(filter_name)
+    filter_name:str="GaussianImageFilter"
+    
+    def __init__(self, kernel_size: int=5, sigma: float=1.0):
         self.kernel_size = kernel_size
         self.sigma = sigma
         

@@ -1,49 +1,42 @@
-import pandas as pd
 from src.text2image import FixedSizeText2Image
 from src.benchmarkManager import BenchmarkManager
-from src.filters import IdentityTextFilter, IdentityImageFilter
+from src.filters import FilterLoader
 from src.datasetWrapper import GSM8kWrapper
-from src.multimodalWrappers import ModelManager, LlamaWrapper
+from src.multimodalWrappers import LlamaWrapper
 
-class Filters:
-    """
-    Filters is a singleton class that manages a collection of text and image filters.
-    Attributes:
-        img_filters (list): A list of image filter instances.
-        text_filters (list): A list of text filter instances.
-    """
-    
-    _instance = None
-    def __new__(cls):
-        if cls._instance is None:
-            cls._instance = super(Filters, cls).__new__(cls)
-        return cls._instance
-    
-    def __init__(self):    
-        self.img_filters = []
-        self.text_filters = []
-    
-        # Text filters
-        self.text_filters.append(IdentityTextFilter())
-        
-        # Image filters
-        self.img_filters.append(IdentityImageFilter())
-
-def eval_Llama32vision_gsm8k():
+def eval_Llama32vision():
     # prepare the benchmark
-    model_manager = ModelManager(LlamaWrapper())
+    multimodal_wrapper = LlamaWrapper()
+    filter_loader = FilterLoader()
+    
+    ############################# GSM8k dataset ##############################
+    
     text2image=FixedSizeText2Image(font_path="/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf")
     datasetWrapper = GSM8kWrapper(text2image)
-    metadata = {
-        "Model": model_manager.model_name,
-        "Dataset": datasetWrapper.dataset_id
-    }
-    # create the benchmark
-    benchmark_manager = BenchmarkManager(datasetWrapper, model_manager, metadata, save_predictions=True)
-
-    filters = Filters()
     
-    # identity filters, just to check if the benchmark is working
-    benchmark_manager.execute_test(filters.text_filters[0], filters.img_filters[0])
+    metadata = {
+        "test name": "demo test with two filters",
+        "Model": multimodal_wrapper.model_name,
+        "Dataset": datasetWrapper.dataset_id,
+        "Save Predictions": True,
+        "Use Text Filter": True,
+        "Use Image Filter": False 
+    }
+    
+    benchmark_manager = BenchmarkManager(datasetWrapper, multimodal_wrapper, metadata)
+    
+    # ------ execute text filter tests ------ #
+    
+    ## shuffle filter test
+    shuffle_filter = filter_loader.text_filters["ShuffleWordTextFilter"](p=0.2)
+    benchmark_manager.execute_test(text_f=shuffle_filter)
+    
+    ## random filter test
+    swap_words_filter = filter_loader.text_filters["SwapWordsTextFilter"](p=0.2)
+    benchmark_manager.execute_test(text_f=swap_words_filter)
+    
+    # --------------------------------------- #
     
     benchmark_manager.write_summary()
+    
+    ##########################################################################

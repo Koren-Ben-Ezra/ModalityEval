@@ -35,15 +35,17 @@ class MultimodalWrapper:
         return None
 
 
-class ModelManager:
-    def __init__(self, multimodal: MultimodalWrapper):
-        self._multimodal = multimodal
-        self.model_name = self._multimodal.model_name
+# class ModelManager:
+#     def __init__(self, multimodal: MultimodalWrapper):
+#         self._multimodal = multimodal
+#         self.model_name = self._multimodal.model_name
 
-    def separate_forward(self, text_q: str, img_q: Image):
-        answer_text_q = self._multimodal.generate_ans_from_text(text_q)
-        answer_img_q = self._multimodal.generate_ans_from_image(img_q)
-        return answer_text_q, answer_img_q
+#     def separate_forward(self, text_q: str, img_q: Image):
+#         answer_text_q = self._multimodal.generate_ans_from_text(text_q)
+#         answer_img_q = self._multimodal.generate_ans_from_image(img_q)
+#         return answer_text_q, answer_img_q
+    
+    
 
 
 class LlamaWrapper(MultimodalWrapper):

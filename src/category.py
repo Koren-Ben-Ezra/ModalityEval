@@ -13,7 +13,14 @@ class Category:
     def __init__(self, text_f: AbstractTextFilter, img_f: AbstractImageFilter, benchmark_name: str, save_predictions: bool):
         self.text_f = text_f
         self.img_f = img_f
-        self.category_name = os.path.join(benchmark_name, f"{text_f.filter_name}_{img_f.filter_name}")
+        
+        if text_f is not None and img_f is not None:
+            self.category_name = os.path.join(benchmark_name, f"{text_f.filter_name}_{img_f.filter_name}")
+        elif text_f is not None:
+            self.category_name = os.path.join(benchmark_name, text_f.filter_name)
+        else:
+            self.category_name = os.path.join(benchmark_name, img_f.filter_name)
+        
         self.text_stats = Category.Statistics()
         self.img_stats = Category.Statistics()
         self.predictions_df = None
