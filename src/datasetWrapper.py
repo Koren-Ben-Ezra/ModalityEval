@@ -18,7 +18,7 @@ class GSM8kWrapper(AbstractDatasetWrapper):
     def __init__(self, text2image: AbstractText2Image = FixedSizeText2Image()):
         self.dataset_id = "GSM8k"
         self._text2image = text2image
-        self.dataset = load_dataset("gsm8k", "main")["test"]
+        self.dataset = load_dataset("gsm8k", "main")["test"].select(range(3))
         self.dataset = self.dataset.map(self._map_sample)
     
     def _map_sample(self, sample):
@@ -41,7 +41,7 @@ class SQuADWrapper(AbstractDatasetWrapper):
         self._text2image = text2image
         # Load the dataset. 
         # For example, use the validation split in SQuAD v1.1
-        self.dataset = load_dataset("squad")["validation"]
+        self.dataset = load_dataset("squad")["validation"].select(range(3))
         self.dataset = self.dataset.map(self._map_sample)
 
     def _map_sample(self, sample):
@@ -66,7 +66,7 @@ class TriviaQAWrapper(AbstractDatasetWrapper):
         self._text2image = text2image
         # Load the dataset. 
         # For example, use the 'rc' config with the validation split
-        self.dataset = load_dataset("trivia_qa", "rc")["validation"]
+        self.dataset = load_dataset("trivia_qa", "rc")["validation"].select(range(3))
         self.dataset = self.dataset.map(self._map_sample)
 
     def _map_sample(self, sample):

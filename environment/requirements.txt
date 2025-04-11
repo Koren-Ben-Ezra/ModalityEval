@@ -13,4 +13,3 @@ accelerate
 numpy
 opencv-python
 huggingface_hub
-openai
