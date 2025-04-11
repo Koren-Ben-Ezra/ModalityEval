@@ -8,9 +8,9 @@ RANDOM_VALUES: list[str] = [str(random.randint(0, 10000)) for _ in range(100)]
 class AbstractImageFilter:
     filter_name = None
     
-    def __init_subclass__(cls, **kwargs):
-        super().__init_subclass__(**kwargs)
-        FilterLoader.register_image_filter(cls)
+    # def __init_subclass__(cls, **kwargs):
+    #     super().__init_subclass__(**kwargs)
+    #     FilterLoader.register_image_filter(cls)
         
     def apply_filter(self, input: Image, answer: str=None):
         return None
@@ -18,39 +18,39 @@ class AbstractImageFilter:
 class AbstractTextFilter:
     filter_name = None
     
-    def __init_subclass__(cls, **kwargs):
-        super().__init_subclass__(**kwargs)
-        FilterLoader.register_text_filter(cls)
+    # def __init_subclass__(cls, **kwargs):
+    #     super().__init_subclass__(**kwargs)
+    #     FilterLoader.register_text_filter(cls)
     
     def apply_filter(self, input: str, answer: str=None):
         return None
 
-class FilterLoader:
+# class FilterLoader:
 
-    image_filters: dict[type[AbstractImageFilter]] = {}
-    text_filters: dict[type[AbstractTextFilter]] = {}
+#     image_filters = {}
+#     text_filters = {}
         
-    @classmethod
-    def register_image_filter(cls, image_filter_cls: AbstractImageFilter):
-        cls.image_filters[image_filter_cls.filter_name] = image_filter_cls
+#     @classmethod
+#     def register_image_filter(cls, image_filter_cls: AbstractImageFilter):
+#         cls.image_filters[image_filter_cls.filter_name] = image_filter_cls
                 
-    @classmethod
-    def register_text_filter(cls, text_filter_cls: AbstractTextFilter):
-        cls.text_filters[text_filter_cls.filter_name] = text_filter_cls
+#     @classmethod
+#     def register_text_filter(cls, text_filter_cls: AbstractTextFilter):
+#         cls.text_filters[text_filter_cls.filter_name] = text_filter_cls
 
 
 # ---------- Identity Filters ---------- #
 
 
 class IdentityTextFilter(AbstractTextFilter):
-    filter_name:str="IdentityTextFilter"
+    filter_name:str="Identity_TF"
 
     def apply_filter(self, input: str , answer: str=None):
         return input
 
 
 class IdentityImageFilter(AbstractImageFilter):
-    filter_name:str="IdentityImageFilter"
+    filter_name:str="Identity_IF"
     
     def apply_filter(self, input: Image , answer: str=None):
         return input
@@ -58,7 +58,7 @@ class IdentityImageFilter(AbstractImageFilter):
 
 # ---------- Noise Filters ---------- #
 class ContrastStretchingImageFilter(AbstractImageFilter):
-    filter_name:str="ContrastStretchingImageFilter"
+    filter_name:str="ContrastStretching_IF"
         
     def apply_filter(self, input: Image , answer: str=None):
         image_array = np.array(input)
@@ -69,7 +69,7 @@ class ContrastStretchingImageFilter(AbstractImageFilter):
     
 
 class HistogramEqualizationImageFilter(AbstractImageFilter):
-    filter_name:str="HistogramEqualizationImageFilter"
+    filter_name:str="HistogramEqualization_IF"
         
     def apply_filter(self, input: Image , answer: str=None):
         gray_image = input.convert("L")
@@ -82,7 +82,7 @@ class HistogramEqualizationImageFilter(AbstractImageFilter):
 
 class GaussianImageFilter(AbstractImageFilter):
     
-    filter_name:str="GaussianImageFilter"
+    filter_name:str="Gaussian_IF"
     
     def __init__(self, kernel_size: int=5, sigma: float=1.0):
         self.kernel_size = kernel_size
@@ -95,9 +95,8 @@ class GaussianImageFilter(AbstractImageFilter):
 
 
 class ShuffleWordTextFilter(AbstractTextFilter):
-    
-    def __init__(self, p: float=0.2, filter_name:str="ShuffleWordTextFilter"):
-        super().__init__(filter_name)
+    filter_name:str="ShuffleWord_TF"
+    def __init__(self, p: float=0.2):
         self.p = p
         
     def apply_filter(self, input: str , answer: str=None):
@@ -114,9 +113,8 @@ class ShuffleWordTextFilter(AbstractTextFilter):
 
 
 class SwapWordsTextFilter(AbstractTextFilter):
-    
-    def __init__(self, p: float=0.2, filter_name:str="SwapWordsTextFilter"):
-        super().__init__(filter_name)
+    filter_name:str="SwapWords_TF"
+    def __init__(self, p: float=0.2):
         self.p = p
         
     def apply_filter(self, input: str , answer: str=None):
@@ -132,11 +130,10 @@ class SwapWordsTextFilter(AbstractTextFilter):
 
 # ---------- General Information Filters ---------- #
 class ReplaceBackgroundImageFilter(AbstractImageFilter):
-
-    def __init__(self, background_image: Image , alpha: float=0.5, filter_name:str="ReplaceBackgroundImageFilter"):
-            super().__init__(filter_name)
-            self.bg_image: Image = background_image
-            self.alpha = alpha
+    filter_name:str="ReplaceBackground_IF"
+    def __init__(self, background_image: Image , alpha: float=0.5):
+        self.bg_image: Image = background_image
+        self.alpha = alpha
         
     def apply_filter(self, input: Image , answer: str=None):
         bg_image_resized = self.bg_image.resize(input.size, Image.LANCZOS) 
@@ -144,9 +141,8 @@ class ReplaceBackgroundImageFilter(AbstractImageFilter):
 
 
 class PushFrontTextFilter(AbstractTextFilter):
-    
-    def __init__(self, phrase: str, filter_name:str="PushFrontTextFilter"):
-        super().__init__(filter_name)
+    filter_name:str="PushFront_TF"
+    def __init__(self, phrase: str):
         self.phrase = phrase
         
     def apply_filter(self, input: str , answer: str=None):
@@ -154,8 +150,8 @@ class PushFrontTextFilter(AbstractTextFilter):
 
 
 class PushTopImageFilter(AbstractImageFilter):
-    def __init__(self, additional_image: Image, filter_name: str="PushTopImageFilter"):
-        super().__init__(filter_name)
+    filter_name: str="PushTop_IF"
+    def __init__(self, additional_image: Image):
         self.additional_image = additional_image
 
     def apply_filter(self, input: Image , answer: str=None):
@@ -172,23 +168,22 @@ class PushTopImageFilter(AbstractImageFilter):
 
 # ---------- Personal Information Filters ---------- #
 class SurroundByCorrectAnsImageFilter(AbstractImageFilter):
-     def __init__(
-         self, 
-         num_repeats: int = 5, 
-         alpha: float = 0.2, 
-         font_size: int = 40, 
-         font_type: str = "arial.ttf", 
-         font_color = "black", 
-         filter_name: str="SurroundByCorrectAnsImageFilter"):
-         
-         super().__init__(filter_name)
-         self.num_repeats = num_repeats
-         self.font_size = font_size
-         self.font_type = font_type
-         self.font_color = font_color
-         self.alpha = alpha
+    filter_name: str="SurroundByCorrectAns_IF"
+    def __init__(
+        self, 
+        num_repeats: int = 5, 
+        alpha: float = 0.2, 
+        font_size: int = 40, 
+        font_type: str = "arial.ttf", 
+        font_color = "black"):
+        
+        self.num_repeats = num_repeats
+        self.font_size = font_size
+        self.font_type = font_type
+        self.font_color = font_color
+        self.alpha = alpha
 
-     def apply_filter(self, input: Image, answer: str):
+    def apply_filter(self, input: Image, answer: str):
         width, height = input.size
         background = Image.new("RGB", (width, height), "white")
         draw = ImageDraw.Draw(background)
@@ -198,26 +193,24 @@ class SurroundByCorrectAnsImageFilter(AbstractImageFilter):
             y = random.randint(0, height - 20)
             draw.text((x, y), answer, font=font, fill= self.font_color)
         return Image.blend(input.convert("RGB"), background, alpha=self.alpha)
-     
+    
 
 class SurroundByWrongAnsImageFilter(AbstractImageFilter):
-
+    filter_name: str="SurroundByWrongAns_IF"
     def __init__(
             self, 
             num_repeats: int = 5, 
             alpha: float = 0.2, 
             font_size: int = 40, 
             font_type: str = "arial.ttf", 
-            font_color = "black", 
-            filter_name: str="SurroundByWrongAnsImageFilter"):
+            font_color = "black"):
         
-        super().__init__(filter_name)
         self.num_repeats = num_repeats
         self.font_size = font_size
         self.font_type = font_type
         self.font_color = font_color
         self.alpha = alpha
-         
+        
     def apply_filter(self, input: Image , answer: str=None):
         width, height = input.size
         background = Image.new("RGB", (width, height), "white")
@@ -231,6 +224,7 @@ class SurroundByWrongAnsImageFilter(AbstractImageFilter):
 
 
 class SurroundByPartialCorrectAnsImageFilter(AbstractImageFilter):
+    filter_name: str="SurroundByPartialCorrectAns_IF"
     def __init__(
             self, 
             p: float = 0.2,
@@ -238,10 +232,8 @@ class SurroundByPartialCorrectAnsImageFilter(AbstractImageFilter):
             alpha: float = 0.2, 
             font_size: int = 40, 
             font_type: str = "arial.ttf", 
-            font_color = "black", 
-            filter_name: str="SurroundByPartialCorrectAnsImageFilter"):
+            font_color = "black"):
         
-        super().__init__(filter_name)
         self.p = p
         self.num_repeats = num_repeats
         self.font_size = font_size
@@ -267,8 +259,8 @@ class SurroundByPartialCorrectAnsImageFilter(AbstractImageFilter):
     
         
 class SurroundByCorrectAnsTextFilter(AbstractTextFilter):
-    def __init__(self, padding_symbol: str = "*", num_repeats: int = 6, filter_name:str = "SurroundByCorrectAnsTextFilter"):
-        super().__init__(filter_name)
+    filter_name:str = "SurroundByCorrectAns_TF"
+    def __init__(self, padding_symbol: str = "*", num_repeats: int = 6):
         self.padding_symbol = padding_symbol
         self.num_repeats = num_repeats
 
@@ -287,8 +279,8 @@ class SurroundByCorrectAnsTextFilter(AbstractTextFilter):
     
 
 class SurroundByWrongAnsTextFilter(AbstractTextFilter):
-    def __init__(self, padding_symbol: str = "*", num_repeats: int = 6, filter_name:str = "SurroundByWrongAnsTextFilter"):
-        super().__init__(filter_name)
+    filter_name:str = "SurroundByWrongAns_TF"
+    def __init__(self, padding_symbol: str = "*", num_repeats: int = 6):
         self.padding_symbol = padding_symbol
         self.num_repeats = num_repeats
 
@@ -305,8 +297,8 @@ class SurroundByWrongAnsTextFilter(AbstractTextFilter):
     
 
 class SurroundByPartialCorrectAnsTextFilter(AbstractTextFilter):
-    def __init__(self, p: float = 0.2, padding_symbol: str = "*", num_repeats: int = 6, filter_name:str = "SurroundByPartialCorrectAnsTextFilter"):
-        super().__init__(filter_name)
+    filter_name:str = "SurroundByPartialCorrectAns_TF"
+    def __init__(self, p: float = 0.2, padding_symbol: str = "*", num_repeats: int = 6):
         self.p = p
         self.padding_symbol = padding_symbol
         self.num_repeats = num_repeats

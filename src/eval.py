@@ -1,17 +1,17 @@
 from src.text2image import FixedSizeText2Image
 from src.benchmarkManager import BenchmarkManager
-from src.filters import FilterLoader
+from src.filters import *
 from src.datasetWrapper import GSM8kWrapper
 from src.multimodalWrappers import LlamaWrapper
 
 def eval_Llama32vision():
     # prepare the benchmark
     multimodal_wrapper = LlamaWrapper()
-    filter_loader = FilterLoader()
     
     ############################# GSM8k dataset ##############################
     
-    text2image=FixedSizeText2Image(font_path="/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf")
+    # text2image=FixedSizeText2Image(font_path="/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf")
+    text2image = FixedSizeText2Image()
     datasetWrapper = GSM8kWrapper(text2image)
     
     metadata = {
@@ -28,11 +28,13 @@ def eval_Llama32vision():
     # ------ execute text filter tests ------ #
     
     ## shuffle filter test
-    shuffle_filter = filter_loader.text_filters["ShuffleWordTextFilter"](p=0.2)
+    # shuffle_filter = filter_loader.text_filters["ShuffleWordTextFilter"](p=0.2)
+    shuffle_filter = ShuffleWordTextFilter(p=0.2)
     benchmark_manager.execute_test(text_f=shuffle_filter)
     
     ## random filter test
-    swap_words_filter = filter_loader.text_filters["SwapWordsTextFilter"](p=0.2)
+    # swap_words_filter = filter_loader.text_filters["SwapWordsTextFilter"](p=0.2)
+    swap_words_filter = SwapWordsTextFilter(p=0.2)
     benchmark_manager.execute_test(text_f=swap_words_filter)
     
     # --------------------------------------- #

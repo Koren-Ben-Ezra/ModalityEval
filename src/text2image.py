@@ -92,7 +92,7 @@ class FixedSizeText2Image(AbstractText2Image):
         self,
         width=800,
         height=300,
-        font_path="Arial.ttf",
+        font_path="arial.ttf",
         text_color=(0, 0, 0),
         bg_color=(255, 255, 255),
         max_font_size=100,

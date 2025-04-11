@@ -1,5 +1,4 @@
 from src.eval import eval_Llama32vision
-from src.filters import FilterLoader
 def main():
     eval_Llama32vision()
     # eval_Llama32vision_SQuAD()
