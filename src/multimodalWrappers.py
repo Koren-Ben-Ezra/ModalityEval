@@ -3,25 +3,33 @@ from PIL import Image
 import matplotlib.pyplot as plt
 import torch
 import re
+from openai_key import API_KEY
+from openai import OpenAI
+import base64
+import io
+import json
 
-TXT_INSTRUCTION = "[INSTRUCTION] Provide only the final answer in plain text. No explanations or additional words. For example, if the answer is 5, respond with $5$ only."
-IMG_INSTRUCTION = "[INSTRUCTION] The question is displayed within the provided image. Respond solely with the final answer in text form. No explanations or extra words. For example, if the answer is 5, respond with $5$ only."
+PARAMETERS_PATH = "parameters.json"
+
+with open(PARAMETERS_PATH, 'r') as file:
+    data = json.load(file)
+    system = data.get('system', '')
+
+TXT_INSTRUCTION = system.get('text instruction', '')
+IMG_INSTRUCTION = system.get('image instruction', '')
 MAX_NEW_TOKENS = 30
 
+#for "gpt-4o-mini"
 
 def extract_number(text: str) -> str:
     """
-    Cleans the text by removing special tokens and then extracts the last number found.
-    Returns the number as a float. If no number is found, returns None.
+    Removes special tokens and extracts the last numeric value found (including decimals).
+    Returns the number as a string. If no number is found, returns an empty string.
     """
-    # Remove special tokens like <|begin_of_text|>, <|end_header_id|>, etc.
-    cleaned_text = re.sub(r'<\|.*?\|>', '', text)
-    # Remove extra whitespace
-    cleaned_text = cleaned_text.strip()
-    # Find all numbers (including decimals)
+    cleaned_text = re.sub(r'<\|.*?\|>', '', text).strip()
     matches = re.findall(r"[-+]?\d*\.\d+|\d+", cleaned_text)
     if matches:
-        return str(matches[-1])
+        return matches[-1]  # Return the last match
     return ""
 
 class MultimodalWrapper:
@@ -35,17 +43,76 @@ class MultimodalWrapper:
         return None
 
 
-# class ModelManager:
-#     def __init__(self, multimodal: MultimodalWrapper):
-#         self._multimodal = multimodal
-#         self.model_name = self._multimodal.model_name
+class GPT4ominiWrapper(MultimodalWrapper):
+    client = OpenAI(api_key=API_KEY)
 
-#     def separate_forward(self, text_q: str, img_q: Image):
-#         answer_text_q = self._multimodal.generate_ans_from_text(text_q)
-#         answer_img_q = self._multimodal.generate_ans_from_image(img_q)
-#         return answer_text_q, answer_img_q
-    
-    
+    def __init__(self, model_id: str = "gpt-4o-mini"):
+        super().__init__()
+        self.model_id = model_id
+
+    # text is the question only without instructions
+    def generate_ans_from_text(self, text: str):
+        # Build the user prompt with the instruction
+        try:
+            completion_text = self.client.chat.completions.create(
+            model=self.model_id,
+            messages=[
+                {"role": "system", "content": TXT_INSTRUCTION}, # <-- This is the system message that provides context to the model
+                {"role": "user", "content": text}  # <-- This is the user message for which the model will generate a response
+            ]
+            )
+            text_only_response = completion_text.choices[0].message.content
+            # print("\n[Text Only] Raw Model Answer:", text_only_response)
+            text_only_extracted = extract_number(text_only_response)
+            # print("[Text Only] Extracted Answer:", text_only_extracted)
+            return text_only_extracted
+        except Exception as e:
+            print("Error querying GPT-4o with text input:", e)
+            return ""
+
+    def generate_ans_from_image(self, img: Image):
+        """
+        Hypothetical method: base64-encodes an image and sends it with an instruction
+        for GPT-4o to parse. Currently, OpenAI does NOT support images via the ChatCompletion API.
+        This code is for demonstration only and will not work with the real GPT-4 endpoint.
+        """
+        # Convert the PIL image to base64
+        buffer = io.BytesIO()
+        img.save(buffer, format="PNG")
+        buffer.seek(0)
+        base64_img = base64.b64encode(buffer.getvalue()).decode("utf-8")
+
+        try:
+            completion_image = self.client.chat.completions.create(
+                model=self.model_id,
+                messages=[
+                    {"role": "system", "content": IMG_INSTRUCTION},
+                    {"role": "user", "content": [
+                        {"type": "text", "text": ""},
+                        {"type": "image_url", "image_url": {
+                            "url": f"data:image/png;base64,{base64_img}"}
+                        }
+                    ]}
+                ],
+                temperature=0.0,
+            )
+            image_response = completion_image.choices[0].message.content
+            # print("\n[Image Input] Raw Model Answer:", image_response)
+            image_number_response = extract_number(image_response)
+            # print("[Image Input] Extracted Answer:", image_number_response)
+
+            # Save the image as a JPG in the "images" directory
+            # import os
+            # output_dir = "images"
+            # os.makedirs(output_dir, exist_ok=True)
+            # image_path = os.path.join(output_dir, "output_image.jpg")
+            # img.save(image_path, format="JPEG")
+            # print(f"Image saved to {image_path}")
+            
+            return image_number_response
+        except Exception as e:
+            print("Error querying GPT-4o with image input (not supported):", e)
+            return ""
 
 
 class LlamaWrapper(MultimodalWrapper):

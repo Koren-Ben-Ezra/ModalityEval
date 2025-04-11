@@ -1,5 +1,6 @@
 import os
 import pandas as pd
+import time
 from tqdm import tqdm
 
 from src.filters import AbstractImageFilter, AbstractTextFilter
@@ -12,8 +13,8 @@ EPSILON = 1e-3
 
 class BenchmarkManager:
     def __init__(self, datasetWrapper: AbstractDatasetWrapper, multimodal_wrapper: MultimodalWrapper, metadata: dict):
-        if metadata.get("Use Text Filter", False) and metadata.get("Use Image Filter", False):
-            raise ValueError("Both text and image filters cannot be used simultaneously.")
+        # if metadata.get("Use Text Filter", False) and metadata.get("Use Image Filter", False):
+        #     raise ValueError("Both text and image filters cannot be used simultaneously.")
 
         self._datasetWrapper = datasetWrapper
         self.multimodal_wrapper = multimodal_wrapper
@@ -29,64 +30,49 @@ class BenchmarkManager:
         )
         
         self._make_benchmark_dir()
-        # print(f"[BenchmarkManager __init__] Benchmark directory: {self.benchmark_name}", flush=True)
 
         
     def execute_test(self, text_f: AbstractTextFilter=None, img_f: AbstractImageFilter=None):
+        if text_f is None and img_f is None:
+            raise ValueError("Both text and image filters cannot be None.")
+        
         category = Category(text_f, img_f, self.benchmark_name, self.save_predictions)
         self._categories.append(category)
-        # print("[execute_test] Starting test execution...", flush=True)
+
         for sample in tqdm(self._datasetWrapper.dataset):
             self._execute_single_prompt(sample, category)
+            
         category.save_predictions()
-        # print("[execute_test] Test execution completed.", flush=True)
             
     def _execute_single_prompt(self, sample, category: Category):
         
-        filtered_text = None
-        filtered_image = None
+        pred_from_text = None
+        pred_from_image = None
         if category.text_f is not None:
             filtered_text = category.text_f.apply_filter(sample["question"])
+            pred_from_text = self.multimodal_wrapper.generate_ans_from_text(filtered_text)
+            
         if category.img_f is not None:
             filtered_image = category.img_f.apply_filter(sample["question_image"])
-        # print("Filtered text:", filtered_text, flush=True)
-        # If filtered_image is transformed to a specific format (or shape):
-        # print("Filtered image shape:", filtered_image.size, flush=True)
+            pred_from_image = self.multimodal_wrapper.generate_ans_from_image(filtered_image)
         
-        prediction_from_text = None
-        prediction_from_image = None
-        if self.metadata.get("Use Text Filter", False) and self.metadata.get("Use Image Filter", False):
-            prediction_from_text = self.multimodal_wrapper.generate_ans_from_text(filtered_text)
-            prediction_from_image = self.multimodal_wrapper.generate_ans_from_image(filtered_image)
-        elif self.metadata.get("Use Text Filter", False):
-            prediction_from_text = self.multimodal_wrapper.generate_ans_from_text(filtered_text)
-        else:
-            prediction_from_image = self.multimodal_wrapper.generate_ans_from_image(filtered_image)
-        
-        
-        # print("Prediction from text:", prediction_from_text, flush=True)
-        # print("Prediction from image:", prediction_from_image, flush=True)
-        self._update_category_stats(sample, category, prediction_from_text, prediction_from_image)
+        self._update_category_stats(sample, category, pred_from_text, pred_from_image)
     
     def _update_category_stats(self, sample, category: Category, pred_from_text: str, pred_from_img: str):
-        # print("[_update_category_stats] Updating stats...", flush=True)
-        category.text_stats.total += 1
-        category.img_stats.total += 1
+
         answer = sample["answer"]
-        # print(f"Question: {sample['question']}", flush=True)
-        # print(f"Answer (Ground Truth): {answer}", flush=True)
-        # print(f"Text Prediction: {pred_from_text}", flush=True)
-        # print(f"Image Prediction: {pred_from_img}", flush=True)
-        if pred_from_text == answer:
-            category.text_stats.success += 1
         
-        # print("Text match:", pred_from_text == answer, flush=True)
-        if pred_from_img == answer:
-            category.img_stats.success += 1
-        # print("Image match:", pred_from_img == answer, flush=True)
+        if pred_from_text is not None:
+            category.text_stats.total += 1
+            if pred_from_text == answer:
+                category.text_stats.success += 1
+        
+        if pred_from_img is not None:        
+            category.img_stats.total += 1
+            if pred_from_img == answer:
+                category.img_stats.success += 1
 
         # Append predictions if predictions_df exists
-        
         if category.predictions_df is not None:
             new_row = pd.DataFrame([{
                 "answer": answer,
@@ -98,7 +84,6 @@ class BenchmarkManager:
                 new_row["img_prediction"] = pred_from_img            
 
             category.predictions_df = pd.concat([category.predictions_df, new_row],ignore_index=True)
-            # print(f"[_update_category_stats] Appended new row. Total rows now: {len(category.predictions_df)}", flush=True)
     
     def _make_benchmark_dir(self):
         if not os.path.exists(BENCHMARKS_DIR):
@@ -107,33 +92,28 @@ class BenchmarkManager:
             os.makedirs(self.benchmark_name)
     
     def _create_summary(self):
-        try:
-            columns = []
-            if self.metadata.get("Use Text Filter", False):
-                columns.append("Text Filter", "Text Correct")
-            if self.metadata.get("Use Image Filter", False):
-                columns.append("Image Filter", "Image Correct")
-            columns.append("Total Samples")
+        columns = ["Text Filter", "Text Correct", "Image Filter", "Image Correct", "Total Samples"]
+        
+        summary_df = pd.DataFrame(columns=columns)
+        for category in self._categories:
+            new_row = pd.DataFrame([{}])
             
-            summary_df = pd.DataFrame(columns=columns)
-            for category in self._categories:
-                new_row = pd.DataFrame([{}])
-                if self.metadata.get("Use Text Filter", False):
-                    new_row["Text Filter"] = category.text_f.filter_name
-                    new_row["Text Correct"] = category.text_stats.success
-                if self.metadata.get("Use Image Filter", False):
-                    new_row["Image Filter"] = category.img_f.filter_name
-                    new_row["Image Correct"] = category.img_stats.success
-                
-                new_row["Total Samples"] = category.text_stats.total                
-                try:
-                    summary_df = pd.concat([summary_df, new_row], ignore_index=True)
-                except Exception as e:
-                    print("[_create_summary] Error during concatenation:", e, flush=True)
-            return summary_df
-        except Exception as e:
-            print("[_create_summary] Error:", e, flush=True)
-            raise
+            new_row["Text Filter"] = ""
+            new_row["Text Correct"] = ""
+            new_row["Image Filter"] = ""
+            new_row["Image Correct"] = ""
+            
+            if category.text_f is not None:
+                new_row["Text Filter"] = category.text_f.filter_name
+                new_row["Text Correct"] = category.text_stats.success
+            if category.img_f is not None:
+                new_row["Image Filter"] = category.img_f.filter_name
+                new_row["Image Correct"] = category.img_stats.success
+            
+            new_row["Total Samples"] = category.text_stats.total
+            summary_df = pd.concat([summary_df, new_row], ignore_index=True)
+            
+        return summary_df
         
     def write_summary(self):
         # print("[write_summary] Starting to write summary...", flush=True)
