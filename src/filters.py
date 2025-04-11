@@ -7,40 +7,16 @@ RANDOM_VALUES: list[str] = [str(random.randint(0, 10000)) for _ in range(100)]
 
 class AbstractImageFilter:
     filter_name = None
-    
-    # def __init_subclass__(cls, **kwargs):
-    #     super().__init_subclass__(**kwargs)
-    #     FilterLoader.register_image_filter(cls)
-        
     def apply_filter(self, input: Image, answer: str=None):
         return None
 
 class AbstractTextFilter:
     filter_name = None
-    
-    # def __init_subclass__(cls, **kwargs):
-    #     super().__init_subclass__(**kwargs)
-    #     FilterLoader.register_text_filter(cls)
-    
     def apply_filter(self, input: str, answer: str=None):
         return None
 
-# class FilterLoader:
-
-#     image_filters = {}
-#     text_filters = {}
-        
-#     @classmethod
-#     def register_image_filter(cls, image_filter_cls: AbstractImageFilter):
-#         cls.image_filters[image_filter_cls.filter_name] = image_filter_cls
-                
-#     @classmethod
-#     def register_text_filter(cls, text_filter_cls: AbstractTextFilter):
-#         cls.text_filters[text_filter_cls.filter_name] = text_filter_cls
-
 
 # ---------- Identity Filters ---------- #
-
 
 class IdentityTextFilter(AbstractTextFilter):
     filter_name:str="Identity_TF"
