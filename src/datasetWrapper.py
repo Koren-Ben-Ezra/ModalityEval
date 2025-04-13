@@ -13,9 +13,7 @@ class AbstractDatasetWrapper:
         self._text2image = text2image
     
 class GSM8kWrapper(AbstractDatasetWrapper):
-    '''
-    Example for the gsm8k dataset.
-    '''
+
     def __init__(self, text2image: AbstractText2Image = FixedSizeText2Image()):
         self.dataset_id = "GSM8k"
         self._text2image = text2image
@@ -36,12 +34,13 @@ class GSM8kWrapper(AbstractDatasetWrapper):
         Log().logger.info(f"Loaded {len(self.dataset)} samples from {self.dataset_id} dataset.")
     
     def _map_sample(self, sample):
-        parts = sample["answer"].split("####")
-        if len(parts) < 2:
-            sample["answer"] = sample["answer"].strip()
-        else:
-            sample["answer"] = parts[-1].strip()
-        sample["question_image"] = self._text2image.create_image(sample["question"])
+        sample["answer"] = sample["answer"].split("####")[-1].strip()
+            
+        try:
+            sample["question_image"] = self._text2image.create_image(sample["question"])
+        except Exception as e:
+            Log().logger.error(f"Error creating image: {e}")
+            raise e
         return sample
 
 

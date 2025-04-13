@@ -18,10 +18,10 @@ def eval_llama():
     ############################# GSM8k dataset ##############################
     
     ## With slurm:
-    # text2image=FixedSizeText2Image(font_path="/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf")
+    text2image=FixedSizeText2Image(font_path="/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf")
     
     ## Without slurm:
-    text2image = FixedSizeText2Image()
+    # text2image = FixedSizeText2Image()
     
     datasetWrapper = GSM8kWrapper(text2image)
     

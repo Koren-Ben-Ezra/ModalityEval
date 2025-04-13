@@ -71,7 +71,7 @@ class LlamaWrapper(MultimodalWrapper):
             Log().logger.error(f"Error loading processor: {e}")
             raise e
         
-        Log().logger.info(f"Processor {self._processor.__class__.__name__} loaded successfully.")
+        Log().logger.info(f"Model {self.model_name} loaded successfully.")
         
     def generate_ans_from_image(self, image: Image):
         image = image.convert("RGB")  # keep it 3-channel

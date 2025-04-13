@@ -1,5 +1,6 @@
 from PIL import Image, ImageDraw, ImageFont
 from src.filters import AbstractTextFilter
+from src.log import Log
 
 MAX_WORDS_PER_LINE__IMG = 10
 
@@ -98,15 +99,6 @@ class FixedSizeText2Image(AbstractText2Image):
         max_font_size=100,
         padding=20
     ):
-        """
-        :param width: Desired image width.
-        :param height: Desired image height.
-        :param font_path: Path to the .ttf or .otf font file.
-        :param text_color: (R, G, B) tuple for text color.
-        :param bg_color: (R, G, B) tuple for background color.
-        :param max_font_size: The maximum font size to try.
-        :param padding: Integer number of pixels to pad on all sides.
-        """
         self.width = width
         self.height = height
         self.font_path = font_path
@@ -117,7 +109,11 @@ class FixedSizeText2Image(AbstractText2Image):
 
     def create_image(self, text: str):
         
-        text = AbstractText2Image._preprocess_text(text)
+        try:
+            text = AbstractText2Image._preprocess_text(text)
+        except Exception as e:
+            Log().logger.error(f"Error in preprocessing text: {e}")
+            raise e
         
         chosen_font_size = 1
 
@@ -162,5 +158,9 @@ class FilteredFixedSizeText2Image(FixedSizeText2Image):
         self.filter = filter
     
     def create_image(self, text: str):
-        text = self.filter.apply_filter(text)
+        try:
+            text = self.filter.apply_filter(text)
+        except Exception as e:
+            Log().logger.error(f"Error in applying filter: {e}")
+            raise e
         return super().create_image(text)
