@@ -23,7 +23,7 @@ def eval_llama():
     datasetWrapper = GSM8kWrapper(text2image)
     
     metadata = {
-        "test name": "demo test",
+        "test name": "basic test",
         "Model": multimodal_wrapper.model_id,
         "Dataset": datasetWrapper.dataset_id,
         "Save Predictions": True,
@@ -44,10 +44,6 @@ def eval_llama():
     # Image #
     # benchmark_manager.execute_test(IdentityImageFilter())
     
-    # DEBUG:
-    benchmark_manager.write_summary()
-    exit(0)
-    
     benchmark_manager.execute_test(IdentityImageFilter())
     
     
@@ -59,6 +55,8 @@ def eval_llama():
     benchmark_manager.execute_test(HistogramEqualizationImageFilter())
     benchmark_manager.execute_test(GaussianImageFilter()) # kernel_size = 5 sigms = 1.0
 
+    benchmark_manager.write_summary()
+    exit(0)
 
     # -- General information filters -- #
     # Text #
