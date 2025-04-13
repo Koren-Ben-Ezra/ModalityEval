@@ -1,5 +1,6 @@
 from datasets import load_dataset, Dataset
 from src.text2image import AbstractText2Image, FixedSizeText2Image
+from src.log import Log
 
 class AbstractDatasetWrapper:
     """
@@ -20,6 +21,7 @@ class GSM8kWrapper(AbstractDatasetWrapper):
         self._text2image = text2image
         self.dataset = load_dataset("gsm8k", "main")["test"]
         self.dataset = self.dataset.map(self._map_sample)
+        Log().logger.info(f"Loaded {len(self.dataset)} samples from {self.dataset_id} dataset.")
     
     def _map_sample(self, sample):
         parts = sample["answer"].split("####")

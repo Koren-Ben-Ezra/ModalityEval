@@ -1,11 +1,12 @@
+import json
 from PIL import Image
+
 from src.text2image import FixedSizeText2Image
 from src.benchmarkManager import BenchmarkManager
 from src.filters import *
 from src.datasetWrapper import GSM8kWrapper
 from src.multimodalWrappers import LlamaWrapper
-import json
-
+from src.log import Log
 PARAMETERS_PATH = "parameters.json"
 
 def eval_llama():
@@ -15,10 +16,10 @@ def eval_llama():
     ############################# GSM8k dataset ##############################
     
     ## With slurm:
-    text2image=FixedSizeText2Image(font_path="/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf")
+    # text2image=FixedSizeText2Image(font_path="/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf")
     
     ## Without slurm:
-    # text2image = FixedSizeText2Image()
+    text2image = FixedSizeText2Image()
     
     datasetWrapper = GSM8kWrapper(text2image)
     
@@ -36,6 +37,7 @@ def eval_llama():
 
     # Initialize the BenchmarkManager
     benchmark_manager = BenchmarkManager(datasetWrapper, multimodal_wrapper, metadata)
+    Log().logger.info(f"Running benchmark for {multimodal_wrapper.model_id} on {datasetWrapper.dataset_id}")
     
     # ------ execute text and image filter tests ------ #
     # -- Identity filters -- #

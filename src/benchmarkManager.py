@@ -1,26 +1,23 @@
 import os
 import pandas as pd
-import time
 from tqdm import tqdm
 
 from src.filters import AbstractImageFilter, AbstractTextFilter
 from src.category import Category
 from src.datasetWrapper import AbstractDatasetWrapper
 from src.multimodalWrappers import MultimodalWrapper
+from src.log import Log
 
 BENCHMARKS_DIR = "benchmarks"
 EPSILON = 1e-3
 
 class BenchmarkManager:
     def __init__(self, datasetWrapper: AbstractDatasetWrapper, multimodal_wrapper: MultimodalWrapper, metadata: dict):
-        # if metadata.get("Use Text Filter", False) and metadata.get("Use Image Filter", False):
-        #     raise ValueError("Both text and image filters cannot be used simultaneously.")
-
         self._datasetWrapper = datasetWrapper
         self.multimodal_wrapper = multimodal_wrapper
         self.metadata = metadata
         self.save_predictions = metadata.get("Save Predictions", False)
-        
+        self.logger = Log().logger
         self._categories: list[Category] = []
 
         self.benchmark_name = os.path.join(
@@ -35,7 +32,16 @@ class BenchmarkManager:
     def execute_test(self, text_f: AbstractTextFilter=None, img_f: AbstractImageFilter=None):
         if text_f is None and img_f is None:
             raise ValueError("Both text and image filters cannot be None.")
-        
+
+        name1 = text_f.filter_name if text_f is not None else ""
+        name2 = img_f.filter_name if img_f is not None else ""
+        if name1 and name2:
+            self.logger.info(f"Executing test with filters: {name1} and {name2}")
+        elif name1:
+            self.logger.info(f"Executing test with filter: {name1}")
+        elif name2:
+            self.logger.info(f"Executing test with filter: {name2}")
+            
         category = Category(text_f, img_f, self.benchmark_name, self.save_predictions)
         self._categories.append(category)
 
@@ -118,14 +124,14 @@ class BenchmarkManager:
     def write_summary(self):
         # print("[write_summary] Starting to write summary...", flush=True)
         try:
+            self.logger.info("Writing summary...")
             summary_df = self._create_summary()
             filename = self.metadata.get("test name", "summary").replace(" ", "_") + ".csv"
             filename = os.path.join(self.benchmark_name, filename)
-            # print(f"[write_summary] Writing summary to {filename}", flush=True)
             with open(filename, "w") as file:
                 for key, value in self.metadata.items():
                     file.write(f"# {key}: {value}\n")
                 summary_df.to_csv(file, index=False)
-            # print("[write_summary] Summary successfully written.", flush=True)
+            self.logger.info(f"Summary successfully written to {filename}.")
         except Exception as e:
-            print("[write_summary] Error:", e, flush=True)
+            self.logger.error("Error writing summary:", e)

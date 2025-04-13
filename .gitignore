@@ -17,3 +17,5 @@ Thumbs.db
 
 test_filters_output/
 outputs/
+
+*.log

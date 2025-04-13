@@ -2,7 +2,7 @@ import os
 import pandas as pd
 
 from src.filters import AbstractTextFilter, AbstractImageFilter
-
+from src.log import Log
 
 class Category:
     class Statistics:
@@ -32,12 +32,9 @@ class Category:
         self.text_stats = Category.Statistics()
         self.img_stats = Category.Statistics()
         
-    # def eval_accuracy(self):
-    #     text_acc = self.text_stats.success / self.text_stats.total
-    #     img_acc = self.img_stats.success / self.img_stats.total
-    #     return text_acc, img_acc
-    
     def save_predictions(self):
         if self.predictions_df is not None:
             filename = self.category_name + ".csv"
             self.predictions_df.to_csv(filename, index=True)
+            Log().logger.info(f"Saved predictions to {filename}")
+        

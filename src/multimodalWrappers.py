@@ -9,6 +9,8 @@ import re
 # import io
 import json
 
+from src.log import Log
+
 PARAMETERS_PATH = "parameters.json"
 
 with open(PARAMETERS_PATH, 'r') as file:
@@ -124,8 +126,9 @@ class LlamaWrapper(MultimodalWrapper):
             torch_dtype=torch.bfloat16,
             device_map="auto",
         )
-        self._model.tie_weights() 
+        self._model.tie_weights()
         self._processor = AutoProcessor.from_pretrained(self.model_id)
+        Log().logger.info(f"Loaded model {self.model_name} with processor {self._processor.__class__.__name__}")
         
     def generate_ans_from_image(self, image: Image):
         image = image.convert("RGB")  # keep it 3-channel
