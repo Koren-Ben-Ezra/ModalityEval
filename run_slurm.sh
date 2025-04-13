@@ -32,3 +32,5 @@ export PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
 
 # Run your main Python script in unbuffered mode
 python -u main.py
+
+tail -f outputs/multimodal_eval.out

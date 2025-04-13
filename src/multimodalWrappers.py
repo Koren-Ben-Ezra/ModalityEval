@@ -1,12 +1,7 @@
 from transformers import MllamaForConditionalGeneration, AutoProcessor
 from PIL import Image
-# import matplotlib.pyplot as plt
 import torch
 import re
-# from openai_key import API_KEY
-# from openai import OpenAI
-# import base64
-# import io
 import json
 
 from src.log import Log
@@ -17,8 +12,12 @@ with open(PARAMETERS_PATH, 'r') as file:
     data = json.load(file)
     system = data.get('system', '')
 
-TXT_INSTRUCTION = system.get('text instruction', '')
-IMG_INSTRUCTION = system.get('image instruction', '')
+# TXT_INSTRUCTION = system.get('text instruction', '')
+# IMG_INSTRUCTION = system.get('image instruction', '')
+
+TXT_INSTRUCTION = system.get('CoT text instruction', '')
+IMG_INSTRUCTION = system.get('CoT image instruction', '')
+
 MAX_NEW_TOKENS = 30
 
 #for "gpt-4o-mini"
@@ -34,9 +33,13 @@ def extract_number(text: str) -> str:
         return matches[-1]  # Return the last match
     return ""
 
+def extract_answer(text: str, seperator: str="####") -> str:
+    return text.split(seperator)[-1].strip()
+
 class MultimodalWrapper:
     def __init__(self):
         self.model_id: str = None
+        self.model_name: str = None
     
     def generate_ans_from_image(self, img: Image):
         return None
@@ -48,7 +51,7 @@ class LlamaWrapper(MultimodalWrapper):
     def __init__(self, model_id: str="meta-llama/Llama-3.2-11B-Vision-Instruct"):
         Log().logger.info("Loading Llama model...")
         self.model_id = model_id
-        self.model_name= model_id.split('/')[-1]
+        self.model_name = model_id.split('/')[-1]
         try:
             self._model = MllamaForConditionalGeneration.from_pretrained(
                 self.model_id,
@@ -92,7 +95,8 @@ class LlamaWrapper(MultimodalWrapper):
 
         output = self._model.generate(**inputs, max_new_tokens=MAX_NEW_TOKENS)
         decoded_output = self._processor.decode(output[0])
-        return extract_number(decoded_output)
+        # return extract_number(decoded_output)
+        return extract_answer(decoded_output)
 
 
     def generate_ans_from_text(self, text: str):
@@ -118,8 +122,8 @@ class LlamaWrapper(MultimodalWrapper):
 
         output = self._model.generate(**inputs, max_new_tokens=MAX_NEW_TOKENS)
         decoded_output = self._processor.decode(output[0])
-        final_output = extract_number(decoded_output)
-        return final_output
+        # return extract_number(decoded_output)
+        return extract_answer(decoded_output)
 
     
 

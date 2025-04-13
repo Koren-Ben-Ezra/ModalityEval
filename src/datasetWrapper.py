@@ -1,6 +1,9 @@
 from datasets import load_dataset, Dataset
 from text2image import AbstractText2Image, FixedSizeText2Image
 from src.log import Log
+import os
+
+CACHE_NAME = "cache"
 
 class AbstractDatasetWrapper:
     """
@@ -19,17 +22,33 @@ class GSM8kWrapper(AbstractDatasetWrapper):
         self._text2image = text2image
         Log().logger.info(f"Loading {self.dataset_id} dataset...")
         
-        try:
-            self.dataset = load_dataset("gsm8k", "main")["test"]
-        except Exception as e:
-            Log().logger.error(f"Error loading dataset: {e}")
-            raise e
-        
-        try:
-            self.dataset = self.dataset.map(self._map_sample)
-        except Exception as e:
-            Log().logger.error(f"Error mapping dataset: {e}")
-            raise e
+        if not os.path.exists(CACHE_NAME):
+            os.makedirs(CACHE_NAME)
+            
+        cache_path = os.path.join(CACHE_NAME, f"{self.dataset_id}_dataset")
+        if os.path.exists(cache_path):
+            Log().logger.info(f"Found cached dataset at {cache_path}. Loading from cache...")
+            self.dataset = Dataset.load_from_disk(str(cache_path))
+            return
+        else:
+            try:
+                self.dataset = load_dataset("gsm8k", "main")["test"].select(range(1))
+            except Exception as e:
+                Log().logger.error(f"Error loading dataset: {e}")
+                raise e
+            
+            try:
+                self.dataset = self.dataset.map(self._map_sample)
+            except Exception as e:
+                Log().logger.error(f"Error mapping dataset: {e}")
+                raise e
+            
+            try:
+                self.dataset.save_to_disk(f"./cache/{self.dataset_id}_dataset")
+                Log().logger.info(f"Cached {self.dataset_id} dataset to ./cache/{self.dataset_id}_dataset.")
+            except Exception as e:
+                Log().logger.error(f"Error caching dataset: {e}")
+                raise e
         
         Log().logger.info(f"Loaded {len(self.dataset)} samples from {self.dataset_id} dataset.")
     

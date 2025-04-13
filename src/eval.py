@@ -18,16 +18,16 @@ def eval_llama():
     ############################# GSM8k dataset ##############################
     
     ## With slurm:
-    text2image=FixedSizeText2Image(font_path="/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf")
+    # text2image=FixedSizeText2Image(font_path="/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf")
     
     ## Without slurm:
-    # text2image = FixedSizeText2Image()
+    text2image = FixedSizeText2Image()
     
     datasetWrapper = GSM8kWrapper(text2image)
     
     metadata = {
         "test name": "basic test",
-        "Model": multimodal_wrapper.model_id,
+        "Model": multimodal_wrapper.model_name,
         "Dataset": datasetWrapper.dataset_id,
         "Save Predictions": True,
     }
@@ -39,12 +39,13 @@ def eval_llama():
 
     # Initialize the BenchmarkManager
     benchmark_manager = BenchmarkManager(datasetWrapper, multimodal_wrapper, metadata)
-    Log().logger.info(f"Running benchmark for {multimodal_wrapper.model_id} on {datasetWrapper.dataset_id}")
+    Log().logger.info(f"Running benchmark for {multimodal_wrapper.model_name} on {datasetWrapper.dataset_id}")
     
     # ------ execute text and image filter tests ------ #
     # -- Identity filters -- #
     # Text #
     benchmark_manager.execute_test(IdentityTextFilter())
+    exit(0)
     # Image #
     # benchmark_manager.execute_test(IdentityImageFilter())
     
@@ -59,7 +60,6 @@ def eval_llama():
     benchmark_manager.execute_test(HistogramEqualizationImageFilter())
     benchmark_manager.execute_test(GaussianImageFilter()) # kernel_size = 5 sigms = 1.0
 
-    benchmark_manager.write_summary()
     exit(0)
 
     # -- General information filters -- #
@@ -87,6 +87,5 @@ def eval_llama():
     
     # --------------------------------------- #
     
-    benchmark_manager.write_summary()
     
     ##########################################################################
