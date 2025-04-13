@@ -119,16 +119,20 @@ class MultimodalWrapper:
 
 class LlamaWrapper(MultimodalWrapper):
     def __init__(self, model_id: str="meta-llama/Llama-3.2-11B-Vision-Instruct"):
+        Log().logger.info("Loading Llama model...")
         self.model_id = model_id
         self.model_name= model_id.split('/')[-1]
+        Log().logger.info(f"Model ID: {self.model_id}")
         self._model = MllamaForConditionalGeneration.from_pretrained(
             self.model_id,
             torch_dtype=torch.bfloat16,
             device_map="auto",
         )
+        Log().logger.info(f"Model {self.model_name} loaded successfully.")
         self._model.tie_weights()
+        Log().logger.info("Tied weights of the model.")
         self._processor = AutoProcessor.from_pretrained(self.model_id)
-        Log().logger.info(f"Loaded model {self.model_name} with processor {self._processor.__class__.__name__}")
+        Log().logger.info(f"Processor {self._processor.__class__.__name__} loaded successfully.")
         
     def generate_ans_from_image(self, image: Image):
         image = image.convert("RGB")  # keep it 3-channel
