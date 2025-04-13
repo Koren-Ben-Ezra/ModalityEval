@@ -6,6 +6,7 @@
 #SBATCH --partition=killable
 #SBATCH --gres=gpu:1
 #SBATCH --mem=50000         # 50,000 MB (50GB) of CPU memory
+#SBATCH --constraint=geforce_rtx_3090
 
 # Print GPU info
 nvidia-smi --query-gpu=name,memory.total --format=csv
