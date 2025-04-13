@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 from PIL import Image
 
 from src.filters import *
-from src.text2image import *
+from text2image import *
 
 TEST_DIR = "test_filters_output"
 

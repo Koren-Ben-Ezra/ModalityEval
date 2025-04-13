@@ -1,7 +1,7 @@
 import json
 from PIL import Image
 
-from src.text2image import FixedSizeText2Image
+from text2image import FixedSizeText2Image
 from src.benchmarkManager import BenchmarkManager
 from src.filters import *
 from src.datasetWrapper import GSM8kWrapper
