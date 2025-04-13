@@ -1,5 +1,5 @@
 from datasets import load_dataset, Dataset
-from text2image import AbstractText2Image, FixedSizeText2Image
+from src.text2image import AbstractText2Image, FixedSizeText2Image
 from src.log import Log
 import os
 

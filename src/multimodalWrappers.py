@@ -18,7 +18,7 @@ with open(PARAMETERS_PATH, 'r') as file:
 TXT_INSTRUCTION = system.get('CoT text instruction', '')
 IMG_INSTRUCTION = system.get('CoT image instruction', '')
 
-MAX_NEW_TOKENS = 30
+MAX_NEW_TOKENS = 1000
 
 #for "gpt-4o-mini"
 
