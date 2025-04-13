@@ -52,7 +52,6 @@ class LlamaWrapper(MultimodalWrapper):
         try:
             self._model = MllamaForConditionalGeneration.from_pretrained(
                 self.model_id,
-                use_auto_token=True,
                 torch_dtype=torch.bfloat16,
                 device_map="auto",
             )
