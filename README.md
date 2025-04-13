@@ -21,6 +21,7 @@ conda activate ModalityEval
 (after conda environment was activated)
 ```
 pip install -r environment\requirements.txt
+pip install --upgrade transformer
 
 ```
 
