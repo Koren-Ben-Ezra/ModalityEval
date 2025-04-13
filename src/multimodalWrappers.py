@@ -44,6 +44,85 @@ class MultimodalWrapper:
     def generate_ans_from_text(self, text: str):
         return None
 
+class LlamaWrapper(MultimodalWrapper):
+    def __init__(self, model_id: str="meta-llama/Llama-3.2-11B-Vision-Instruct"):
+        Log().logger.info("Loading Llama model...")
+        self.model_id = model_id
+        self.model_name= model_id.split('/')[-1]
+        try:
+            self._model = MllamaForConditionalGeneration.from_pretrained(
+                self.model_id,
+                use_auto_token=True,
+                torch_dtype=torch.bfloat16,
+                device_map="auto",
+            )
+        except Exception as e:
+            Log().logger.error(f"Error loading model: {e}")
+            raise e
+            
+        try:
+            self._model.tie_weights()
+        except Exception as e:
+            Log().logger.error(f"Error tying weights: {e}")
+            raise e
+
+        try:
+            self._processor = AutoProcessor.from_pretrained(self.model_id)
+        except Exception as e:
+            Log().logger.error(f"Error loading processor: {e}")
+            raise e
+        
+        Log().logger.info(f"Processor {self._processor.__class__.__name__} loaded successfully.")
+        
+    def generate_ans_from_image(self, image: Image):
+        image = image.convert("RGB")  # keep it 3-channel
+
+        messages = [
+            {"role": "user", "content": [
+                {"type": "image"},
+                {"type": "text", "text": IMG_INSTRUCTION}
+            ]}
+        ]
+        input_text = self._processor.apply_chat_template(messages, add_generation_prompt=True)
+        inputs = self._processor(
+            image,
+            input_text,
+            add_special_tokens=False,
+            return_tensors="pt"
+        ).to(self._model.device)
+
+        output = self._model.generate(**inputs, max_new_tokens=MAX_NEW_TOKENS)
+        decoded_output = self._processor.decode(output[0])
+        return extract_number(decoded_output)
+
+
+    def generate_ans_from_text(self, text: str):
+        # Create a dummy 224x224 RGB image (NOT 1x1, not grayscale)
+        image = Image.new(mode="RGB", size=(224, 224), color="white")
+        
+        txt_message = TXT_INSTRUCTION + f"\n[QUESTION] {text}"
+        messages = [
+            {"role": "user", "content": [
+                {"type": "image"},
+                {"type": "text", "text": txt_message}
+            ]}
+        ]
+        input_text = self._processor.apply_chat_template(messages, add_generation_prompt=True)
+
+        # Now pass this 224x224 RGB image (three channels) to the processor
+        inputs = self._processor(
+            image,
+            input_text,
+            add_special_tokens=False,
+            return_tensors="pt"
+        ).to(self._model.device)
+
+        output = self._model.generate(**inputs, max_new_tokens=MAX_NEW_TOKENS)
+        decoded_output = self._processor.decode(output[0])
+        final_output = extract_number(decoded_output)
+        return final_output
+
+    
 
 # class GPT4ominiWrapper(MultimodalWrapper):
 #     client = OpenAI(api_key=API_KEY)
@@ -115,74 +194,3 @@ class MultimodalWrapper:
 #         except Exception as e:
 #             print("Error querying GPT-4o with image input (not supported):", e)
 #             return ""
-
-
-class LlamaWrapper(MultimodalWrapper):
-    def __init__(self, model_id: str="meta-llama/Llama-3.2-11B-Vision-Instruct"):
-        Log().logger.info("Loading Llama model...")
-        self.model_id = model_id
-        self.model_name= model_id.split('/')[-1]
-        Log().logger.info(f"Model ID: {self.model_id}")
-        self._model = MllamaForConditionalGeneration.from_pretrained(
-            self.model_id,
-            use_auto_token=True,
-            torch_dtype=torch.bfloat16,
-            device_map="auto",
-        )
-        Log().logger.info(f"Model {self.model_name} loaded successfully.")
-        self._model.tie_weights()
-        Log().logger.info("Tied weights of the model.")
-        self._processor = AutoProcessor.from_pretrained(self.model_id)
-        Log().logger.info(f"Processor {self._processor.__class__.__name__} loaded successfully.")
-        
-    def generate_ans_from_image(self, image: Image):
-        image = image.convert("RGB")  # keep it 3-channel
-
-        messages = [
-            {"role": "user", "content": [
-                {"type": "image"},
-                {"type": "text", "text": IMG_INSTRUCTION}
-            ]}
-        ]
-        input_text = self._processor.apply_chat_template(messages, add_generation_prompt=True)
-        inputs = self._processor(
-            image,
-            input_text,
-            add_special_tokens=False,
-            return_tensors="pt"
-        ).to(self._model.device)
-
-        output = self._model.generate(**inputs, max_new_tokens=MAX_NEW_TOKENS)
-        decoded_output = self._processor.decode(output[0])
-        return extract_number(decoded_output)
-
-
-    def generate_ans_from_text(self, text: str):
-        # Create a dummy 224x224 RGB image (NOT 1x1, not grayscale)
-        image = Image.new(mode="RGB", size=(224, 224), color="white")
-        
-        txt_message = TXT_INSTRUCTION + f"\n[QUESTION] {text}"
-        messages = [
-            {"role": "user", "content": [
-                {"type": "image"},
-                {"type": "text", "text": txt_message}
-            ]}
-        ]
-        input_text = self._processor.apply_chat_template(messages, add_generation_prompt=True)
-
-        # Now pass this 224x224 RGB image (three channels) to the processor
-        inputs = self._processor(
-            image,
-            input_text,
-            add_special_tokens=False,
-            return_tensors="pt"
-        ).to(self._model.device)
-
-        output = self._model.generate(**inputs, max_new_tokens=MAX_NEW_TOKENS)
-        decoded_output = self._processor.decode(output[0])
-        final_output = extract_number(decoded_output)
-        return final_output
-
-    
-    # def _postprocess_output(self, output):
-    #     return output.split("####")[1].strip()

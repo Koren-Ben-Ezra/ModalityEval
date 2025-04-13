@@ -3,6 +3,7 @@ __pycache__/
 *.pyc
 *.pyo
 *.pyd
+*.log
 
 # Ignore VS Code settings (if using VS Code)
 .vscode/
@@ -17,5 +18,3 @@ Thumbs.db
 
 test_filters_output/
 outputs/
-
-*.log

@@ -1,5 +1,5 @@
 from datasets import load_dataset, Dataset
-from src.text2image import AbstractText2Image, FixedSizeText2Image
+from text2image import AbstractText2Image, FixedSizeText2Image
 from src.log import Log
 
 class AbstractDatasetWrapper:
@@ -19,8 +19,20 @@ class GSM8kWrapper(AbstractDatasetWrapper):
     def __init__(self, text2image: AbstractText2Image = FixedSizeText2Image()):
         self.dataset_id = "GSM8k"
         self._text2image = text2image
-        self.dataset = load_dataset("gsm8k", "main")["test"]
-        self.dataset = self.dataset.map(self._map_sample)
+        Log().logger.info(f"Loading {self.dataset_id} dataset...")
+        
+        try:
+            self.dataset = load_dataset("gsm8k", "main")["test"]
+        except Exception as e:
+            Log().logger.error(f"Error loading dataset: {e}")
+            raise e
+        
+        try:
+            self.dataset = self.dataset.map(self._map_sample)
+        except Exception as e:
+            Log().logger.error(f"Error mapping dataset: {e}")
+            raise e
+        
         Log().logger.info(f"Loaded {len(self.dataset)} samples from {self.dataset_id} dataset.")
     
     def _map_sample(self, sample):

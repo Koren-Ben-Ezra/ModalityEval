@@ -55,13 +55,31 @@ class BenchmarkManager:
         pred_from_text = None
         pred_from_image = None
         if category.text_f is not None:
-            filtered_text = category.text_f.apply_filter(sample["question"])
-            pred_from_text = self.multimodal_wrapper.generate_ans_from_text(filtered_text)
+            try:
+                filtered_text = category.text_f.apply_filter(sample["question"])
+            except Exception as e:
+                self.logger.error(f"Error applying text filter: {e}")
+                raise e
+            
+            try:
+                pred_from_text = self.multimodal_wrapper.generate_ans_from_text(filtered_text)
+            except Exception as e:
+                self.logger.error(f"Error generating answer from text: {e}")
+                raise e
             
         if category.img_f is not None:
-            filtered_image = category.img_f.apply_filter(sample["question_image"])
-            pred_from_image = self.multimodal_wrapper.generate_ans_from_image(filtered_image)
-        
+            try:
+                filtered_image = category.img_f.apply_filter(sample["question_image"])
+            except Exception as e:
+                self.logger.error(f"Error applying image filter: {e}")
+                raise e
+            
+            try:
+                pred_from_image = self.multimodal_wrapper.generate_ans_from_image(filtered_image)
+            except Exception as e:
+                self.logger.error(f"Error generating answer from image: {e}")
+                raise e
+            
         self._update_category_stats(sample, category, pred_from_text, pred_from_image)
     
     def _update_category_stats(self, sample, category: Category, pred_from_text: str, pred_from_img: str):
