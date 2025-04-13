@@ -11,6 +11,8 @@ PARAMETERS_PATH = "parameters.json"
 
 def eval_llama():
     # prepare the benchmark
+    Log().logger.info("------------------------------------------------")
+    Log().logger.info("Starting evaluation...")
     multimodal_wrapper = LlamaWrapper()
     
     ############################# GSM8k dataset ##############################
