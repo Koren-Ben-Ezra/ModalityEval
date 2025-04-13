@@ -15,14 +15,14 @@ export PATH=/usr/local/cuda-11.0/bin:$PATH
 export LD_LIBRARY_PATH=/usr/local/cuda-11.0/lib64:$LD_LIBRARY_PATH
 
 # Initialize Conda and activate your environment
-source /home/joberant/NLP_2425a/amitstein/anaconda3/etc/profile.d/conda.sh
+source /home/joberant/NLP_2425a/$(whoami)/anaconda3/etc/profile.d/conda.sh
 conda activate ModalityEval
 export HUGGING_FACE_HUB_TOKEN="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"
 # Set Hugging Face cache and TMPDIR to scratch space to avoid home quota issues
-export HF_HOME=/vol/scratch/amitstein/hf_cache
+export HF_HOME=/vol/scratch/$(whoami)/hf_cache
 mkdir -p "$HF_HOME"
 
-export TMPDIR=/vol/scratch/amitstein/tmp
+export TMPDIR=/vol/scratch/$(whoami)/tmp
 mkdir -p "$TMPDIR"
 
 # Optional: Configure PyTorch CUDA allocation to help avoid fragmentation
