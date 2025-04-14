@@ -13,7 +13,9 @@ def eval_llama():
     # prepare the benchmark
     Log().logger.info("------------------------------------------------")
     Log().logger.info("Starting evaluation...")
-    multimodal_wrapper = LlamaWrapper()
+    
+    llama4_scout = "meta-llama/Llama-4-Maverick-17B-128E"
+    multimodal_wrapper = LlamaWrapper(model_id=llama4_scout)
     
     ############################# GSM8k dataset ##############################
     
@@ -57,8 +59,8 @@ def eval_llama():
     benchmark_manager.execute_test(SwapWordsTextFilter()) #p = 0.2
     exit(0)
     # Image #
-    benchmark_manager.execute_test(HistogramEqualizationImageFilter())
-    benchmark_manager.execute_test(GaussianImageFilter()) # kernel_size = 5 sigms = 1.0
+    benchmark_manager.execute_test(img_f=HistogramEqualizationImageFilter())
+    benchmark_manager.execute_test(img_f=GaussianImageFilter()) # kernel_size = 5 sigms = 1.0
 
     exit(0)
 
@@ -68,11 +70,11 @@ def eval_llama():
     benchmark_manager.execute_test(PushFrontTextFilter(phrase))
     
     # Image #
-    benchmark_manager.execute_test(ReplaceBackgroundImageFilter()) # alpha: float=0.5
+    benchmark_manager.execute_test(img_f=ReplaceBackgroundImageFilter()) # alpha: float=0.5
     image_path = f"images/amanda.jpg"
     image = Image.open(image_path)
-    benchmark_manager.execute_test(PushTopImageFilter(image)) # additional_image: Image
-    benchmark_manager.execute_test(ReplaceBackgroundImageFilter(image)) #  background_image: Image , alpha: float=0.5
+    benchmark_manager.execute_test(img_f=PushTopImageFilter(image)) # additional_image: Image
+    benchmark_manager.execute_test(img_f=ReplaceBackgroundImageFilter(image)) #  background_image: Image , alpha: float=0.5
     
     
     # -- Personal information filters -- #
@@ -81,9 +83,9 @@ def eval_llama():
     benchmark_manager.execute_test(SurroundByWrongAnsTextFilter()) # padding_symbol: str = "*", num_repeats: int = 6)
     benchmark_manager.execute_test(SurroundByPartialCorrectAnsTextFilter()) #  p: float = 0.2, padding_symbol: str = "*", num_repeats: int = 6
     # Image #
-    benchmark_manager.execute_test(SurroundByCorrectAnsImageFilter()) # num_repeats: int = 5, alpha: float = 0.2,  font_size: int = 40, font_type: str = "arial.ttf", font_color = "black"
-    benchmark_manager.execute_test(SurroundByWrongAnsImageFilter()) # same
-    benchmark_manager.execute_test(SurroundByPartialCorrectAnsImageFilter()) # p = 0.2, the rest as SurroundByCorrectAnsImageFilter
+    benchmark_manager.execute_test(img_f=SurroundByCorrectAnsImageFilter()) # num_repeats: int = 5, alpha: float = 0.2,  font_size: int = 40, font_type: str = "arial.ttf", font_color = "black"
+    benchmark_manager.execute_test(img_f=SurroundByWrongAnsImageFilter()) # same
+    benchmark_manager.execute_test(img_f=SurroundByPartialCorrectAnsImageFilter()) # p = 0.2, the rest as SurroundByCorrectAnsImageFilter
     
     # --------------------------------------- #
     

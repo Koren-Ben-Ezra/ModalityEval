@@ -129,5 +129,11 @@ class TestExtractAnswer(unittest.TestCase):
 
     def test_real(self):
         self.assertEqual(extract_answer(text), "18")
+    
+    def test_1(self):
+        self.assertEqual(extract_answer("18.05 <|eot_id|>"), "18.05")
+        
+    def test_2(self):
+        self.assertEqual(extract_answer("18.00 <|eot_id|>"), "18.00")
 if __name__ == "__main__":
     unittest.main()
