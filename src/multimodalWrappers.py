@@ -73,6 +73,14 @@ class LlamaWrapper(MultimodalWrapper):
         
         Log().logger.info(f"Model {self.model_name} loaded successfully.")
         
+        if torch.cuda.is_available():
+            Log().logger.info(f"GPU available: {torch.cuda.get_device_name(0)}, device count: {torch.cuda.device_count()}")
+        else:
+            Log().logger.warning("No GPU available.")
+            
+        Log().logger.info(f"Model is running on {self._model.device}.")            
+        
+        
     def generate_ans_from_image(self, image: Image):
         image = image.convert("RGB")  # keep it 3-channel
 

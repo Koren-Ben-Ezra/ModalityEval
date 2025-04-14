@@ -4,7 +4,7 @@
 #SBATCH --error=outputs/error.err
 #SBATCH --account=gpu-research
 #SBATCH --partition=killable
-#SBATCH --gres=gpu:10
+#SBATCH --gres=gpu:5
 #SBATCH --mem=50000         # 50,000 MB (50GB) of CPU memory
 #SBATCH --constraint=geforce_rtx_3090
 
