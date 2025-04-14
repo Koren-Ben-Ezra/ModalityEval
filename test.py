@@ -90,13 +90,43 @@ Total amount made = Price per egg * Number of eggs sold
 = $18 per day.
 
 **Answer:** $18<|eot_id|>"""
-def extract_answer(text: str, token: str="<|eot_id|>") -> str:
-    pattern = r"([-+]?\d+(?:\.\d+)?)(?:\s*" + re.escape(token) + ")"
 
+
+import unittest
+import re
+
+def extract_answer(text: str, token: str = "<|eot_id|>") -> str:
+    pattern = r"([-+]?\d+(?:\.\d+)?)(?:\s*" + re.escape(token) + ")"
     match = re.search(pattern, text)
     if match:
         return str(match.group(1))
     else:
         return None
-    
-print(extract_answer(text))
+
+class TestExtractAnswer(unittest.TestCase):
+
+    def test_positive_integer(self):
+        self.assertEqual(extract_answer("answer: 18 <|eot_id|>"), "18")
+
+    def test_negative_integer(self):
+        self.assertEqual(extract_answer("answer: -42 <|eot_id|>"), "-42")
+
+    def test_positive_float(self):
+        self.assertEqual(extract_answer("answer: 3.14 <|eot_id|>"), "3.14")
+
+    def test_negative_float(self):
+        self.assertEqual(extract_answer("answer: -0.001 <|eot_id|>"), "-0.001")
+
+    def test_number_with_extra_space(self):
+        self.assertEqual(extract_answer("answer: 99   <|eot_id|>"), "99")
+
+    def test_no_number(self):
+        self.assertIsNone(extract_answer("answer: hello <|eot_id|>"))
+
+    def test_token_not_found(self):
+        self.assertIsNone(extract_answer("answer: 18 <END>"))
+
+    def test_real(self):
+        self.assertEqual(extract_answer(text), "18")
+if __name__ == "__main__":
+    unittest.main()
