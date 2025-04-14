@@ -1,9 +1,9 @@
 {
     "system" : {
         "text instruction": "Provide only the final answer in plain text. No explanations or additional words, you MUST provide the final answer: 'answer: <your answer>",
-        "CoT text instruction": "You are a capable vision-language reasoning assistant. When you see the question, first break down your thought process into clear, logical steps. Explain each reasoning step in detail before arriving at the final answer. Only after completing your step-by-step reasoning, you MUST provide the final answer: 'answer: <your answer>",
+        "CoT text instruction": "Let's think step by step. At the end, you MUST write the answer as an integer after '####'.",
         "image instruction": "The question is displayed within the provided image. Respond solely with the final answer in text form. No explanations or extra words, you MUST provide the final answer: 'answer: <your answer>",
-        "CoT image instruction": "The question is displayed within the provided image. You are a capable vision-language reasoning assistant. When you see the question, first break down your thought process into clear, logical steps. Explain each reasoning step in detail before arriving at the final answer. Only after completing your step-by-step reasoning, you MUST provide the final answer: 'answer: <your answer>"
+        "CoT image instruction": "The question is displayed within the provided image. Let's think step by step. At the end, you MUST write the answer as an integer after '####'."
     
     },
 

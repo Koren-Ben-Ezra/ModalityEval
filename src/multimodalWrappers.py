@@ -94,7 +94,7 @@ class LlamaWrapper(MultimodalWrapper):
         output = self._model.generate(**inputs, max_new_tokens=MAX_NEW_TOKENS)
         decoded_output = self._processor.decode(output[0])
         # return extract_number(decoded_output)
-        return extract_answer(decoded_output)
+        return self.extract_ans_from_response(decoded_output, eos="<|eot_id|>")
 
 
     def generate_ans_from_text(self, text: str):
@@ -121,16 +121,29 @@ class LlamaWrapper(MultimodalWrapper):
         output = self._model.generate(**inputs, max_new_tokens=MAX_NEW_TOKENS)
         decoded_output = self._processor.decode(output[0])
         # return extract_number(decoded_output)
-        return self.extract_answer(decoded_output)
+        return self.extract_ans_from_response(decoded_output, eos="<|eot_id|>")
+    
+    def extract_ans_from_response(answer: str, eos=None):
+        if eos:
+            answer = answer.split(eos)[0].strip()
 
-    def extract_answer(text: str, token: str="<|eot_id|>") -> str:
-        pattern = r"([-+]?\d+(?:\.\d+)?)(?:\s*" + re.escape(token) + ")"
+        answer = answer.split('####')[-1].strip()
 
-        match = re.search(pattern, text)
-        if match:
-            return str(match.group(1))
-        else:
-            return None
+        for remove_char in [',', '$', '%', 'g']:
+            answer = answer.replace(remove_char, '')
+
+        try:
+            return int(answer)
+        except ValueError:
+            return answer
+    # def extract_answer(text: str, token: str="<|eot_id|>") -> str:
+    #     pattern = r"([-+]?\d+(?:\.\d+)?)(?:\s*" + re.escape(token) + ")"
+
+    #     match = re.search(pattern, text)
+    #     if match:
+    #         return str(match.group(1))
+    #     else:
+    #         return None
     
 
 # class GPT4ominiWrapper(MultimodalWrapper):
