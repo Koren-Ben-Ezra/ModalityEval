@@ -133,7 +133,7 @@ class LlamaWrapper(MultimodalWrapper):
         
         return output
         
-    def extract_answer(text: str, token: str="<|eot_id|>") -> str:
+    def extract_answer(self, text: str, token: str="<|eot_id|>") -> str:
         if not isinstance(text, str):
             raise ValueError(f"Expected string, got {type(text)}: {text}")
 
