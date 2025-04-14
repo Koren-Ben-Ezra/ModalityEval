@@ -33,7 +33,7 @@ class GSM8kWrapper(AbstractDatasetWrapper):
         
         else:
             try:
-                self.dataset = load_dataset("gsm8k", "main")["test"].select(range(1))
+                self.dataset = load_dataset("gsm8k", "main")["test"]
             except Exception as e:
                 Log().logger.error(f"Error loading dataset: {e}")
                 raise e

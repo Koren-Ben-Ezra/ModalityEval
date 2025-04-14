@@ -45,7 +45,6 @@ def eval_llama():
     # -- Identity filters -- #
     # Text #
     benchmark_manager.execute_test(IdentityTextFilter())
-    exit(0)
     # Image #
     # benchmark_manager.execute_test(IdentityImageFilter())
     
@@ -56,6 +55,7 @@ def eval_llama():
     # Text #
     benchmark_manager.execute_test(ShuffleWordTextFilter()) #p = 0.2
     benchmark_manager.execute_test(SwapWordsTextFilter()) #p = 0.2
+    exit(0)
     # Image #
     benchmark_manager.execute_test(HistogramEqualizationImageFilter())
     benchmark_manager.execute_test(GaussianImageFilter()) # kernel_size = 5 sigms = 1.0
