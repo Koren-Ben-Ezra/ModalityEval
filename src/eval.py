@@ -14,8 +14,7 @@ def eval_llama():
     Log().logger.info("------------------------------------------------")
     Log().logger.info("Starting evaluation...")
     
-    llama4_scout = "meta-llama/Llama-4-Scout-17B-16E-Instruct"
-    multimodal_wrapper = LlamaWrapper(model_id=llama4_scout)
+    multimodal_wrapper = LlamaWrapper()
     
     ############################# GSM8k dataset ##############################
     
