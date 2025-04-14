@@ -95,7 +95,7 @@ class LlamaWrapper(MultimodalWrapper):
         decoded_output = self._processor.decode(output[0])
         
         try:
-            output = self.extract_answer(decoded_output, eos="<|eot_id|>")
+            output = self.extract_answer(decoded_output, token="<|eot_id|>")
         except Exception as e:
             Log().logger.error(f"Error extracting answer: {e}")
             raise e
@@ -126,7 +126,7 @@ class LlamaWrapper(MultimodalWrapper):
         decoded_output = self._processor.decode(output[0])
         
         try:
-            output = self.extract_answer(decoded_output, eos="<|eot_id|>")
+            output = self.extract_answer(decoded_output, token="<|eot_id|>")
         except Exception as e:
             Log().logger.error(f"Error extracting answer: {e}")
             raise e
