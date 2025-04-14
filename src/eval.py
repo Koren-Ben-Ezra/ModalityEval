@@ -47,8 +47,6 @@ def eval_llama():
     # Text #
     benchmark_manager.execute_test(IdentityTextFilter())
     # Image #
-    # benchmark_manager.execute_test(IdentityImageFilter())
-    
     benchmark_manager.execute_test(IdentityImageFilter())
     
     
@@ -56,16 +54,14 @@ def eval_llama():
     # Text #
     benchmark_manager.execute_test(ShuffleWordTextFilter()) #p = 0.2
     benchmark_manager.execute_test(SwapWordsTextFilter()) #p = 0.2
-    exit(0)
     # Image #
     benchmark_manager.execute_test(img_f=HistogramEqualizationImageFilter())
     benchmark_manager.execute_test(img_f=GaussianImageFilter()) # kernel_size = 5 sigms = 1.0
 
-    exit(0)
 
     # -- General information filters -- #
     # Text #
-    phrase = saved_text.get("angry", "")
+    phrase = saved_text.get("scared", "")
     benchmark_manager.execute_test(PushFrontTextFilter(phrase))
     
     # Image #
