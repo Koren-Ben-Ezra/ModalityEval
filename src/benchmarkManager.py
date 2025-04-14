@@ -37,6 +37,7 @@ class BenchmarkManager:
 
         name1 = text_f.filter_name if text_f is not None else ""
         name2 = img_f.filter_name if img_f is not None else ""
+        
         if name1 and name2:
             self.logger.info(f"Executing test with filters: {name1} and {name2}")
         elif name1:

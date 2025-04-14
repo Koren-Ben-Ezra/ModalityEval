@@ -74,10 +74,10 @@ class Log:
 
 
 if __name__ == "__main__":
-    Log = Log().logger
+    log = Log().logger
     
-    Log.debug("This DEBUG message will not be shown (INFO level set).")
-    Log.info("This is an INFO message.")
-    Log.warning("This is a WARNING message.")
-    Log.error("This is an ERROR message.")
-    Log.critical("This is a CRITICAL message.")
+    log.debug("This DEBUG message will not be shown (INFO level set).")
+    log.info("This is an INFO message.")
+    log.warning("This is a WARNING message.")
+    log.error("This is an ERROR message.")
+    log.critical("This is a CRITICAL message.")

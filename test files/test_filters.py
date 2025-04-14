@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 from PIL import Image
 
 from src.filters import *
-from text2image import *
+from src.text2image import *
 
 TEST_DIR = "test_filters_output"
 
@@ -23,7 +23,7 @@ def test_text_filter(filter: AbstractTextFilter, input: str, answer: str):
         print(f"\n[Error] {filter.filter_name}: {e}")
         return
     
-    summary = f"{filter.filter_name}\n\nInput:\n{input}\n\nOutput:\n{output}" 
+    summary = f"{filter.filter_name}\n\nInput:\n{input}\n\nOutput:\n{output}"
 
     with open(os.path.join(TEST_DIR, f"{filter.filter_name}.txt"), "w") as f:
         f.write(summary)

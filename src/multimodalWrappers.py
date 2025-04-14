@@ -85,7 +85,8 @@ class LlamaWrapper(MultimodalWrapper):
                 {"type": "text", "text": IMG_INSTRUCTION}
             ]}
         ]
-        input_text = self._processor.apply_chat_template(messages, add_generation_prompt=True)
+        # input_text = self._processor.apply_chat_template(messages, add_generation_prompt=True)
+        input_text = self._processor.apply_chat_template(messages)
         inputs = self._processor(
             image,
             input_text,

@@ -30,6 +30,7 @@ class GSM8kWrapper(AbstractDatasetWrapper):
             Log().logger.info(f"Found cached dataset at {cache_path}. Loading from cache...")
             self.dataset = Dataset.load_from_disk(str(cache_path))
             return
+        
         else:
             try:
                 self.dataset = load_dataset("gsm8k", "main")["test"].select(range(1))
