@@ -95,13 +95,14 @@ Total amount made = Price per egg * Number of eggs sold
 import unittest
 import re
 
-def extract_answer(text: str, token: str = "<|eot_id|>") -> str:
+def extract_answer(text: str, token: str="<|eot_id|>") -> str:
+    if not isinstance(text, str):
+        raise ValueError(f"Expected string, got {type(text)}: {text}")
+
     pattern = r"([-+]?\d+(?:\.\d+)?)(?:\s*" + re.escape(token) + ")"
+
     match = re.search(pattern, text)
-    if match:
-        return str(match.group(1))
-    else:
-        return None
+    return match.group(1) if match else None
 
 class TestExtractAnswer(unittest.TestCase):
 

@@ -93,10 +93,14 @@ class LlamaWrapper(MultimodalWrapper):
 
         output = self._model.generate(**inputs, max_new_tokens=MAX_NEW_TOKENS)
         decoded_output = self._processor.decode(output[0])
-        # return extract_number(decoded_output)
-        return self.extract_answer(decoded_output, eos="<|eot_id|>")
-
-
+        
+        try:
+            output = self.extract_answer(decoded_output, eos="<|eot_id|>")
+        except Exception as e:
+            Log().logger.error(f"Error extracting answer: {e}")
+            raise e
+        return output
+    
     def generate_ans_from_text(self, text: str):
         # Create a dummy 224x224 RGB image (NOT 1x1, not grayscale)
         image = Image.new(mode="RGB", size=(224, 224), color="white")
@@ -120,31 +124,24 @@ class LlamaWrapper(MultimodalWrapper):
 
         output = self._model.generate(**inputs, max_new_tokens=MAX_NEW_TOKENS)
         decoded_output = self._processor.decode(output[0])
-        # return extract_number(decoded_output)
-        return self.extract_answer(decoded_output, eos="<|eot_id|>")
-    
-    # def extract_ans_from_response(answer: str, eos=None):
-    #     if eos:
-    #         answer = answer.split(eos)[0].strip()
-
-    #     answer = answer.split('####')[-1].strip()
-
-    #     for remove_char in [',', '$', '%', 'g']:
-    #         answer = answer.replace(remove_char, '')
-
-    #     try:
-    #         return int(answer)
-    #     except ValueError:
-    #         return answer
+        
+        try:
+            output = self.extract_answer(decoded_output, eos="<|eot_id|>")
+        except Exception as e:
+            Log().logger.error(f"Error extracting answer: {e}")
+            raise e
+        
+        return output
         
     def extract_answer(text: str, token: str="<|eot_id|>") -> str:
+        if not isinstance(text, str):
+            raise ValueError(f"Expected string, got {type(text)}: {text}")
+
         pattern = r"([-+]?\d+(?:\.\d+)?)(?:\s*" + re.escape(token) + ")"
 
         match = re.search(pattern, text)
-        if match:
-            return str(match.group(1))
-        else:
-            return None
+        return match.group(1) if match else None
+
     
 
 # class GPT4ominiWrapper(MultimodalWrapper):
