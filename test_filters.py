@@ -36,14 +36,18 @@ def test_image_filter(filter: AbstractImageFilter, input: Image, answer: str):
     except Exception as e:
         print(f"\n[Error] {filter.filter_name}: {e}")
         return
-
+    
     plt.subplot(1, 2, 1)
+    plt.xticks([])
+    plt.yticks([]) 
     plt.suptitle(f"{filter.filter_name}")
     plt.imshow(input)
-    plt.title("input")
+    # plt.title("input")
     plt.subplot(1, 2, 2)
+    plt.xticks([])
+    plt.yticks([]) 
     plt.imshow(output)
-    plt.title("output")
+    # plt.title("output")
     plt.savefig(os.path.join(TEST_DIR, f"{filter.filter_name}.png"))
 
 
@@ -73,7 +77,7 @@ test_text_filter(SwapWordsTextFilter(), text_input, answer)
 
 
 # Test general information filters
-img = Image.open("my_image.jpg")
+img = Image.open("images/amanda.jpg")
 phrase = "My name is John Doe. I live in New York City. I am a software engineer at Google."
 test_image_filter(ReplaceBackgroundImageFilter(img), image_input, answer)
 test_text_filter(PushFrontTextFilter(phrase), text_input, answer)

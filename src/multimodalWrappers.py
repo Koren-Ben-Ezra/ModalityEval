@@ -78,7 +78,7 @@ class LlamaWrapper(MultimodalWrapper):
         else:
             Log().logger.warning("No GPU available.")
             
-        Log().logger.info(f"Model is running on {self._model.device}.")            
+        Log().logger.info(f"Model is running on {self._model.device}.")
         
         
     def generate_ans_from_image(self, image: Image):
