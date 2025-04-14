@@ -1,7 +1,7 @@
 #!/bin/bash
 #SBATCH --job-name=MultimodalEval
-#SBATCH --output=outputs/multimodal_eval.out
-#SBATCH --error=outputs/multimodal_eval.err
+#SBATCH --output=outputs/output.out
+#SBATCH --error=outputs/error.err
 #SBATCH --account=gpu-research
 #SBATCH --partition=killable
 #SBATCH --gres=gpu:1
@@ -33,4 +33,4 @@ export PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
 # Run your main Python script in unbuffered mode
 python -u main.py
 
-tail -f outputs/multimodal_eval.out
+tail -f outputs/output.out
