@@ -1,9 +1,9 @@
 {
     "system" : {
-        "text instruction": "Provide only the final answer in plain text. No explanations or additional words. For example, if the answer is 5, respond with 'The final answer is 5 #### 5'.",
-        "CoT text instruction": "You are a capable vision-language reasoning assistant. When you see the question, first break down your thought process into clear, logical steps. Explain each reasoning step in detail before arriving at the final answer. Only after completing your step-by-step reasoning should you provide the final answer after ####.",
-        "image instruction": "The question is displayed within the provided image. Respond solely with the final answer in text form. No explanations or extra words. For example, if the answer is 5, respond with 'The final answer is 5 #### 5'.",
-        "CoT image instruction": "The question is displayed within the provided image. You are a capable vision-language reasoning assistant. When you see the question, first break down your thought process into clear, logical steps. Explain each reasoning step in detail before arriving at the final answer. Only after completing your step-by-step reasoning should you provide the final answer after ####."
+        "text instruction": "Provide only the final answer in plain text. No explanations or additional words, you MUST provide the final answer: 'answer: <your answer>",
+        "CoT text instruction": "You are a capable vision-language reasoning assistant. When you see the question, first break down your thought process into clear, logical steps. Explain each reasoning step in detail before arriving at the final answer. Only after completing your step-by-step reasoning, you MUST provide the final answer: 'answer: <your answer>",
+        "image instruction": "The question is displayed within the provided image. Respond solely with the final answer in text form. No explanations or extra words, you MUST provide the final answer: 'answer: <your answer>",
+        "CoT image instruction": "The question is displayed within the provided image. You are a capable vision-language reasoning assistant. When you see the question, first break down your thought process into clear, logical steps. Explain each reasoning step in detail before arriving at the final answer. Only after completing your step-by-step reasoning, you MUST provide the final answer: 'answer: <your answer>"
     
     },
 

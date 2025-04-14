@@ -33,9 +33,6 @@ def extract_number(text: str) -> str:
         return matches[-1]  # Return the last match
     return ""
 
-def extract_answer(text: str, seperator: str="####") -> str:
-    return text.split(seperator)[-1].strip()
-
 class MultimodalWrapper:
     def __init__(self):
         self.model_id: str = None
@@ -86,7 +83,7 @@ class LlamaWrapper(MultimodalWrapper):
             ]}
         ]
         # input_text = self._processor.apply_chat_template(messages, add_generation_prompt=True)
-        input_text = self._processor.apply_chat_template(messages)
+        input_text = self._processor.apply_chat_template(messages, add_generation_prompt=False)
         inputs = self._processor(
             image,
             input_text,
@@ -124,8 +121,16 @@ class LlamaWrapper(MultimodalWrapper):
         output = self._model.generate(**inputs, max_new_tokens=MAX_NEW_TOKENS)
         decoded_output = self._processor.decode(output[0])
         # return extract_number(decoded_output)
-        return extract_answer(decoded_output)
+        return self.extract_answer(decoded_output)
 
+    def extract_answer(text: str, token: str="<|eot_id|>") -> str:
+        pattern = r"([-+]?\d+(?:\.\d+)?)(?:\s*" + re.escape(token) + ")"
+
+        match = re.search(pattern, text)
+        if match:
+            return str(match.group(1))
+        else:
+            return None
     
 
 # class GPT4ominiWrapper(MultimodalWrapper):
