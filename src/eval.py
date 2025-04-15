@@ -110,7 +110,7 @@ def eval_llama():
         ## Without slurm:
         # text2image = FixedSizeText2Image()
         
-        datasetWrapper = GSM8kWrapper(text2image)
+        datasetWrapper = GSM8kWrapper(text2image, cache_filename="gsm8k_shuffled_dataset")
         
         metadata = {
             "test name": "shuffle word test",

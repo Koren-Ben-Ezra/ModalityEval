@@ -17,15 +17,18 @@ class AbstractDatasetWrapper:
     
 class GSM8kWrapper(AbstractDatasetWrapper):
 
-    def __init__(self, text2image: AbstractText2Image = FixedSizeText2Image()):
+    def __init__(self, text2image: AbstractText2Image = FixedSizeText2Image(), cache_filename: str=""):
         self.dataset_id = "GSM8k"
         self._text2image = text2image
         Log().logger.info(f"Loading {self.dataset_id} dataset...")
         
         if not os.path.exists(CACHE_NAME):
             os.makedirs(CACHE_NAME)
+        
+        if not cache_filename:
+            cache_filename = f"{self.dataset_id}_dataset"
             
-        cache_path = os.path.join(CACHE_NAME, f"{self.dataset_id}_dataset")
+        cache_path = os.path.join(CACHE_NAME, cache_filename)
         if os.path.exists(cache_path):
             Log().logger.info(f"Found cached dataset at {cache_path}. Loading from cache...")
             self.dataset = Dataset.load_from_disk(str(cache_path))
