@@ -41,6 +41,7 @@ class JobHandler:
                 job()  # Actually run the job
             except Exception as e:
                 self.logger.error(f"Error executing job: {e}")
+            
             finally:
                 self.job_queue.task_done()
                 self.logger.info("Job completed.")
