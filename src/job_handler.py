@@ -4,7 +4,7 @@ from queue import Queue
 # Remove if not actually used:
 # import torch  
 
-from log import Log
+from src.log import Log
 
 class JobHandler:
     _instance = None

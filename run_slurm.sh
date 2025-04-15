@@ -32,7 +32,7 @@ mkdir -p "$TMPDIR"
 export PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
 
 # Optionally set how many tasks to run in parallel inside Python
-export NUM_PARALLEL_JOBS=4
+export NUM_PARALLEL_JOBS=6
 
 # Launch main Python script (unbuffered)
 python -u main.py
