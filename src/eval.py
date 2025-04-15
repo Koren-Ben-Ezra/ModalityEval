@@ -70,9 +70,9 @@ def eval_llama():
     benchmark_manager.register_job(PushFrontTextFilter(phrase))
     
     # Image #
-    benchmark_manager.register_job(img_f=ReplaceBackgroundImageFilter()) # alpha: float=0.5
     image_path = f"images/amanda.jpg"
     image = Image.open(image_path)
+    benchmark_manager.register_job(img_f=ReplaceBackgroundImageFilter(image)) # alpha: float=0.5
     benchmark_manager.register_job(img_f=PushTopImageFilter(image)) # additional_image: Image
     benchmark_manager.register_job(img_f=ReplaceBackgroundImageFilter(image)) #  background_image: Image , alpha: float=0.5
     
