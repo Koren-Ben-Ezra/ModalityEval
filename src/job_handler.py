@@ -1,8 +1,6 @@
 import os
 import threading
 from queue import Queue
-# Remove if not actually used:
-# import torch  
 
 from src.log import Log
 
@@ -25,9 +23,6 @@ class JobHandler:
         self.logger.info("JobHandler initialized.")
         
     def register_job(self, job):
-        """
-        Register a job (callable) into the queue.
-        """
         if not callable(job):
             raise ValueError("Job must be a callable function or method.")
         
@@ -35,9 +30,6 @@ class JobHandler:
         self.logger.info("Job registered.")
         
     def worker(self):
-        """
-        Worker thread function: fetch jobs until queue is empty.
-        """
         while True:
             try:
                 job = self.job_queue.get_nowait()
@@ -54,14 +46,11 @@ class JobHandler:
                 self.logger.info("Job completed.")
     
     def start_workers(self):
-        """
-        Start worker threads to process the queued jobs in parallel.
-        """
         # Number of worker threads to spawn
         num_threads = int(os.getenv("NUM_PARALLEL_JOBS", "1"))
         self.logger.info(f"Starting {num_threads} workers.")
 
-        threads = []
+        threads: list[threading.Thread] = []
         for _ in range(num_threads):
             t = threading.Thread(target=self.worker)
             t.start()

@@ -79,18 +79,16 @@ def eval_llama():
     
     # -- Personal information filters -- #
     # Text #
-    benchmark_manager.register_job(SurroundByCorrectAnsTextFilter()) # padding_symbol: str = "*", num_repeats: int = 6
-    benchmark_manager.register_job(SurroundByWrongAnsTextFilter()) # padding_symbol: str = "*", num_repeats: int = 6)
-    benchmark_manager.register_job(SurroundByPartialCorrectAnsTextFilter()) #  p: float = 0.2, padding_symbol: str = "*", num_repeats: int = 6
-    # Image #
-    benchmark_manager.register_job(img_f=SurroundByCorrectAnsImageFilter()) # num_repeats: int = 5, alpha: float = 0.2,  font_size: int = 40, font_type: str = "arial.ttf", font_color = "black"
-    benchmark_manager.register_job(img_f=SurroundByWrongAnsImageFilter()) # same
-    benchmark_manager.register_job(img_f=SurroundByPartialCorrectAnsImageFilter()) # p = 0.2, the rest as SurroundByCorrectAnsImageFilter
+    # benchmark_manager.register_job(SurroundByCorrectAnsTextFilter()) # padding_symbol: str = "*", num_repeats: int = 6
+    # benchmark_manager.register_job(SurroundByWrongAnsTextFilter()) # padding_symbol: str = "*", num_repeats: int = 6)
+    # benchmark_manager.register_job(SurroundByPartialCorrectAnsTextFilter()) #  p: float = 0.2, padding_symbol: str = "*", num_repeats: int = 6
+    # # Image #
+    # benchmark_manager.register_job(img_f=SurroundByCorrectAnsImageFilter()) # num_repeats: int = 5, alpha: float = 0.2,  font_size: int = 40, font_type: str = "arial.ttf", font_color = "black"
+    # benchmark_manager.register_job(img_f=SurroundByWrongAnsImageFilter()) # same
+    # benchmark_manager.register_job(img_f=SurroundByPartialCorrectAnsImageFilter()) # p = 0.2, the rest as SurroundByCorrectAnsImageFilter
     
     # --------------------------------------- #
 
-    execute_jobs(benchmark_manager.category_queue)
-    Log().logger.info("Evaluation completed.")
-    
+    benchmark_manager.start_workers()
     
     ##########################################################################

@@ -38,6 +38,9 @@ class BenchmarkManager:
         
         JobHandler().register_job(partial(self._execute_test, text_f, img_f))
 
+    def start_workers(self):
+        JobHandler().start_workers()
+        
     def _execute_test(self, text_f: AbstractTextFilter=None, img_f: AbstractImageFilter=None):
         if text_f is None and img_f is None:
             raise ValueError("Both text and image filters cannot be None.")
