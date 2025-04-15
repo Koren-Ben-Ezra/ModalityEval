@@ -65,18 +65,16 @@ class BenchmarkManager:
         category.save_predictions()
         self.append_res_to_summary(category)
     
-    def _track_result(self, question: str, answer: str, pred_from_text: str, pred_from_image: str):
-        new_row = pd.DataFrame([{
-            "question": question,
-            "answer": answer
-        }])
-        if pred_from_text is not None:
-            new_row["text_prediction"] = pred_from_text
-        if pred_from_image is not None:
-            new_row["img_prediction"] = pred_from_image
-        
-        predictions_filename = os.path.join(self.benchmark_name, "debug.csv")
-        new_row.to_csv(predictions_filename, mode='a', index=False, header=not os.path.exists(predictions_filename))
+    def _track_result(self, question: str, answer: str, pred: str):
+        predictions_filename = os.path.join(self.benchmark_name, "checking_pulse.txt")
+        if not os.path.exists(predictions_filename):
+            with open(predictions_filename, "w") as f:
+                f.write("1. question \n2. answer \n 3. prediction\n\n")
+
+        with open(predictions_filename, "a") as f:
+            f.write("-------------------------------------------------------------")
+            f.write(f"{question}\n\n {answer}\n\n {pred}\n\n")
+
         
     def _execute_single_prompt(self, sample, category: Category, track_result: bool = False):
         pred_from_text = None
@@ -90,6 +88,9 @@ class BenchmarkManager:
             
             try:
                 pred_from_text = self.multimodal_wrapper.generate_ans_from_text(filtered_text)
+                if track_result:
+                    self._track_result(sample["question"], sample["answer"], pred_from_text)
+                
             except Exception as e:
                 self.logger.error(f"Error generating answer from text: {e}")
                 raise e
@@ -97,6 +98,8 @@ class BenchmarkManager:
         if category.img_f is not None:
             try:
                 filtered_image = category.img_f.apply_filter(sample["question_image"])
+                if track_result:
+                    self._track_result(sample["question"], sample["answer"], filtered_image)
             except Exception as e:
                 self.logger.error(f"Error applying image filter: {e}")
                 raise e
@@ -109,8 +112,7 @@ class BenchmarkManager:
             
         self._update_category_stats(sample, category, pred_from_text, pred_from_image)
     
-        if track_result:
-            self._track_result(sample["question"], sample["answer"], pred_from_text, pred_from_image)
+        
     
     def _update_category_stats(self, sample, category: Category, pred_from_text: str, pred_from_img: str):
         answer = self.clean_str_number(sample["answer"])

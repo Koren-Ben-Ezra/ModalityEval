@@ -62,3 +62,15 @@ class JobHandler:
             t.join()
 
         self.logger.info("All jobs completed.")
+
+    def execute_test(self):
+        job = self.job_queue.get_nowait()
+        
+        self.logger.info("Executing test function.")
+        
+        
+        job()
+        
+        
+        
+        self.logger.info("Test function executed successfully.")
