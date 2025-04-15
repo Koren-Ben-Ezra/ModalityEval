@@ -3,12 +3,14 @@ import pandas as pd
 from tqdm import tqdm
 import json
 from decimal import Decimal, InvalidOperation
+from functools import partial
 
 from src.filters import AbstractImageFilter, AbstractTextFilter
 from src.category import Category
 from src.datasetWrapper import AbstractDatasetWrapper
 from src.multimodalWrappers import MultimodalWrapper
 from src.log import Log
+from src.job_handler import JobHandler
 
 BENCHMARKS_DIR = "benchmarks"
 EPSILON = 1e-3
@@ -29,9 +31,14 @@ class BenchmarkManager:
         
         self._make_benchmark_dir()
         self._make_summary_files()
-
+    
+    def add_job(self, img_f: AbstractImageFilter=None, text_f: AbstractTextFilter=None):
+        if img_f is None and text_f is None:
+            raise ValueError("Both image and text filters cannot be None.")
         
-    def execute_test(self, text_f: AbstractTextFilter=None, img_f: AbstractImageFilter=None):
+        JobHandler().register_job(partial(self._execute_test, text_f, img_f))
+
+    def _execute_test(self, text_f: AbstractTextFilter=None, img_f: AbstractImageFilter=None):
         if text_f is None and img_f is None:
             raise ValueError("Both text and image filters cannot be None.")
 

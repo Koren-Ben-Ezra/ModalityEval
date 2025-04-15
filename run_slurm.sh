@@ -5,7 +5,7 @@
 #SBATCH --account=gpu-research
 #SBATCH --partition=killable
 #SBATCH --gres=gpu:1
-#SBATCH --mem=50000         # 50,000 MB (50GB) of CPU memory
+#SBATCH --mem=50000         # 50 GB of CPU memory
 #SBATCH --constraint=geforce_rtx_3090
 
 # Print GPU info
@@ -18,8 +18,10 @@ export LD_LIBRARY_PATH=/usr/local/cuda-11.0/lib64:$LD_LIBRARY_PATH
 # Initialize Conda and activate your environment
 source /home/joberant/NLP_2425a/$(whoami)/anaconda3/etc/profile.d/conda.sh
 conda activate ModalityEval
+
 export HUGGING_FACE_HUB_TOKEN="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"
-# Set Hugging Face cache and TMPDIR to scratch space to avoid home quota issues
+
+# Set Hugging Face cache and TMPDIR to scratch space
 export HF_HOME=/vol/scratch/$(whoami)/hf_cache
 mkdir -p "$HF_HOME"
 
@@ -29,6 +31,8 @@ mkdir -p "$TMPDIR"
 # Optional: Configure PyTorch CUDA allocation to help avoid fragmentation
 export PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
 
+# Optionally set how many tasks to run in parallel inside Python
+export NUM_PARALLEL_JOBS=4
 
-# Run your main Python script in unbuffered mode
+# Launch main Python script (unbuffered)
 python -u main.py
