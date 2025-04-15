@@ -47,13 +47,28 @@ class BenchmarkManager:
             
         category = Category(text_f, img_f, self.benchmark_name, self.save_predictions)
 
+        cnt = 0
         for sample in tqdm(self._datasetWrapper.dataset):
-            self._execute_single_prompt(sample, category)
+            track_result = cnt < 5 or cnt % 50 == 0
+            self._execute_single_prompt(sample, category, track_result)
             
         category.save_predictions()
         self.append_res_to_summary(category)
-            
-    def _execute_single_prompt(self, sample, category: Category):
+    
+    def _track_result(self, question: str, answer: str, pred_from_text: str, pred_from_image: str):
+        new_row = pd.DataFrame([{
+            "question": question,
+            "answer": answer
+        }])
+        if pred_from_text is not None:
+            new_row["text_prediction"] = pred_from_text
+        if pred_from_image is not None:
+            new_row["img_prediction"] = pred_from_image
+        
+        predictions_filename = os.path.join(self.benchmark_name, "debug.csv")
+        new_row.to_csv(predictions_filename, mode='a', index=False, header=not os.path.exists(predictions_filename))
+        
+    def _execute_single_prompt(self, sample, category: Category, track_result: bool = False):
         pred_from_text = None
         pred_from_image = None
         if category.text_f is not None:
@@ -83,6 +98,9 @@ class BenchmarkManager:
                 raise e
             
         self._update_category_stats(sample, category, pred_from_text, pred_from_image)
+    
+        if track_result:
+            self._track_result(sample["question"], sample["answer"], pred_from_text, pred_from_image)
     
     def _update_category_stats(self, sample, category: Category, pred_from_text: str, pred_from_img: str):
         answer = self.clean_str_number(sample["answer"])

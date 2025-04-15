@@ -45,7 +45,7 @@ def eval_llama():
     # ------ execute text and image filter tests ------ #
     # -- Identity filters -- #
     # Text #
-    benchmark_manager.execute_test(IdentityTextFilter())
+    # benchmark_manager.execute_test(IdentityTextFilter()) DONE!
     # Image #
     benchmark_manager.execute_test(IdentityImageFilter())
     
