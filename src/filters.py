@@ -6,12 +6,12 @@ from PIL import Image, ImageDraw, ImageFont
 RANDOM_VALUES: list[str] = [str(random.randint(0, 10000)) for _ in range(100)]
 
 class AbstractImageFilter:
-    filter_name = ""
+    filter_name = None
     def apply_filter(self, input: Image, answer: str=None):
         return None
 
 class AbstractTextFilter:
-    filter_name = ""
+    filter_name = None
     def apply_filter(self, input: str, answer: str=None):
         return None
 
