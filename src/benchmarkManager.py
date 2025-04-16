@@ -45,38 +45,38 @@ class BenchmarkManager:
         if text_f is None and img_f is None:
             raise ValueError("Both text and image filters cannot be None.")
 
-        name1 = text_f.filter_name if text_f is not None else ""
-        name2 = img_f.filter_name if img_f is not None else ""
+        name_tf = text_f.filter_name
+        name_if = img_f.filter_name 
         
-        if name1 and name2:
-            self.logger.info(f"Executing test with filters: {name1} and {name2}")
-        elif name1:
-            self.logger.info(f"Executing test with filter: {name1}")
-        elif name2:
-            self.logger.info(f"Executing test with filter: {name2}")
+        if name_tf and name_if:
+            self.logger.info(f"Executing test with filters: {name_tf} and {name_if}")
+        elif name_tf:
+            self.logger.info(f"Executing test with filter: {name_tf}")
+        elif name_if:
+            self.logger.info(f"Executing test with filter: {name_if}")
             
         category = Category(text_f, img_f, self.benchmark_name, self.save_predictions)
 
-        cnt = 0
+        idx = 0
         for sample in tqdm(self._datasetWrapper.dataset):
-            track_result = cnt < 5 or cnt % 50 == 0
-            self._execute_single_prompt(sample, category, track_result)
+            self._execute_single_prompt(sample, category, idx, track_result=True)
+            idx += 1
             
         category.save_predictions()
         self.append_res_to_summary(category)
     
-    def _track_result(self, question: str, answer: str, pred: str):
-        predictions_filename = os.path.join(self.benchmark_name, "checking_pulse.txt")
+    def _track_result(self, question: str, answer: str, pred: str, title: str):
+        predictions_filename = os.path.join(self.benchmark_name, "track.txt")
         if not os.path.exists(predictions_filename):
-            with open(predictions_filename, "w") as f:
-                f.write("1. question \n2. answer \n 3. prediction\n\n")
+            open(predictions_filename, "w").close()
 
         with open(predictions_filename, "a") as f:
             f.write("-------------------------------------------------------------")
+            f.write(f"[{title}]")
             f.write(f"{question}\n\n {answer}\n\n {pred}\n\n")
 
         
-    def _execute_single_prompt(self, sample, category: Category, track_result: bool = False):
+    def _execute_single_prompt(self, sample, category: Category, idx: int, track_result: bool = False):
         pred_from_text = None
         pred_from_image = None
         if category.text_f is not None:
@@ -89,7 +89,8 @@ class BenchmarkManager:
             try:
                 pred_from_text = self.multimodal_wrapper.generate_ans_from_text(filtered_text)
                 if track_result:
-                    self._track_result(sample["question"], sample["answer"], pred_from_text)
+                    title = f"filter: {category.text_f.filter_name}, question: {idx}"
+                    self._track_result(sample["question"], sample["answer"], pred_from_text, title)
                 
             except Exception as e:
                 self.logger.error(f"Error generating answer from text: {e}")
@@ -99,7 +100,8 @@ class BenchmarkManager:
             try:
                 filtered_image = category.img_f.apply_filter(sample["question_image"])
                 if track_result:
-                    self._track_result(sample["question"], sample["answer"], filtered_image)
+                    title = f"filter: {category.img_f.filter_name}, question: {idx}"
+                    self._track_result(sample["question"], sample["answer"], pred_from_image, title)
             except Exception as e:
                 self.logger.error(f"Error applying image filter: {e}")
                 raise e
@@ -112,8 +114,6 @@ class BenchmarkManager:
             
         self._update_category_stats(sample, category, pred_from_text, pred_from_image)
     
-        
-    
     def _update_category_stats(self, sample, category: Category, pred_from_text: str, pred_from_img: str):
         answer = self.clean_str_number(sample["answer"])
         
@@ -125,8 +125,8 @@ class BenchmarkManager:
             if pred_from_text == answer:
                 category.text_stats.success += 1
         
-        if pred_from_img is not None:        
-            pred_from_text = self.clean_str_number(pred_from_img)
+        if pred_from_img is not None:  
+            pred_from_img = self.clean_str_number(pred_from_img)
             if pred_from_img == answer:
                 category.img_stats.success += 1
 
