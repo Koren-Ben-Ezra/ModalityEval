@@ -81,7 +81,7 @@ class BenchmarkManager:
         pred_from_image = None
         if category.text_f is not None:
             try:
-                filtered_text = category.text_f.apply_filter(sample["question"])
+                filtered_text = category.text_f.apply_filter(sample["question"], sample["answer"])
             except Exception as e:
                 self.logger.error(f"Error applying text filter: {e}")
                 raise e
@@ -98,7 +98,7 @@ class BenchmarkManager:
             
         if category.img_f is not None:
             try:
-                filtered_image = category.img_f.apply_filter(sample["question_image"])
+                filtered_image = category.img_f.apply_filter(sample["question_image"], sample["answer"])
                 if track_result:
                     title = f"filter: {category.img_f.filter_name}, question: {idx}"
                     self._track_result(sample["question"], sample["answer"], pred_from_image, title)
