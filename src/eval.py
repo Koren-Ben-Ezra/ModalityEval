@@ -157,7 +157,7 @@ def eval_llama2():
     benchmark_manager = BenchmarkManager(datasetWrapper, multimodal_wrapper, metadata)
     Log().logger.info(f"Running benchmark for {multimodal_wrapper.model_name} on {datasetWrapper.dataset_id}")
     
-    benchmark_manager.register_job(ShuffleWordTextFilter(), IdentityImageFilter())
+    benchmark_manager.register_job(text_f=ShuffleWordTextFilter(), img_f=IdentityImageFilter())
     
     benchmark_manager.start_workers()
     
