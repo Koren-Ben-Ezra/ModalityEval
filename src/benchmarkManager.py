@@ -45,8 +45,8 @@ class BenchmarkManager:
         if text_f is None and img_f is None:
             raise ValueError("Both text and image filters cannot be None.")
 
-        name_tf = text_f.filter_name
-        name_if = img_f.filter_name 
+        name_tf = text_f.filter_name if text_f else ""
+        name_if = img_f.filter_name if img_f else ""
         
         if name_tf and name_if:
             self.logger.info(f"Executing test with filters: {name_tf} and {name_if}")
