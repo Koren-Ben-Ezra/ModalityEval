@@ -53,7 +53,11 @@ def test_image_filter(filter: AbstractImageFilter, input: Image, answer: str):
 
 # Setup test environment
 clear_test_dir()
-text2image = FixedSizeText2Image()
+
+max_font_size = 200
+width = 600
+height = 300
+text2image = FixedSizeText2Image(max_font_size=max_font_size, width=width, height=height)
 # text2image = FilteredFixedSizeText2Image(ShuffleWordTextFilter())
 text_input = """Janet's ducks lay 16 eggs per day. She eats three for breakfast 
 every morning and bakes muffins for her friends every day with four. 

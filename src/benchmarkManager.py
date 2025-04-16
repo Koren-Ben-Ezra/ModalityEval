@@ -32,7 +32,7 @@ class BenchmarkManager:
         self._make_benchmark_dir()
         self._make_summary_files()
     
-    def register_job(self, img_f: AbstractImageFilter=None, text_f: AbstractTextFilter=None):
+    def register_job(self, text_f: AbstractTextFilter=None, img_f: AbstractImageFilter=None):
         if img_f is None and text_f is None:
             raise ValueError("Both image and text filters cannot be None.")
         

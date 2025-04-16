@@ -47,9 +47,13 @@ def eval_llama():
     }
     # Read the JSON file
     with open(PARAMETERS_PATH, 'r') as file:
-        data = json.load(file)
-        saved_text = data.get('saved text', '')
-
+        parameters = json.load(file)
+    
+    try:
+        saved_text = parameters['saved text']
+    except KeyError:
+        Log().logger.error("The key 'saved text' was not found in the JSON file.")
+        return
 
     # Initialize the BenchmarkManager
     benchmark_manager = BenchmarkManager(datasetWrapper, multimodal_wrapper, metadata)
@@ -59,16 +63,16 @@ def eval_llama():
     # -- Identity filters -- #
     if job == "1":
         # Text #
-        benchmark_manager.register_job(IdentityTextFilter())
+        benchmark_manager.register_job(text_f=IdentityTextFilter())
         # Image #
-        benchmark_manager.register_job(IdentityImageFilter())
+        benchmark_manager.register_job(text_f=IdentityImageFilter())
     
     
     # -- Noise filters -- #
     if job == "2":
         # TODO: fix those two filters:
         # Text #
-        benchmark_manager.register_job(ShuffleWordTextFilter()) #p = 0.2
+        benchmark_manager.register_job(text_f=ShuffleWordTextFilter()) #p = 0.2
         benchmark_manager.register_job(SwapWordsTextFilter()) #p = 0.2
     if job == "3":
         # Image #
@@ -77,17 +81,23 @@ def eval_llama():
 
 
     # -- General information filters -- #
-    # Text #
     if job == "4":
-        phrase_scared = saved_text.get("scared", "")
-        benchmark_manager.register_job(PushFrontTextFilter(phrase_scared))
+        # Text #
+        try:
+            phrase_scared = saved_text["scared"]
+            benchmark_manager.register_job(text_f=PushFrontTextFilter(phrase_scared))
+        except KeyError:
+            Log().logger.error("The key 'scared' was not found in the JSON file.")
         
-        phrase_sad = saved_text.get("sad", "")
-        benchmark_manager.register_job(PushFrontTextFilter(phrase_sad))
+        try:                
+            phrase_sad = saved_text["sad"]
+            benchmark_manager.register_job(text_f=PushFrontTextFilter(phrase_sad))
+        except KeyError:
+            Log().logger.error("The key 'sad' was not found in the JSON file.")
     
-    # Image #
     
     if job == "5":
+        # Image #
         image_path = f"images/amanda.jpg"
         image = Image.open(image_path)
         benchmark_manager.register_job(img_f=ReplaceBackgroundImageFilter(image)) # alpha: float=0.5
@@ -98,9 +108,9 @@ def eval_llama():
     # -- Personal information filters -- #
     if job == "6":
         # Text #
-        benchmark_manager.register_job(SurroundByCorrectAnsTextFilter()) # padding_symbol: str = "*", num_repeats: int = 6
-        benchmark_manager.register_job(SurroundByWrongAnsTextFilter()) # padding_symbol: str = "*", num_repeats: int = 6)
-        benchmark_manager.register_job(SurroundByPartialCorrectAnsTextFilter()) #  p: float = 0.2, padding_symbol: str = "*", num_repeats: int = 6
+        benchmark_manager.register_job(text_f=SurroundByCorrectAnsTextFilter()) # padding_symbol: str = "*", num_repeats: int = 6
+        benchmark_manager.register_job(text_f=SurroundByWrongAnsTextFilter()) # padding_symbol: str = "*", num_repeats: int = 6)
+        benchmark_manager.register_job(text_f=SurroundByPartialCorrectAnsTextFilter()) #  p: float = 0.2, padding_symbol: str = "*", num_repeats: int = 6
     
     if job == "7":
         # Image #
@@ -151,3 +161,31 @@ def eval_llama2():
     
     benchmark_manager.start_workers()
     
+    
+# def eval_llama3():
+    
+#     if job != "C":
+#         return
+    
+#     # prepare the benchmark
+#     Log().logger.info("------------------------------------------------")
+#     Log().logger.info("Starting evaluation...")
+    
+#     multimodal_wrapper = LlamaWrapper()
+    
+#     ############################# GSM8k dataset ##############################
+    
+#     ## With slurm:
+#     text2image=FixedSizeText2Image(font_path="/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf")
+    
+#     ## Without slurm:
+#     # text2image = FixedSizeText2Image()
+    
+#     datasetWrapper = GSM8kWrapper(text2image, cache_filename="gsm8k_shuffled_dataset")
+    
+#     metadata = {
+#         "test name": "shuffle word test",
+#         "Model": multimodal_wrapper.model_name,
+#         "Dataset": datasetWrapper.dataset_id,
+#         "Save Predictions": True,
+#     }
