@@ -11,6 +11,8 @@
 # Print GPU info
 nvidia-smi --query-gpu=name,memory.total --format=csv
 
+export JOB=$1
+
 # Manually set CUDA paths (if module system isn't used)
 export PATH=/usr/local/cuda-11.0/bin:$PATH
 export LD_LIBRARY_PATH=/usr/local/cuda-11.0/lib64:$LD_LIBRARY_PATH
@@ -32,7 +34,7 @@ mkdir -p "$TMPDIR"
 export PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
 
 # Optionally set how many tasks to run in parallel inside Python
-export NUM_PARALLEL_JOBS=6
+export NUM_PARALLEL_JOBS=1
 
 # Launch main Python script (unbuffered)
 python -u main.py

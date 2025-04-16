@@ -1,8 +1,5 @@
 import json
-from PIL import Image
-import multiprocessing
-import torch
-from queue import Queue
+import os
 
 from src.text2image import FixedSizeText2Image, FilteredFixedSizeText2Image
 from src.benchmarkManager import BenchmarkManager
@@ -12,8 +9,10 @@ from src.multimodalWrappers import LlamaWrapper
 from src.log import Log
 PARAMETERS_PATH = "parameters.json"
 
+job = os.getenv("JOB", "0")
 
-
+if job == "0":
+    raise ValueError("Please set the JOB environment variable (sbatch run_slurm.sh <job>)")
 def eval_llama():
     # prepare the benchmark
     Log().logger.info("------------------------------------------------")
@@ -49,48 +48,57 @@ def eval_llama():
     
     # ------ execute text and image filter tests ------ #
     # -- Identity filters -- #
-    # Text #
-    # benchmark_manager.execute_test(IdentityTextFilter()) DONE!
-    # Image #
-    # benchmark_manager.register_job(IdentityImageFilter())
+    
+    if job == "1":
+        # Text #
+        benchmark_manager.register_job(IdentityTextFilter())
+        # Image #
+        benchmark_manager.register_job(IdentityImageFilter())
     
     
     # -- Noise filters -- #
-    # Text #
-    
-    # TODO: fix those two filters:
-    # benchmark_manager.register_job(ShuffleWordTextFilter()) #p = 0.2
-    # benchmark_manager.register_job(SwapWordsTextFilter()) #p = 0.2
-    # Image #
-    # benchmark_manager.register_job(img_f=HistogramEqualizationImageFilter())
-    # benchmark_manager.register_job(img_f=GaussianImageFilter()) # kernel_size = 5 sigms = 1.0
+    if job == "2":
+        # TODO: fix those two filters:
+        # Text #
+        benchmark_manager.register_job(ShuffleWordTextFilter()) #p = 0.2
+        benchmark_manager.register_job(SwapWordsTextFilter()) #p = 0.2
+    if job == "3":
+        # Image #
+        benchmark_manager.register_job(img_f=HistogramEqualizationImageFilter())
+        benchmark_manager.register_job(img_f=GaussianImageFilter()) # kernel_size = 5 sigms = 1.0
 
 
     # -- General information filters -- #
     # Text #
-    phrase_scared = saved_text.get("scared", "")
-    benchmark_manager.register_job(PushFrontTextFilter(phrase_scared))
-    
-    phrase_sad = saved_text.get("sad", "")
-    benchmark_manager.register_job(PushFrontTextFilter(phrase_sad))
+    if job == "4":
+        phrase_scared = saved_text.get("scared", "")
+        benchmark_manager.register_job(PushFrontTextFilter(phrase_scared))
+        
+        phrase_sad = saved_text.get("sad", "")
+        benchmark_manager.register_job(PushFrontTextFilter(phrase_sad))
     
     # Image #
-    # image_path = f"images/amanda.jpg"
-    # image = Image.open(image_path)
-    # benchmark_manager.register_job(img_f=ReplaceBackgroundImageFilter(image)) # alpha: float=0.5
-    # benchmark_manager.register_job(img_f=PushTopImageFilter(image)) # additional_image: Image
-    # benchmark_manager.register_job(img_f=ReplaceBackgroundImageFilter(image)) #  background_image: Image , alpha: float=0.5
+    
+    if job == "5":
+        image_path = f"images/amanda.jpg"
+        image = Image.open(image_path)
+        benchmark_manager.register_job(img_f=ReplaceBackgroundImageFilter(image)) # alpha: float=0.5
+        benchmark_manager.register_job(img_f=PushTopImageFilter(image)) # additional_image: Image
+        benchmark_manager.register_job(img_f=ReplaceBackgroundImageFilter(image)) #  background_image: Image , alpha: float=0.5
     
     
     # -- Personal information filters -- #
-    # Text #
-    # benchmark_manager.register_job(SurroundByCorrectAnsTextFilter()) # padding_symbol: str = "*", num_repeats: int = 6
-    # benchmark_manager.register_job(SurroundByWrongAnsTextFilter()) # padding_symbol: str = "*", num_repeats: int = 6)
-    # benchmark_manager.register_job(SurroundByPartialCorrectAnsTextFilter()) #  p: float = 0.2, padding_symbol: str = "*", num_repeats: int = 6
-    # # Image #
-    # benchmark_manager.register_job(img_f=SurroundByCorrectAnsImageFilter()) # num_repeats: int = 5, alpha: float = 0.2,  font_size: int = 40, font_type: str = "arial.ttf", font_color = "black"
-    # benchmark_manager.register_job(img_f=SurroundByWrongAnsImageFilter()) # same
-    # benchmark_manager.register_job(img_f=SurroundByPartialCorrectAnsImageFilter()) # p = 0.2, the rest as SurroundByCorrectAnsImageFilter
+    if job == "6":
+        # Text #
+        benchmark_manager.register_job(SurroundByCorrectAnsTextFilter()) # padding_symbol: str = "*", num_repeats: int = 6
+        benchmark_manager.register_job(SurroundByWrongAnsTextFilter()) # padding_symbol: str = "*", num_repeats: int = 6)
+        benchmark_manager.register_job(SurroundByPartialCorrectAnsTextFilter()) #  p: float = 0.2, padding_symbol: str = "*", num_repeats: int = 6
+    
+    if job == "7":
+        # Image #
+        benchmark_manager.register_job(img_f=SurroundByCorrectAnsImageFilter()) # num_repeats: int = 5, alpha: float = 0.2,  font_size: int = 40, font_type: str = "arial.ttf", font_color = "black"
+        benchmark_manager.register_job(img_f=SurroundByWrongAnsImageFilter()) # same
+        benchmark_manager.register_job(img_f=SurroundByPartialCorrectAnsImageFilter()) # p = 0.2, the rest as SurroundByCorrectAnsImageFilter
     
     # --------------------------------------- #
 
