@@ -76,7 +76,7 @@ class ShuffleWordTextFilter(AbstractTextFilter):
         self.p = p
         
     def apply_filter(self, input: str , answer: str=None):
-        def scramble_word(word):
+        def scramble_word(word: str) -> str:
             if len(word) > 1 and random.random() < self.p:  
                 word_list = list(word)  
                 random.shuffle(word_list)  

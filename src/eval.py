@@ -52,29 +52,34 @@ def eval_llama():
     # Text #
     # benchmark_manager.execute_test(IdentityTextFilter()) DONE!
     # Image #
-    benchmark_manager.register_job(IdentityImageFilter())
+    # benchmark_manager.register_job(IdentityImageFilter())
     
     
     # -- Noise filters -- #
     # Text #
-    benchmark_manager.register_job(ShuffleWordTextFilter()) #p = 0.2
-    benchmark_manager.register_job(SwapWordsTextFilter()) #p = 0.2
+    
+    # TODO: fix those two filters:
+    # benchmark_manager.register_job(ShuffleWordTextFilter()) #p = 0.2
+    # benchmark_manager.register_job(SwapWordsTextFilter()) #p = 0.2
     # Image #
-    benchmark_manager.register_job(img_f=HistogramEqualizationImageFilter())
-    benchmark_manager.register_job(img_f=GaussianImageFilter()) # kernel_size = 5 sigms = 1.0
+    # benchmark_manager.register_job(img_f=HistogramEqualizationImageFilter())
+    # benchmark_manager.register_job(img_f=GaussianImageFilter()) # kernel_size = 5 sigms = 1.0
 
 
     # -- General information filters -- #
     # Text #
-    phrase = saved_text.get("scared", "")
-    benchmark_manager.register_job(PushFrontTextFilter(phrase))
+    phrase_scared = saved_text.get("scared", "")
+    benchmark_manager.register_job(PushFrontTextFilter(phrase_scared))
+    
+    phrase_sad = saved_text.get("sad", "")
+    benchmark_manager.register_job(PushFrontTextFilter(phrase_sad))
     
     # Image #
-    image_path = f"images/amanda.jpg"
-    image = Image.open(image_path)
-    benchmark_manager.register_job(img_f=ReplaceBackgroundImageFilter(image)) # alpha: float=0.5
-    benchmark_manager.register_job(img_f=PushTopImageFilter(image)) # additional_image: Image
-    benchmark_manager.register_job(img_f=ReplaceBackgroundImageFilter(image)) #  background_image: Image , alpha: float=0.5
+    # image_path = f"images/amanda.jpg"
+    # image = Image.open(image_path)
+    # benchmark_manager.register_job(img_f=ReplaceBackgroundImageFilter(image)) # alpha: float=0.5
+    # benchmark_manager.register_job(img_f=PushTopImageFilter(image)) # additional_image: Image
+    # benchmark_manager.register_job(img_f=ReplaceBackgroundImageFilter(image)) #  background_image: Image , alpha: float=0.5
     
     
     # -- Personal information filters -- #

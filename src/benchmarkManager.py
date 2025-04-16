@@ -117,14 +117,15 @@ class BenchmarkManager:
     def _update_category_stats(self, sample, category: Category, pred_from_text: str, pred_from_img: str):
         answer = self.clean_str_number(sample["answer"])
         
+        category.text_stats.total += 1
+        category.img_stats.total += 1
+
         if pred_from_text is not None:
-            category.text_stats.total += 1
             pred_from_text = self.clean_str_number(pred_from_text)    
             if pred_from_text == answer:
                 category.text_stats.success += 1
         
         if pred_from_img is not None:        
-            category.img_stats.total += 1
             pred_from_text = self.clean_str_number(pred_from_img)
             if pred_from_img == answer:
                 category.img_stats.success += 1
