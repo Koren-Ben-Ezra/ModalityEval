@@ -1,7 +1,7 @@
-from src.eval import eval_llama, eval_llama2
+from src.eval import basic_eval_all, shuffle_txt_in_img_eval
 def main():
-    eval_llama()
-    eval_llama2()
+    basic_eval_all()
+    shuffle_txt_in_img_eval()
 
 if __name__ == "__main__":
     main()

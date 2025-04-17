@@ -32,16 +32,16 @@ class BenchmarkManager:
         self._make_benchmark_dir()
         self._make_summary_files()
     
-    def register_job(self, text_f: AbstractTextFilter=None, img_f: AbstractImageFilter=None):
+    def register_job(self, text_f: AbstractTextFilter=None, img_f: AbstractImageFilter=None, inner_dir: str=""):
         if img_f is None and text_f is None:
             raise ValueError("Both image and text filters cannot be None.")
         
-        JobHandler().register_job(partial(self._execute_test, text_f, img_f))
+        JobHandler().register_job(partial(self._execute_test, text_f, img_f, inner_dir))
 
     def start_workers(self):
         JobHandler().start_workers()
         
-    def _execute_test(self, text_f: AbstractTextFilter=None, img_f: AbstractImageFilter=None):
+    def _execute_test(self, text_f: AbstractTextFilter=None, img_f: AbstractImageFilter=None, inner_dir: str=""):
         if text_f is None and img_f is None:
             raise ValueError("Both text and image filters cannot be None.")
 
@@ -55,7 +55,7 @@ class BenchmarkManager:
         elif name_if:
             self.logger.info(f"Executing test with filter: {name_if}")
             
-        category = Category(text_f, img_f, self.benchmark_name, self.save_predictions)
+        category = Category(text_f, img_f, self.benchmark_name, self.save_predictions, inner_dir)
 
         idx = 0
         for sample in tqdm(self._datasetWrapper.dataset):

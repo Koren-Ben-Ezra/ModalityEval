@@ -6,13 +6,14 @@
 #SBATCH --mem=50000         # 50 GB of CPU memory
 #SBATCH --constraint=geforce_rtx_3090
 
-exec 1> outputs/output_${1}.log
-exec 2> outputs/error_${1}.log
+exec 1> outputs/output_${1}_${2}.log
+exec 2> outputs/error_${1}_${2}.log
 
 # Print GPU info
 nvidia-smi --query-gpu=name,memory.total --format=csv
 
-export JOB=$1
+export SELECTED_EVAL=$1
+export SELECTED_TASK=$2
 
 # Manually set CUDA paths (if module system isn't used)
 export PATH=/usr/local/cuda-11.0/bin:$PATH

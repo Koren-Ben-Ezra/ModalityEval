@@ -11,20 +11,40 @@ from src.log import Log
 PARAMETERS_PATH = "parameters.json"
 slurm_font_path = "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf"
 
-job = os.getenv("JOB", "0")
-# JOB 1: Identity filters
-# JOB 2: Noise filters
-# JOB 3: Noise filters
-# JOB 4: General information filters
-# JOB 5: General information filters
-# JOB 6: Personal information filters
-# JOB 7: Personal information filters
-# JOB B: Shuffle word test
+selected_eval = os.getenv("SELECTED_EVAL", "0")
+selected_task = os.getenv("SELECTED_TASK", "0")
 
-if job == "0":
-    raise ValueError("Please set the JOB environment variable (sbatch run_slurm.sh <job>)")
+# EVAL A: basic_eval_all
+    # JOB 1: Identity filters
+    # JOB 2: Noise filters
+    # JOB 3: Noise filters
+    # JOB 4: General information filters
+    # JOB 5: General information filters
+    # JOB 6: Personal information filters
+    # JOB 7: Personal information filters
+    # JOB B: Shuffle word test
+# EVAL B: shuffle_txt_in_img_eval
+# EVAL C: shuffle_p_increase_eval
+    # JOB 1: shuffle word test p=0.05, 0.1, 0.15
+    # JOB 2: shuffle word test p=0.25, 0.3, 0.35
 
-def eval_llama():
+
+image_path_amanda = os.path.join("images", "amanda.jpg")
+image_path_angry = os.path.join("images", "angry.jpg")
+image_path_relax = os.path.join("images", "relax.jpg")
+
+image_amanda = Image.open(image_path_amanda)
+image_angry = Image.open(image_path_angry)
+image_relax = Image.open(image_path_relax)
+
+
+if selected_eval == "0" or selected_task == "0":
+    raise ValueError("execute with: 'sbatch run_slurm.sh <eval> <task>'")
+
+def basic_eval_all():
+    if selected_eval != "A":
+        return
+    
     # prepare the benchmark
     Log().logger.info("------------------------------------------------")
     Log().logger.info("Starting evaluation...")
@@ -59,11 +79,10 @@ def eval_llama():
 
     # Initialize the BenchmarkManager
     benchmark_manager = BenchmarkManager(datasetWrapper, multimodal_wrapper, metadata)
-    Log().logger.info(f"Running benchmark for {multimodal_wrapper.model_name} on {datasetWrapper.dataset_id}")
-    
+    Log().logger.info(f"Running benchmark: {multimodal_wrapper.model_name} | {datasetWrapper.dataset_id} | {selected_eval} | {selected_task}")
     # ------ execute text and image filter tests ------ #
     # -- Identity filters -- #
-    if job == "1":
+    if selected_task == "1":
         # Text #
         benchmark_manager.register_job(text_f=IdentityTextFilter())
         # Image #
@@ -71,50 +90,51 @@ def eval_llama():
     
     
     # -- Noise filters -- #
-    if job == "2":
-        # TODO: fix those two filters:
+    if selected_task == "2":
         # Text #
         benchmark_manager.register_job(text_f=ShuffleWordTextFilter()) #p = 0.2
         benchmark_manager.register_job(SwapWordsTextFilter()) #p = 0.2
-    if job == "3":
+    if selected_task == "3":
         # Image #
         benchmark_manager.register_job(img_f=HistogramEqualizationImageFilter())
         benchmark_manager.register_job(img_f=GaussianImageFilter()) # kernel_size = 5 sigms = 1.0
 
 
     # -- General information filters -- #
-    if job == "4":
+    if selected_task == "4":
         # Text #
         try:
             phrase_scared = saved_text["scared"]
-            benchmark_manager.register_job(text_f=PushFrontTextFilter(phrase_scared))
+            benchmark_manager.register_job(text_f=PushFrontTextFilter(phrase_scared), inner_dir="scared_text")
         except KeyError:
             Log().logger.error("The key 'scared' was not found in the JSON file.")
         
         try:                
             phrase_sad = saved_text["sad"]
-            benchmark_manager.register_job(text_f=PushFrontTextFilter(phrase_sad))
+            benchmark_manager.register_job(text_f=PushFrontTextFilter(phrase_sad), inner_dir="sad_text")
         except KeyError:
             Log().logger.error("The key 'sad' was not found in the JSON file.")
     
     
-    if job == "5":
+    if selected_task == "5":
         # Image #
-        image_path = f"images/amanda.jpg"
-        image = Image.open(image_path)
-        benchmark_manager.register_job(img_f=ReplaceBackgroundImageFilter(image)) # alpha: float=0.5
-        benchmark_manager.register_job(img_f=PushTopImageFilter(image)) # additional_image: Image
-        benchmark_manager.register_job(img_f=ReplaceBackgroundImageFilter(image)) #  background_image: Image , alpha: float=0.5
-    
+        benchmark_manager.register_job(img_f=ReplaceBackgroundImageFilter(image_amanda), inner_dir="RB_amanda")
+        benchmark_manager.register_job(img_f=ReplaceBackgroundImageFilter(image_angry), inner_dir="RB_angry")
+        benchmark_manager.register_job(img_f=ReplaceBackgroundImageFilter(image_relax), inner_dir="RB_relax")
+
+    if selected_task == "6":
+        benchmark_manager.register_job(img_f=PushTopImageFilter(image_amanda), inner_dir="PT_amanda")
+        benchmark_manager.register_job(img_f=PushTopImageFilter(image_angry), inner_dir="PT_angry")
+        benchmark_manager.register_job(img_f=PushTopImageFilter(image_relax), inner_dir="PT_relax")
     
     # -- Personal information filters -- #
-    if job == "6":
+    if selected_task == "7":
         # Text #
         benchmark_manager.register_job(text_f=SurroundByCorrectAnsTextFilter()) # padding_symbol: str = "*", num_repeats: int = 6
         benchmark_manager.register_job(text_f=SurroundByWrongAnsTextFilter()) # padding_symbol: str = "*", num_repeats: int = 6)
         benchmark_manager.register_job(text_f=SurroundByPartialCorrectAnsTextFilter()) #  p: float = 0.2, padding_symbol: str = "*", num_repeats: int = 6
     
-    if job == "7":
+    if selected_task == "8":
         # Image #
         benchmark_manager.register_job(img_f=SurroundByCorrectAnsImageFilter(font_path=slurm_font_path)) # num_repeats: int = 5, alpha: float = 0.2,  font_size: int = 40, font_type: str = "arial.ttf", font_color = "black"
         benchmark_manager.register_job(img_f=SurroundByWrongAnsImageFilter(font_path=slurm_font_path)) # same
@@ -127,9 +147,9 @@ def eval_llama():
     ##########################################################################
     
 
-def eval_llama2():
+def shuffle_txt_in_img_eval():
     
-    if job != "B":
+    if selected_eval != "B":
         return
     
     # prepare the benchmark
@@ -157,37 +177,54 @@ def eval_llama2():
     }
 
     benchmark_manager = BenchmarkManager(datasetWrapper, multimodal_wrapper, metadata)
-    Log().logger.info(f"Running benchmark for {multimodal_wrapper.model_name} on {datasetWrapper.dataset_id}")
+    Log().logger.info(f"Running benchmark: {multimodal_wrapper.model_name} | {datasetWrapper.dataset_id} | {selected_eval} | {selected_task}")
     
     benchmark_manager.register_job(text_f=ShuffleWordTextFilter(), img_f=IdentityImageFilter())
     
     benchmark_manager.start_workers()
     
     
-# def eval_llama3():
+def shuffle_p_increase_eval():
     
-#     if job != "C":
-#         return
+    if selected_eval != "C":
+        return
     
-#     # prepare the benchmark
-#     Log().logger.info("------------------------------------------------")
-#     Log().logger.info("Starting evaluation...")
+    # prepare the benchmark
+    Log().logger.info("------------------------------------------------")
+    Log().logger.info("Starting evaluation...")
     
-#     multimodal_wrapper = LlamaWrapper()
+    multimodal_wrapper = LlamaWrapper()
     
-#     ############################# GSM8k dataset ##############################
+    ############################# GSM8k dataset ##############################
     
-#     ## With slurm:
-#     text2image=FixedSizeText2Image(font_path="/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf")
+    ## With slurm:
+    text2image=FixedSizeText2Image(font_path=slurm_font_path)
     
-#     ## Without slurm:
-#     # text2image = FixedSizeText2Image()
+    ## Without slurm:
+    # text2image = FixedSizeText2Image()
     
-#     datasetWrapper = GSM8kWrapper(text2image, cache_filename="gsm8k_shuffled_dataset")
+    datasetWrapper = GSM8kWrapper(text2image, cache_filename="gsm8k_dataset")
     
-#     metadata = {
-#         "test name": "shuffle word test",
-#         "Model": multimodal_wrapper.model_name,
-#         "Dataset": datasetWrapper.dataset_id,
-#         "Save Predictions": True,
-#     }
+    metadata = {
+        "test name": "shuffle_p_increase eval",
+        "Model": multimodal_wrapper.model_name,
+        "Dataset": datasetWrapper.dataset_id,
+        "Save Predictions": True,
+    }
+    
+    benchmark_manager = BenchmarkManager(datasetWrapper, multimodal_wrapper, metadata)
+    Log().logger.info(f"Running benchmark: {multimodal_wrapper.model_name} | {datasetWrapper.dataset_id} | {selected_eval} | {selected_task}")
+    
+    if selected_task == "1":
+        # Image #
+        benchmark_manager.register_job(text_f=ShuffleWordTextFilter(p=0.05), inner_dir="SW_p_0_05")
+        benchmark_manager.register_job(text_f=ShuffleWordTextFilter(p=0.1), inner_dir="SW_p_0_1")
+        benchmark_manager.register_job(text_f=ShuffleWordTextFilter(p=0.1), inner_dir="SW_p_0_15")
+    
+    if selected_task == "2":
+        benchmark_manager.register_job(text_f=ShuffleWordTextFilter(p=0.4), inner_dir="SW_p_0.25")
+        benchmark_manager.register_job(text_f=ShuffleWordTextFilter(p=0.4), inner_dir="SW_p_0.3")
+        benchmark_manager.register_job(text_f=ShuffleWordTextFilter(p=0.4), inner_dir="SW_p_0.35")
+        
+    benchmark_manager.start_workers()
+        
