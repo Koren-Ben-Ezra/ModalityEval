@@ -228,11 +228,11 @@ def shuffle_p_increase_eval():
     
     if selected_task == "2":
         benchmark_manager.register_job(text_f=ShuffleWordTextFilter(p=0.1), inner_dir="SW_p_0_15")
-        benchmark_manager.register_job(text_f=ShuffleWordTextFilter(p=0.4), inner_dir="SW_p_0.25")
+        benchmark_manager.register_job(text_f=ShuffleWordTextFilter(p=0.25), inner_dir="SW_p_0.25")
         
     if selected_task == "3":
-        benchmark_manager.register_job(text_f=ShuffleWordTextFilter(p=0.4), inner_dir="SW_p_0.3")
-        benchmark_manager.register_job(text_f=ShuffleWordTextFilter(p=0.4), inner_dir="SW_p_0.35")
+        benchmark_manager.register_job(text_f=ShuffleWordTextFilter(p=0.3), inner_dir="SW_p_0.3")
+        benchmark_manager.register_job(text_f=ShuffleWordTextFilter(p=0.35), inner_dir="SW_p_0.35")
         
     benchmark_manager.start_workers()
         
