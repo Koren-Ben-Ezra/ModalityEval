@@ -40,12 +40,14 @@ image_angry = Image.open(image_path_angry)
 image_relax = Image.open(image_path_relax)
 
 
-if selected_eval == "0" or selected_task == "0":
+if selected_eval == "0":
     raise ValueError("execute with: 'sbatch run_slurm.sh <eval> <task>'")
 
 def basic_eval_all():
     if selected_eval != "A":
         return
+    if selected_task == "0":
+        raise ValueError("execute with: 'sbatch run_slurm.sh <eval> <task>'")
     
     # prepare the benchmark
     Log().logger.info("------------------------------------------------")
@@ -190,6 +192,8 @@ def shuffle_p_increase_eval():
     
     if selected_eval != "C":
         return
+    if selected_task == "0":
+        raise ValueError("execute with: 'sbatch run_slurm.sh <eval> <task>'")
     
     # prepare the benchmark
     Log().logger.info("------------------------------------------------")
