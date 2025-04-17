@@ -48,14 +48,14 @@ class GSM8kWrapper(AbstractDatasetWrapper):
                 raise e
             
             try:
-                self.dataset.save_to_disk(f"./cache/{self.dataset_id}_dataset")
-                Log().logger.info(f"Cached {self.dataset_id} dataset to ./cache/{self.dataset_id}_dataset.")
+                self.dataset.save_to_disk(cache_path)
+                Log().logger.info(f"Cached dataset at {cache_path}")
             except Exception as e:
                 Log().logger.error(f"Error caching dataset: {e}")
                 raise e
         
-        Log().logger.info(f"Loaded {len(self.dataset)} samples from {self.dataset_id} dataset.")
-    
+        Log().logger.info(f"Loaded {self.dataset_id} dataset with {len(self.dataset)} samples.")
+        
     def _map_sample(self, sample):
         sample["answer"] = sample["answer"].split("####")[-1].strip()
             
