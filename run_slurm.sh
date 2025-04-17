@@ -6,8 +6,8 @@
 #SBATCH --mem=50000         # 50 GB of CPU memory
 #SBATCH --constraint=geforce_rtx_3090
 
-exec 1> outputs/output_${1}_${2}.out
-exec 2> outputs/error_${1}_${2}.err
+exec 1> outputs/${1}_${2}.out
+exec 2> outputs/${1}_${2}.err
 
 # Print GPU info
 nvidia-smi --query-gpu=name,memory.total --format=csv
