@@ -188,7 +188,7 @@ def shuffle_txt_in_img_eval():
     benchmark_manager.start_workers()
     
     
-def shuffle_p_increase_eval():
+def shuffle_p_increase_text_eval():
     
     if selected_eval != "C":
         return
@@ -235,4 +235,59 @@ def shuffle_p_increase_eval():
         benchmark_manager.register_job(text_f=ShuffleWordTextFilter(p=0.35), inner_dir="SW_p_0.35")
         
     benchmark_manager.start_workers()
+
+def shuffle_p_increase_image_eval():
+    
+    if selected_eval != "D":
+        return
+    if selected_task == "0":
+        raise ValueError("execute with: 'sbatch run_slurm.sh <eval> <task>'")
+    
+    # prepare the benchmark
+    Log().logger.info("------------------------------------------------")
+    Log().logger.info("Starting evaluation...")
+    
+    multimodal_wrapper = LlamaWrapper()
+    
+    ############################# GSM8k dataset ##############################
+    
+    p_lst = [0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35]
+    # selected_task = "1" -> 0.05
+    # selected_task = "2" -> 0.1
+    # selected_task = "3" -> 0.15
+    # selected_task = "4" -> 0.2
+    # selected_task = "5" -> 0.25
+    # selected_task = "6" -> 0.3
+    # selected_task = "7" -> 0.35
+    
+    def run_eval(p):
+        filter_p = ShuffleWordTextFilter(p=p)
+        text2image=FilteredFixedSizeText2Image(filter=filter_p, font_path=slurm_font_path)
+        cache_name = f"gsm8k_dataset_p_{p}"
         
+        dataset_wrapper = GSM8kWrapper(text2image, cache_filename=cache_name)
+
+        metadata = {
+            "test name": "shuffle_p_increase eval",
+            "Model": multimodal_wrapper.model_name,
+            "Dataset": dataset_wrapper.dataset_id,
+            "Save Predictions": True,
+        }
+        
+        benchmark_manager = BenchmarkManager(dataset_wrapper, multimodal_wrapper, metadata)
+        Log().logger.info(f"Running benchmark: {multimodal_wrapper.model_name} | {dataset_wrapper.dataset_id} | {selected_eval} | {selected_task}")
+        p_str = str(p).replace(".", "_")
+        benchmark_manager.register_job(text_f=ShuffleWordTextFilter(p=p), inner_dir=f"SW_{p_str}")
+        benchmark_manager.start_workers()
+
+        Log().logger.info(f"Finished evaluation for p={p}.")
+        if os.path.exists(cache_name):
+            Log().logger.info(f"Removing cache file: {cache_name}")
+            os.remove(cache_name)
+
+
+    for task in range(len(p_lst)):
+        if selected_task == str(task + 1):
+            selected_p = p_lst[task]
+            run_eval(selected_p)
+            break
