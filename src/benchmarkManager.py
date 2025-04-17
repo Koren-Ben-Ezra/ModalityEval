@@ -71,9 +71,9 @@ class BenchmarkManager:
             open(predictions_filename, "w").close()
 
         with open(predictions_filename, "a") as f:
-            f.write("-------------------------------------------------------------")
-            f.write(f"[{title}]")
-            f.write(f"{question}\n\n {answer}\n\n {pred}\n\n")
+            f.write("-------------------------------------------------------------\n")
+            f.write(f"[{title}]\n\n")
+            f.write(f"{question}\n\n {answer}\n\n {pred}\n")
 
         
     def _execute_single_prompt(self, sample, category: Category, idx: int, track_result: bool = False):

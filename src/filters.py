@@ -150,12 +150,12 @@ class SurroundByCorrectAnsImageFilter(AbstractImageFilter):
         num_repeats: int = 5, 
         alpha: float = 0.2, 
         font_size: int = 40, 
-        font_type: str = "arial.ttf", 
+        font_path: str = "arial.ttf", 
         font_color = "black"):
         
         self.num_repeats = num_repeats
         self.font_size = font_size
-        self.font_type = font_type
+        self.font_path = font_path
         self.font_color = font_color
         self.alpha = alpha
 
@@ -163,7 +163,7 @@ class SurroundByCorrectAnsImageFilter(AbstractImageFilter):
         width, height = input.size
         background = Image.new("RGB", (width, height), "white")
         draw = ImageDraw.Draw(background)
-        font = ImageFont.truetype(self.font_type, self.font_size)
+        font = ImageFont.truetype(self.font_path, self.font_size)
         for _ in range(self.num_repeats):
             x = random.randint(0, width - 50)
             y = random.randint(0, height - 20)
@@ -178,12 +178,12 @@ class SurroundByWrongAnsImageFilter(AbstractImageFilter):
             num_repeats: int = 5, 
             alpha: float = 0.2, 
             font_size: int = 40, 
-            font_type: str = "arial.ttf", 
+            font_path: str = "arial.ttf", 
             font_color = "black"):
         
         self.num_repeats = num_repeats
         self.font_size = font_size
-        self.font_type = font_type
+        self.font_path = font_path
         self.font_color = font_color
         self.alpha = alpha
         
@@ -191,7 +191,7 @@ class SurroundByWrongAnsImageFilter(AbstractImageFilter):
         width, height = input.size
         background = Image.new("RGB", (width, height), "white")
         draw = ImageDraw.Draw(background)
-        font = ImageFont.truetype(self.font_type, self.font_size)
+        font = ImageFont.truetype(self.font_path, self.font_size)
         for _ in range(self.num_repeats):
             x = random.randint(0, width - 100)
             y = random.randint(0, height - 50)
@@ -207,13 +207,13 @@ class SurroundByPartialCorrectAnsImageFilter(AbstractImageFilter):
             num_repeats: int = 5, 
             alpha: float = 0.2, 
             font_size: int = 40, 
-            font_type: str = "arial.ttf", 
+            font_path: str = "arial.ttf", 
             font_color = "black"):
         
         self.p = p
         self.num_repeats = num_repeats
         self.font_size = font_size
-        self.font_type = font_type
+        self.font_path = font_path
         self.font_color = font_color
         self.alpha = alpha
 
@@ -221,7 +221,7 @@ class SurroundByPartialCorrectAnsImageFilter(AbstractImageFilter):
         width, height = input.size
         background = Image.new("RGB", (width, height), "white")
         draw = ImageDraw.Draw(background)
-        font = ImageFont.truetype(self.font_type, self.font_size)
+        font = ImageFont.truetype(self.font_path, self.font_size)
         current_ans = ""
         for _ in range(self.num_repeats):
             x = random.randint(0, width - 100)
@@ -244,8 +244,6 @@ class SurroundByCorrectAnsTextFilter(AbstractTextFilter):
         prefix = []
         postfix = []
         for _ in range(self.num_repeats//2):
-            # prefix.append(random.choice(RANDOM_VALUES))
-            # postfix.append(random.choice(RANDOM_VALUES))
             prefix.append(answer)
             postfix.append(answer)
         prefix = self.padding_symbol + " ".join(prefix) + self.padding_symbol

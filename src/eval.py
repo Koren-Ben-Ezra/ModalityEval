@@ -7,7 +7,9 @@ from src.filters import *
 from src.datasetWrapper import GSM8kWrapper
 from src.multimodalWrappers import LlamaWrapper
 from src.log import Log
+
 PARAMETERS_PATH = "parameters.json"
+slurm_font_path = "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf"
 
 job = os.getenv("JOB", "0")
 # JOB 1: Identity filters
@@ -32,7 +34,7 @@ def eval_llama():
     ############################# GSM8k dataset ##############################
     
     ## With slurm:
-    text2image=FixedSizeText2Image(font_path="/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf")
+    text2image=FixedSizeText2Image(font_path=slurm_font_path)
     
     ## Without slurm:
     # text2image = FixedSizeText2Image()
@@ -114,9 +116,9 @@ def eval_llama():
     
     if job == "7":
         # Image #
-        benchmark_manager.register_job(img_f=SurroundByCorrectAnsImageFilter()) # num_repeats: int = 5, alpha: float = 0.2,  font_size: int = 40, font_type: str = "arial.ttf", font_color = "black"
-        benchmark_manager.register_job(img_f=SurroundByWrongAnsImageFilter()) # same
-        benchmark_manager.register_job(img_f=SurroundByPartialCorrectAnsImageFilter()) # p = 0.2, the rest as SurroundByCorrectAnsImageFilter
+        benchmark_manager.register_job(img_f=SurroundByCorrectAnsImageFilter(font_path=slurm_font_path)) # num_repeats: int = 5, alpha: float = 0.2,  font_size: int = 40, font_type: str = "arial.ttf", font_color = "black"
+        benchmark_manager.register_job(img_f=SurroundByWrongAnsImageFilter(font_path=slurm_font_path)) # same
+        benchmark_manager.register_job(img_f=SurroundByPartialCorrectAnsImageFilter(font_path=slurm_font_path)) # p = 0.2, the rest as SurroundByCorrectAnsImageFilter
     
     # --------------------------------------- #
 
@@ -140,7 +142,7 @@ def eval_llama2():
     
     ## With slurm:
     text_filter = ShuffleWordTextFilter()
-    text2image=FilteredFixedSizeText2Image(text_filter, font_path="/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf")
+    text2image=FilteredFixedSizeText2Image(text_filter, font_path=slurm_font_path)
     
     ## Without slurm:
     # text2image = FixedSizeText2Image()
