@@ -33,17 +33,6 @@ class IdentityImageFilter(AbstractImageFilter):
 
 
 # ---------- Noise Filters ---------- #
-class ContrastStretchingImageFilter(AbstractImageFilter):
-    filter_name:str="ContrastStretching_IF"
-        
-    def apply_filter(self, input: Image , answer: str=None):
-        image_array = np.array(input)
-        min_pixel = np.min(image_array)
-        max_pixel = np.max(image_array)
-        stretched_array = ((image_array - min_pixel) / (max_pixel - min_pixel) * 255).astype(np.uint8)
-        return Image.fromarray(stretched_array)
-    
-
 class HistogramEqualizationImageFilter(AbstractImageFilter):
     filter_name:str="HistogramEqualization_IF"
         

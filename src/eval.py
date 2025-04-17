@@ -27,10 +27,18 @@ selected_task = os.getenv("SELECTED_TASK", "0")
 # EVAL B: shuffle_txt_in_img_eval
 
 # EVAL C: shuffle_p_increase_eval
-    # JOB 1: shuffle word test p=0.05, 0.1, 0.15
-    # JOB 2: shuffle word test p=0.25, 0.3, 0.35
-
-
+    # JOB 1: p=0.05, 0.1
+    # JOB 2: p=0.15, 0.2
+    # JOB 3: p=0.25, 0.3
+    
+# EVAL D: shuffle_p_increase_image_eval
+    # JOB 1: p=0.05
+    # JOB 2: p=0.1
+    # JOB 3: p=0.15
+    # JOB 4: p=0.25
+    # JOB 5: p=0.3
+    # JOB 6: p=0.35
+    
 image_path_amanda = os.path.join("images", "amanda.jpg")
 image_path_angry = os.path.join("images", "angry.jpg")
 image_path_relax = os.path.join("images", "relax.jpg")
@@ -97,7 +105,7 @@ def basic_eval_all():
     if selected_task == "2":
         # Text #
         benchmark_manager.register_job(text_f=ShuffleWordTextFilter()) #p = 0.2
-        benchmark_manager.register_job(SwapWordsTextFilter()) #p = 0.2
+        benchmark_manager.register_job(text_f=SwapWordsTextFilter()) #p = 0.2
     if selected_task == "3":
         # Image #
         benchmark_manager.register_job(img_f=HistogramEqualizationImageFilter())
@@ -251,14 +259,13 @@ def shuffle_p_increase_image_eval():
     
     ############################# GSM8k dataset ##############################
     
-    p_lst = [0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35]
+    p_lst = [0.05, 0.1, 0.15, 0.25, 0.3, 0.35]
     # selected_task = "1" -> 0.05
     # selected_task = "2" -> 0.1
     # selected_task = "3" -> 0.15
-    # selected_task = "4" -> 0.2
-    # selected_task = "5" -> 0.25
-    # selected_task = "6" -> 0.3
-    # selected_task = "7" -> 0.35
+    # selected_task = "4" -> 0.25
+    # selected_task = "5" -> 0.3
+    # selected_task = "6" -> 0.35
     
     def run_eval(p):
         filter_p = ShuffleWordTextFilter(p=p)
