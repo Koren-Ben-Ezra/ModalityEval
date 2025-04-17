@@ -18,12 +18,14 @@ selected_task = os.getenv("SELECTED_TASK", "0")
     # JOB 1: Identity filters
     # JOB 2: Noise filters
     # JOB 3: Noise filters
-    # JOB 4: General information filters
+    # JOB 4: General information filters 
     # JOB 5: General information filters
-    # JOB 6: Personal information filters
+    # JOB 6: General information filters 
     # JOB 7: Personal information filters
-    # JOB B: Shuffle word test
+    # JOB 8: Personal information filters
+
 # EVAL B: shuffle_txt_in_img_eval
+
 # EVAL C: shuffle_p_increase_eval
     # JOB 1: shuffle word test p=0.05, 0.1, 0.15
     # JOB 2: shuffle word test p=0.25, 0.3, 0.35
@@ -219,10 +221,12 @@ def shuffle_p_increase_eval():
         # Image #
         benchmark_manager.register_job(text_f=ShuffleWordTextFilter(p=0.05), inner_dir="SW_p_0_05")
         benchmark_manager.register_job(text_f=ShuffleWordTextFilter(p=0.1), inner_dir="SW_p_0_1")
-        benchmark_manager.register_job(text_f=ShuffleWordTextFilter(p=0.1), inner_dir="SW_p_0_15")
     
     if selected_task == "2":
+        benchmark_manager.register_job(text_f=ShuffleWordTextFilter(p=0.1), inner_dir="SW_p_0_15")
         benchmark_manager.register_job(text_f=ShuffleWordTextFilter(p=0.4), inner_dir="SW_p_0.25")
+        
+    if selected_task == "3":
         benchmark_manager.register_job(text_f=ShuffleWordTextFilter(p=0.4), inner_dir="SW_p_0.3")
         benchmark_manager.register_job(text_f=ShuffleWordTextFilter(p=0.4), inner_dir="SW_p_0.35")
         
