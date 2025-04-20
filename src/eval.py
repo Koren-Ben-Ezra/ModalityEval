@@ -285,7 +285,7 @@ def shuffle_p_increase_image_eval():
         
         benchmark_manager = BenchmarkManager(dataset_wrapper, multimodal_wrapper, metadata)
         Log().logger.info(f"Running benchmark: {multimodal_wrapper.model_name} | {dataset_wrapper.dataset_id} | {selected_eval} | {selected_task}")
-        benchmark_manager.register_job(text_f=ShuffleWordTextFilter(p=p), inner_dir=f"SW_{p_str}")
+        benchmark_manager.register_job(img_f=IdentityImageFilter(), inner_dir=f"SW_image_{p_str}")
         benchmark_manager.start_workers()
 
         Log().logger.info(f"Finished evaluation for p={p}")
