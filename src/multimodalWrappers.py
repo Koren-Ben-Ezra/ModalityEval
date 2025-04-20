@@ -54,6 +54,8 @@ class LlamaWrapper(MultimodalWrapper):
                 self.model_id,
                 torch_dtype=torch.bfloat16,
                 device_map="auto",
+                use_safetensors=False,     # ← force PyTorch format
+                force_download=True, 
             )
         except Exception as e:
             Log().logger.error(f"Error loading model: {e}")
