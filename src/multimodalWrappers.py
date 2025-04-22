@@ -54,7 +54,6 @@ class LlamaWrapper(MultimodalWrapper):
                 self.model_id,
                 torch_dtype=torch.bfloat16,
                 device_map="auto",
-                use_safetensors=False,     # ← force PyTorch format
             )
         except Exception as e:
             Log().logger.error(f"Error loading model: {e}")
@@ -91,8 +90,7 @@ class LlamaWrapper(MultimodalWrapper):
                 {"type": "text", "text": IMG_INSTRUCTION}
             ]}
         ]
-        # input_text = self._processor.apply_chat_template(messages, add_generation_prompt=True)
-        input_text = self._processor.apply_chat_template(messages, add_generation_prompt=False)
+        input_text = self._processor.apply_chat_template(messages, add_generation_prompt=True)
         inputs = self._processor(
             image,
             input_text,
