@@ -63,8 +63,6 @@ def basic_eval_all():
     
     multimodal_wrapper = LlamaWrapper()
     
-    ############################# GSM8k dataset ##############################
-    
     ## With slurm:
     text2image=FixedSizeText2Image(font_path=slurm_font_path)
     
@@ -156,7 +154,6 @@ def basic_eval_all():
 
     benchmark_manager.start_workers()
     
-    ##########################################################################
     
 
 def shuffle_txt_in_img_eval():
@@ -169,8 +166,6 @@ def shuffle_txt_in_img_eval():
     Log().logger.info("Starting evaluation...")
     
     multimodal_wrapper = LlamaWrapper()
-    
-    ############################# GSM8k dataset ##############################
     
     ## With slurm:
     text_filter = ShuffleWordTextFilter()
@@ -208,8 +203,6 @@ def shuffle_p_increase_text_eval():
     Log().logger.info("Starting evaluation...")
     
     multimodal_wrapper = LlamaWrapper()
-    
-    ############################# GSM8k dataset ##############################
     
     ## With slurm:
     text2image=FixedSizeText2Image(font_path=slurm_font_path)
@@ -257,8 +250,6 @@ def shuffle_p_increase_image_eval():
     
     multimodal_wrapper = LlamaWrapper()
     
-    ############################# GSM8k dataset ##############################
-    
     p_lst: list[float] = [0.05, 0.1, 0.15, 0.25, 0.3, 0.35]
     # selected_task = "1" -> 0.05
     # selected_task = "2" -> 0.1
@@ -299,3 +290,41 @@ def shuffle_p_increase_image_eval():
             selected_p = p_lst[task]
             run_eval(selected_p)
             break
+
+def with_and_without_cot_instruction_eval():
+    if selected_eval != "E":
+        return
+
+    with open(PARAMETERS_PATH, 'r') as file:
+        parameters = json.load(file)
+
+    if selected_task == "1":
+        txt_instruction = parameters['system']['text instruction']
+        img_instruction = parameters['system']['image instruction']
+    elif selected_task == "2":
+        txt_instruction = parameters['system']['CoT text instruction']
+        img_instruction = parameters['system']['CoT image instruction']
+    else:
+        raise ValueError("execute with: 'sbatch run_slurm.sh <eval> <task>'")
+    
+    multimodal_wrapper = LlamaWrapper(txt_instruction=txt_instruction, img_instruction=img_instruction)
+    
+    ## With slurm:
+    text2image=FixedSizeText2Image(font_path=slurm_font_path)
+    
+    ## Without slurm:
+    # text2image = FixedSizeText2Image()
+    
+    datasetWrapper = GSM8kWrapper(text2image)
+    
+    metadata = {
+        "test name": "basic test",
+        "Model": multimodal_wrapper.model_name,
+        "Dataset": datasetWrapper.dataset_id,
+        "Save Predictions": True,
+    }
+    
+    benchmark_manager = BenchmarkManager(datasetWrapper, multimodal_wrapper, metadata)
+    
+    benchmark_manager.register_job(text_f=IdentityTextFilter(), img_f=IdentityImageFilter())
+    benchmark_manager.start_workers()

@@ -45,10 +45,12 @@ class MultimodalWrapper:
         return None
 
 class LlamaWrapper(MultimodalWrapper):
-    def __init__(self, model_id: str="meta-llama/Llama-3.2-11B-Vision-Instruct"):
+    def __init__(self, model_id: str="meta-llama/Llama-3.2-11B-Vision-Instruct", img_instruction: str=IMG_INSTRUCTION, txt_instruction: str=TXT_INSTRUCTION):
         Log().logger.info("Loading Llama model...")
         self.model_id = model_id
         self.model_name = model_id.split('/')[-1]
+        self.img_instruction = img_instruction
+        self.txt_instruction = txt_instruction
         try:
             self._model = MllamaForConditionalGeneration.from_pretrained(
                 self.model_id,
@@ -87,7 +89,7 @@ class LlamaWrapper(MultimodalWrapper):
         messages = [
             {"role": "user", "content": [
                 {"type": "image"},
-                {"type": "text", "text": IMG_INSTRUCTION}
+                {"type": "text", "text": self.img_instruction}
             ]}
         ]
         input_text = self._processor.apply_chat_template(messages, add_generation_prompt=True)
@@ -112,7 +114,7 @@ class LlamaWrapper(MultimodalWrapper):
         # Create a dummy 224x224 RGB image (NOT 1x1, not grayscale)
         image = Image.new(mode="RGB", size=(224, 224), color="white")
         
-        txt_message = TXT_INSTRUCTION + f"\n[QUESTION] {text}"
+        txt_message = self.txt_instruction + f"\n[QUESTION] {text}"
         messages = [
             {"role": "user", "content": [
                 {"type": "image"},
