@@ -294,7 +294,7 @@ def shuffle_p_increase_image_eval():
 def with_and_without_cot_instruction_eval():
     if selected_eval != "E":
         return
-
+    logger = Log().logger
     with open(PARAMETERS_PATH, 'r') as file:
         parameters = json.load(file)
 
@@ -307,6 +307,7 @@ def with_and_without_cot_instruction_eval():
     else:
         raise ValueError("execute with: 'sbatch run_slurm.sh <eval> <task>'")
     
+    logger.info("Starting evaluation...")
     multimodal_wrapper = LlamaWrapper(txt_instruction=txt_instruction, img_instruction=img_instruction)
     
     ## With slurm:
@@ -318,7 +319,7 @@ def with_and_without_cot_instruction_eval():
     datasetWrapper = GSM8kWrapper(text2image)
     
     metadata = {
-        "test name": "basic test",
+        "test name": "E test",
         "Model": multimodal_wrapper.model_name,
         "Dataset": datasetWrapper.dataset_id,
         "Save Predictions": True,
@@ -326,5 +327,7 @@ def with_and_without_cot_instruction_eval():
     
     benchmark_manager = BenchmarkManager(datasetWrapper, multimodal_wrapper, metadata)
     
-    benchmark_manager.register_job(text_f=IdentityTextFilter(), img_f=IdentityImageFilter())
+    dir_name = "with_cot" if selected_task == "2" else "without_cot"
+    
+    benchmark_manager.register_job(text_f=IdentityTextFilter(), img_f=IdentityImageFilter(), inner_dir=dir_name)
     benchmark_manager.start_workers()
