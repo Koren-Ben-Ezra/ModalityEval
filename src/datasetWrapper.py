@@ -1,9 +1,11 @@
+import textwrap
 from datasets import load_dataset, Dataset
 from src.text2image import AbstractText2Image, FixedSizeText2Image
 from src.log import Log
 import os
 import json
-from PIL import Image
+from PIL import Image, ImageDraw, ImageFont
+
 
 CACHE_NAME = "cache"
 
@@ -17,6 +19,42 @@ class AbstractDatasetWrapper:
         self.dataset_id = None
         self.lognest_question = None
         self._text2image = text2image
+
+        
+    def find_font_size(self, text: str, longest_text: int = 500):
+        
+        try:
+            text = AbstractText2Image._preprocess_text(text)
+        except Exception as e:
+            Log().logger.error(f"Error in preprocessing text: {e}")
+            raise e
+        
+        W, H = self.width, self.height
+        font_path = "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf"
+        longest_text = text
+        lo, hi = 5, 300
+        best_font_size = lo
+
+        while lo <= hi:
+            mid = (lo + hi) // 2
+            font = ImageFont.truetype(font_path, mid) if font_path else ImageFont.load_default()
+            draw = ImageDraw.Draw(Image.new("RGB", (1, 1)))
+
+            avg_char_width = sum(draw.textsize(c, font=font)[0] for c in "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ") / 52
+            chars_per_line = max(1, int(W / avg_char_width))
+            wrapped = textwrap.wrap(longest_text, width=chars_per_line)
+
+            ascent, descent = font.getmetrics()
+            line_height = int((ascent + descent) * 1.15)
+            total_height = line_height * len(wrapped)
+
+            if total_height <= H:
+                best_font_size = mid
+                lo = mid + 1
+            else:
+                hi = mid - 1
+
+        return best_font_size
 
 
 
@@ -34,7 +72,7 @@ class GSM8kWrapper(AbstractDatasetWrapper):
         ]
 
         self.longest_question = max(self.data, key=lambda x: len(x['question']))
-
+        self.font_size = self.find_font_size(self.longest_question)
         print(f"Longest question found: {self.longest_question['question']} (length={len(self.longest_question['question'])})")
 
         # Dummy dataset creation
@@ -42,7 +80,7 @@ class GSM8kWrapper(AbstractDatasetWrapper):
 
     def _map_sample(self, sample):
         sample["answer"] = "dummy_answer"
-        sample["question_image"] = self._text2image.create_image(sample["question"]) if self._text2image else None
+        sample["question_image"] = self._text2image.create_image(sample["question"], self.font_size) if self._text2image else None
         return sample
 
     

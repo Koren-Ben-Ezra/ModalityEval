@@ -109,46 +109,11 @@ class FixedSizeText2Image(AbstractText2Image):
         self.max_font_size = max_font_size
         self.padding = padding
 
-    def find_font(self, text: str):
-        
-        try:
-            text = AbstractText2Image._preprocess_text(text)
-        except Exception as e:
-            Log().logger.error(f"Error in preprocessing text: {e}")
-            raise e
-        
-        W, H = self.width, self.height
-        font_path = "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf"
-        longest_text = text
-        lo, hi = 5, 300
-        best_font_size = lo
-
-        while lo <= hi:
-            mid = (lo + hi) // 2
-            font = ImageFont.truetype(font_path, mid) if font_path else ImageFont.load_default()
-            draw = ImageDraw.Draw(Image.new("RGB", (1, 1)))
-
-            avg_char_width = sum(draw.textsize(c, font=font)[0] for c in "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ") / 52
-            chars_per_line = max(1, int(W / avg_char_width))
-            wrapped = textwrap.wrap(longest_text, width=chars_per_line)
-
-            ascent, descent = font.getmetrics()
-            line_height = int((ascent + descent) * 1.15)
-            total_height = line_height * len(wrapped)
-
-            if total_height <= H:
-                best_font_size = mid
-                lo = mid + 1
-            else:
-                hi = mid - 1
-
-        return best_font_size
-
     def create_image(
         self,
-        text,                    
-        image_size = (800, 300),             
-        font_size = 14,               
+        text, 
+        font_size = 14,                       
+        image_size = (800, 300),                      
         font_path = "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",                    
     ):                           
         W, H = image_size
