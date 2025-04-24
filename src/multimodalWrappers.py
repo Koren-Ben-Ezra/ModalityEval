@@ -46,7 +46,7 @@ class MultimodalWrapper:
     
 
     
-class LlamaWrapper_2(MultimodalWrapper):
+class LlamaWrapper(MultimodalWrapper):
     def __init__(self):
         self.model_id = "dummy-llama"
         self.model_name = "DummyLLaMA"
