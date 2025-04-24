@@ -157,7 +157,8 @@ class FixedSizeText2Image(AbstractText2Image):
         font = ImageFont.truetype(font_path, font_size) if font_path else ImageFont.load_default()
 
         draw = ImageDraw.Draw(Image.new("RGB", (1, 1)))
-        avg_char_width = sum(draw.textsize(c, font=font)[0] for c in "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ") / 52
+        avg_char_width = sum(font.getlength(c) for c in "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ") / 52
+
         chars_per_line = max(1, int(W / avg_char_width))
         lines = textwrap.wrap(text, width=chars_per_line)
 
