@@ -43,8 +43,31 @@ class MultimodalWrapper:
     
     def generate_ans_from_text(self, text: str):
         return None
+    
 
-class LlamaWrapper(MultimodalWrapper):
+    
+class LlamaWrapper_2(MultimodalWrapper):
+    def __init__(self):
+        self.model_id = "dummy-llama"
+        self.model_name = "DummyLLaMA"
+        self.img_instruction = "Solve the question from the image."
+        self.txt_instruction = "Solve the question from the text."
+        print("Initialized dummy LLaMA wrapper (no model loaded).")
+
+    def generate_ans_from_image(self, image: Image.Image):
+        print("Pretending to answer image question...")
+        return "42"  # Dummy answer
+
+    def generate_ans_from_text(self, text: str):
+        print(f"Received text: {text}")
+        return "42"  # Dummy answer
+
+    def extract_answer(self, text: str, token: str = "<|eot_id|>") -> str:
+        pattern = r"([-+]?\d+(?:\.\d+)?)(?:\s*" + re.escape(token) + ")"
+        match = re.search(pattern, text)
+        return match.group(1) if match else "no number"
+    
+class LlamaWrapper_2(MultimodalWrapper):
     def __init__(self, model_id: str="meta-llama/Llama-3.2-11B-Vision-Instruct", img_instruction: str=IMG_INSTRUCTION, txt_instruction: str=TXT_INSTRUCTION):
         Log().logger.info("Loading Llama model...")
         self.model_id = model_id

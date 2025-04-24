@@ -1,6 +1,8 @@
 from PIL import Image, ImageDraw, ImageFont
 from src.filters import AbstractTextFilter
 from src.log import Log
+import textwrap
+import uuid
 
 MAX_WORDS_PER_LINE__IMG = 10
 
@@ -107,7 +109,7 @@ class FixedSizeText2Image(AbstractText2Image):
         self.max_font_size = max_font_size
         self.padding = padding
 
-    def create_image(self, text: str):
+    def find_font(self, text: str):
         
         try:
             text = AbstractText2Image._preprocess_text(text)
@@ -115,42 +117,69 @@ class FixedSizeText2Image(AbstractText2Image):
             Log().logger.error(f"Error in preprocessing text: {e}")
             raise e
         
-        chosen_font_size = 1
+        W, H = self.width, self.height
+        font_path = "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf"
+        longest_text = text
+        lo, hi = 5, 300
+        best_font_size = lo
 
-        # Effective drawing area (subtract padding from each side)
-        effective_width = self.width - 2 * self.padding
-        effective_height = self.height - 2 * self.padding
+        while lo <= hi:
+            mid = (lo + hi) // 2
+            font = ImageFont.truetype(font_path, mid) if font_path else ImageFont.load_default()
+            draw = ImageDraw.Draw(Image.new("RGB", (1, 1)))
 
-        # 1. Find the largest font size that fits the given dimensions minus padding
-        for size in range(self.max_font_size, 0, -1):
-            temp_img = Image.new("RGB", (1, 1), self.bg_color)
-            temp_draw = ImageDraw.Draw(temp_img)
-            font = ImageFont.truetype(self.font_path, size)
-            left, top, right, bottom = temp_draw.textbbox((0, 0), text, font=font)
+            avg_char_width = sum(draw.textsize(c, font=font)[0] for c in "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ") / 52
+            chars_per_line = max(1, int(W / avg_char_width))
+            wrapped = textwrap.wrap(longest_text, width=chars_per_line)
 
-            text_width = right - left
-            text_height = bottom - top
+            ascent, descent = font.getmetrics()
+            line_height = int((ascent + descent) * 1.15)
+            total_height = line_height * len(wrapped)
 
-            if text_width <= effective_width and text_height <= effective_height:
-                chosen_font_size = size
-                break
+            if total_height <= H:
+                best_font_size = mid
+                lo = mid + 1
+            else:
+                hi = mid - 1
 
-        # 2. Create the final image
-        image = Image.new("RGB", (self.width, self.height), self.bg_color)
-        draw = ImageDraw.Draw(image)
-        final_font = ImageFont.truetype(self.font_path, chosen_font_size)
+        return best_font_size
 
-        # 3. Measure text with the chosen font, then center it in the padded area
-        left, top, right, bottom = draw.textbbox((0, 0), text, font=final_font)
-        text_width = right - left
-        text_height = bottom - top
+    def create_image(
+        self,
+        text,                    
+        image_size = (800, 300),             
+        font_size = 14,               
+        font_path = "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",                    
+    ):                           
+        W, H = image_size
 
-        # Center the text within the effective (padded) area
-        x_offset = self.padding + (effective_width - text_width) // 2 - left
-        y_offset = self.padding + (effective_height - text_height) // 2 - top
+        font_size = self.find_font(text) if font_size is None else font_size
+        font = ImageFont.truetype(font_path, font_size) if font_path else ImageFont.load_default()
 
-        draw.text((x_offset, y_offset), text, font=final_font, fill=self.text_color)
-        return image
+        draw = ImageDraw.Draw(Image.new("RGB", (1, 1)))
+        avg_char_width = sum(draw.textsize(c, font=font)[0] for c in "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ") / 52
+        chars_per_line = max(1, int(W / avg_char_width))
+        lines = textwrap.wrap(text, width=chars_per_line)
+
+        ascent, descent = font.getmetrics()
+        line_height = int((ascent + descent) * 1.15)
+
+        img = Image.new("RGB", (W, H), "white")
+        draw = ImageDraw.Draw(img)
+
+        for i, line in enumerate(lines):
+            y = i * line_height
+            draw.text((0, y), line, fill="black", font=font)
+        #plot the image 
+
+        filename = f"text_image_{uuid.uuid4().hex[:8]}.png"
+        img.save(filename)
+        print(f"Image saved as: {filename}")
+
+
+        return img
+
+        
     
 class FilteredFixedSizeText2Image(FixedSizeText2Image):
     def __init__(self, filter: AbstractTextFilter, *args, **kwargs):

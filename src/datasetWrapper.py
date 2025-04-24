@@ -2,6 +2,8 @@ from datasets import load_dataset, Dataset
 from src.text2image import AbstractText2Image, FixedSizeText2Image
 from src.log import Log
 import os
+import json
+from PIL import Image
 
 CACHE_NAME = "cache"
 
@@ -13,12 +15,50 @@ class AbstractDatasetWrapper:
     def __init__(self, text2image: AbstractText2Image):
         self.dataset: Dataset = None  # Should be implemented in subclasses
         self.dataset_id = None
+        self.lognest_question = None
         self._text2image = text2image
-    
+
+
+
 class GSM8kWrapper(AbstractDatasetWrapper):
+    def __init__(self, text2image=None):
+        self.dataset_id = "GSM8k"
+        self._text2image = text2image
+
+        self.data = [
+            {"question": "Tom has 3 pencils and buys 7 more. How many does he have now?"},
+            {"question": "A train travels at 60 km/h. How far does it travel in 4 hours?"},
+            {"question": "Janet’s ducks lay 16 eggs per day. She eats three for breakfast every morning and bakes muffins for her friends every day with four. She sells the remainder at the farmers' market daily for $2 per fresh duck egg. How much in dollars does she make every day at the farmers' market?"},
+            {"question": "If a square has side length 5 cm, what is its area?"},
+            {"question": "Sam reads 10 pages every day. How many pages does he read in a week?"}
+        ]
+
+        self.longest_question = max(self.data, key=lambda x: len(x['question']))
+
+        print(f"Longest question found: {self.longest_question['question']} (length={len(self.longest_question['question'])})")
+
+        # Dummy dataset creation
+        self.dataset = Dataset.from_list([self._map_sample(sample) for sample in self.data])
+
+    def _map_sample(self, sample):
+        sample["answer"] = "dummy_answer"
+        sample["question_image"] = self._text2image.create_image(sample["question"]) if self._text2image else None
+        return sample
+
+    
+class GSM8kWrapper_2(AbstractDatasetWrapper):
 
     def __init__(self, text2image: AbstractText2Image = FixedSizeText2Image(), cache_filename: str=""):
         self.dataset_id = "GSM8k"
+
+        # Load the GSM8K dataset
+        with open('gsm8k_train.jsonl', 'r') as f:
+            data = [json.loads(line) for line in f]
+
+        # Find the question with the maximum length
+        self.longest_question = max(data, key=lambda x: len(x['question'])) 
+        Log().logger.info(f"Longest question found in  dataset: {self.longest_question['question']} with length {len(self.longest_question['question'])}")
+
         self._text2image = text2image
         Log().logger.info(f"Loading {self.dataset_id} dataset...")
         

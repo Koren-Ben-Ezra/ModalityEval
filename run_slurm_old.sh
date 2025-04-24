@@ -1,11 +1,13 @@
 #!/bin/bash
 #SBATCH --job-name=ModalityEval
-#SBATCH --partition=studentkillable
+#SBATCH --account=gpu-research
+#SBATCH --partition=killable
 #SBATCH --gres=gpu:1
-#SBATCH --mem=50000e
-ß
-exec 1> outputs/${1}_${2}_Amit.out
-exec 2> outputs/${1}_${2}_Amit.err
+#SBATCH --mem=50000
+#SBATCH --constraint=geforce_rtx_3090
+
+exec 1> outputs/${1}_${2}.out
+exec 2> outputs/${1}_${2}.err
 
 # Load the cluster’s driver/toolkit before any nvidia-smi or torch.cuda calls
 module purge
