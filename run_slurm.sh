@@ -3,40 +3,38 @@
 #SBATCH --account=gpu-research
 #SBATCH --partition=killable
 #SBATCH --gres=gpu:1
-#SBATCH --mem=50000         # 50 GB of CPU memory
+#SBATCH --mem=50000
 #SBATCH --constraint=geforce_rtx_3090
 
 exec 1> outputs/${1}_${2}.out
 exec 2> outputs/${1}_${2}.err
 
-# Print GPU info
+# Load the cluster’s driver/toolkit before any nvidia-smi or torch.cuda calls
+module purge
+module load cuda/11.0
+
+# Now you can safely query the GPU
+echo "CUDA_VISIBLE_DEVICES = $CUDA_VISIBLE_DEVICES"
 nvidia-smi --query-gpu=name,memory.total --format=csv
 
 export SELECTED_EVAL=$1
 export SELECTED_TASK=$2
 
-# Manually set CUDA paths (if module system isn't used)
-export PATH=/usr/local/cuda-11.0/bin:$PATH
-export LD_LIBRARY_PATH=/usr/local/cuda-11.0/lib64:$LD_LIBRARY_PATH
-
 # Initialize Conda and activate your environment
 source /home/joberant/NLP_2425a/$(whoami)/anaconda3/etc/profile.d/conda.sh
 conda activate ModalityEval
 
+# Sanity check PyTorch
+python -c "import torch; print('cuda available?', torch.cuda.is_available(), 'cuda version:', torch.version.cuda)"
+
 export HUGGING_FACE_HUB_TOKEN="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"
 
-# Set Hugging Face cache and TMPDIR to scratch space
-export HF_HOME=/vol/scratch/$(whoami)/hf_cache
-mkdir -p "$HF_HOME"
+# HuggingFace cache & tmp
+export HF_HOME=/vol/scratch/$(whoami)/hf_cache; mkdir -p "$HF_HOME"
+export TMPDIR=/vol/scratch/$(whoami)/tmp; mkdir -p "$TMPDIR"
 
-export TMPDIR=/vol/scratch/$(whoami)/tmp
-mkdir -p "$TMPDIR"
-
-# Optional: Configure PyTorch CUDA allocation to help avoid fragmentation
 export PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
-
-# Optionally set how many tasks to run in parallel inside Python
 export NUM_PARALLEL_JOBS=1
 
-# Launch main Python script (unbuffered)
+# Finally run
 python -u main.py
