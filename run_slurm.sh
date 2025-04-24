@@ -2,7 +2,7 @@
 #SBATCH --job-name=ModalityEval
 #SBATCH --partition=studentkillable
 #SBATCH --gres=gpu:1
-#SBATCH --mem=50000e
+#SBATCH --mem=5000
 ß
 exec 1> outputs/${1}_${2}_Amit.out
 exec 2> outputs/${1}_${2}_Amit.err
