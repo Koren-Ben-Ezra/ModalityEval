@@ -46,7 +46,7 @@ class MultimodalWrapper:
     
 
     
-class LlamaWrapper(MultimodalWrapper):
+class LlamaWrapper_4(MultimodalWrapper):
     def __init__(self):
         self.model_id = "dummy-llama"
         self.model_name = "DummyLLaMA"
@@ -67,7 +67,7 @@ class LlamaWrapper(MultimodalWrapper):
         match = re.search(pattern, text)
         return match.group(1) if match else "no number"
     
-class LlamaWrapper_2(MultimodalWrapper):
+class LlamaWrapper(MultimodalWrapper):
     def __init__(self, model_id: str="meta-llama/Llama-3.2-11B-Vision-Instruct", img_instruction: str=IMG_INSTRUCTION, txt_instruction: str=TXT_INSTRUCTION):
         Log().logger.info("Loading Llama model...")
         self.model_id = model_id
