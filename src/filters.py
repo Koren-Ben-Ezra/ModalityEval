@@ -76,7 +76,24 @@ class ShuffleWordTextFilter(AbstractTextFilter):
         scrambled_words = [scramble_word(word) for word in words]
         return ' '.join(scrambled_words)
 
+class flip2LettersTextFilter(AbstractTextFilter):
+    filter_name:str="flip2Letters_TF"
+    def __init__(self, p: float=0.2):
+        self.p = p
+        
+    def apply_filter(self, input: str , answer: str=None):
+        #choose random word with at least 2 letters
+        def flip_word_2_letters(word: str) -> str:
+            if len(word) > 1 and random.random() < self.p:  
+                letters = list(word)  
+                i = random.randint(0, len(word)-2)
+                letters[i], letters[i+1] = letters[i+1], letters[i]
+                word = ''.join(letters)
+            return word
 
+        words = input.split()
+        scrambled_words = [flip_word_2_letters(word) for word in words]
+        return ' '.join(scrambled_words)
 class SwapWordsTextFilter(AbstractTextFilter):
     filter_name:str="SwapWords_TF"
     def __init__(self, p: float=0.2):
@@ -265,6 +282,7 @@ class SurroundByPartialCorrectAnsTextFilter(AbstractTextFilter):
         self.p = p
         self.padding_symbol = padding_symbol
         self.num_repeats = num_repeats
+
 
     def apply_filter(self, input: str, answer: str):
         prefix = []
