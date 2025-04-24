@@ -23,12 +23,6 @@ class AbstractDatasetWrapper:
         
     def find_font_size(self, text: str, longest_text: int = 500):
         
-        try:
-            text = AbstractText2Image._preprocess_text(text)
-        except Exception as e:
-            Log().logger.error(f"Error in preprocessing text: {e}")
-            raise e
-        
         W, H = self.width, self.height
         font_path = "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf"
         longest_text = text

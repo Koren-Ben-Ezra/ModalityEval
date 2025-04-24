@@ -138,7 +138,7 @@ class FixedSizeText2Image(AbstractText2Image):
             draw.text((0, y), line, fill="black", font=font)
         #plot the image 
 
-        filename = f"text_image_{uuid.uuid4().hex[:8]}.png"
+        filename = f"new_text_image_{uuid.uuid4().hex[:8]}.png"
         img.save(filename)
         print(f"Image saved as: {filename}")
 
