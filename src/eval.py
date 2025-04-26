@@ -412,19 +412,23 @@ def with_and_without_cot_instruction_eval():
     logger = Log().logger
     with open(PARAMETERS_PATH, 'r') as file:
         parameters = json.load(file)
+
     if selected_task == "1":
+        use_CoT = False
         txt_instruction = parameters['system']['text instruction']
         img_instruction = parameters['system']['image instruction']
+        Log().logger.info("Using without CoT instructions")
     elif selected_task == "2":
+        use_CoT = True
         txt_instruction = parameters['system']['CoT text instruction']
         img_instruction = parameters['system']['CoT image instruction']
+        Log().logger.info("Using with CoT instructions")
     else:
         raise ValueError("execute with: 'sbatch run_slurm.sh <eval> <task>'")
     
     logger.info("Starting evaluation...")
     
-    multimodal_wrapper = LlamaWrapper(txt_instruction=txt_instruction, img_instruction=img_instruction)
-    
+    multimodal_wrapper = LlamaWrapper(img_instruction=img_instruction, txt_instruction=txt_instruction, use_CoT = use_CoT)
     text2image=FixedSizeText2Image() 
     
     datasetWrapper = GSM8kWrapper(text2image)

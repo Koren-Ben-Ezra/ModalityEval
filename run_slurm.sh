@@ -9,9 +9,6 @@
 exec 1> outputs/${1}_${2}.out
 exec 2> outputs/${1}_${2}.err
 
-# Load the cluster’s driver/toolkit before any nvidia-smi or torch.cuda calls
-module purge
-module load cuda/11.0
 
 # Now you can safely query the GPU
 echo "CUDA_VISIBLE_DEVICES = $CUDA_VISIBLE_DEVICES"

@@ -65,20 +65,23 @@ class BenchmarkManager:
         category.save_predictions()
         self.append_res_to_summary(category)
     
-    def _track_result(self, question: str, answer: str, extructed_pred: str, response: str, title: str):
+    def _track_result(self, question: str, answer: str, extracted_pred: str, response: str, title: str, is_correct: bool):
         predictions_filename = os.path.join(self.benchmark_name, "track.txt")
         if not os.path.exists(predictions_filename):
             open(predictions_filename, "w").close()
 
         with open(predictions_filename, "a") as f:
             f.write("-------------------------------------------------------------\n")
-            f.write(f"[{title}]\n\n")
-            f.write(f"Q: {question}\nAns: {answer}\nResponse: {response}\nPred: '{extructed_pred}'\n")
+            f.write(f"[{title}] ({'CORRECT' if is_correct else 'WRONG'})\n\n")
+            f.write(f"Q: {question}\n")
+            f.write(f"Ans: {answer}\n")
+            f.write(f"Response: {response}\n")
+            f.write(f"Pred: '{extracted_pred}'\n")
 
         
     def _execute_single_prompt(self, sample, category: Category, idx: int, track_mistakes: bool = False):
         pred_from_txt = None
-        pred_from_image = None
+        pred_from_img = None
         txt_response = None
         img_response = None
         if category.text_f is not None:
@@ -99,9 +102,7 @@ class BenchmarkManager:
                 raise e
         
             txtf_title = f"filter: {category.text_f.filter_name}, question: {idx}"
-            
 
-            
         if category.img_f is not None:
             try:
                 filtered_image = category.img_f.apply_filter(sample["question_image"], sample["answer"])
@@ -114,35 +115,34 @@ class BenchmarkManager:
                 self.logger.error(f"Error generating answer from image: {e}")
                 raise e
             try:
-                pred_from_image = self.multimodal_wrapper.extract_answer(img_response) # function may differ in different models
+                pred_from_img = self.multimodal_wrapper.extract_answer(img_response) # function may differ in different models
             except Exception as e:
-                self.logger.error(f"Error extracting pred_from_image: {e}")
+                self.logger.error(f"Error extracting pred_from_img: {e}")
                 raise e
             
             imgf_title = f"filter: {category.img_f.filter_name}, question: {idx}"
-
             
-        self._update_category_stats(sample, category, pred_from_txt, pred_from_image,txt_response, img_response, txtf_title, imgf_title, track_mistakes)
+        self._update_category_stats(sample, category, pred_from_txt, pred_from_img,txt_response, img_response, txtf_title, imgf_title, track_mistakes)
     
     def _update_category_stats(self, sample, category: Category, pred_from_txt: str, pred_from_img: str, txt_response: str, img_response: str, txtf_title: str, imgf_title: str, track_mistakes: bool):
-        answer = self.clean_str_number(sample["answer"])
+        answer = BenchmarkManager.clean_str_number(sample["answer"])
         
         category.text_stats.total += 1
         category.img_stats.total += 1
 
         if pred_from_txt is not None:
-            pred_from_txt = self.clean_str_number(pred_from_txt)    
-            if pred_from_txt == answer:
+            is_correct = (pred_from_txt == answer)
+            if is_correct:
                 category.text_stats.success += 1
             elif track_mistakes:
-                self._track_result(sample["question"], sample["answer"], pred_from_txt, txt_response, txtf_title)
+                self._track_result(sample["question"], sample["answer"], pred_from_txt, txt_response, txtf_title, is_correct)
         
-        if pred_from_img is not None:  
-            pred_from_img = self.clean_str_number(pred_from_img)
-            if pred_from_img == answer:
+        if pred_from_img is not None:
+            is_correct = (pred_from_img == answer)
+            if is_correct:
                 category.img_stats.success += 1
             elif track_mistakes:
-                self._track_result(sample["question"], sample["answer"], pred_from_img, img_response, imgf_title)
+                self._track_result(sample["question"], sample["answer"], pred_from_img, img_response, imgf_title, is_correct)
 
         # Append predictions if predictions_df exists
         if category.predictions_df is not None:

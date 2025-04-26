@@ -18,17 +18,25 @@ class AbstractText2Image:
 
     def create_image(self, text: str):
         return None
+
+    def find_font_size(
+        self,
+        text: str,
+        min_size: int = 5,
+        max_size: int = 30,
+        line_spacing: float = 1.15
+    ) -> None:
+        """
+        Pick the largest font size so that, when wrapping on word boundaries
+        to self.width, all lines (with line_spacing) fit within self.height.
+        """
+        pass
+        
     
 
     
 class FixedSizeText2Image(AbstractText2Image):
-    """
-    Uses a fixed image size (width, height). Automatically adjusts the font size
-    so the text fits. The text is then centered within the final image, taking
-    bounding box offsets and padding into account to avoid clipping.
-    """
-
-    def __init__(self, width: int = 800, height: int = 300, font_path='/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf', text_color=(0, 0, 0), bg_color=(255, 255, 255), padding: int = 10,font_size: int = 20, longest_text=None):
+    def __init__(self, width: int = 1000, height: int = 600, font_path='/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf', text_color=(0, 0, 0), bg_color=(255, 255, 255), padding: int = 10,font_size: int = 20, longest_text=None):
         super().__init__()
         self.width = width
         self.height = height
@@ -37,7 +45,6 @@ class FixedSizeText2Image(AbstractText2Image):
         self.bg_color = bg_color
         self.padding = padding
         self.font_size = self.find_font_size(longest_text) if longest_text else font_size
-
 
 
     def find_font_size(
@@ -136,60 +143,6 @@ class FixedSizeText2Image(AbstractText2Image):
 
 
         
-
-class FixedFontText2Image(AbstractText2Image):
-
-    def __init__(self):
-        super().__init__()
-
-    def create_image(self, text: str):
-        text = self.preprocess_text(text)
-        # 1. Create a small image to measure the bounding box of the text
-        temp_img = Image.new("RGB", (1, 1), self.bg_color)
-        temp_draw = ImageDraw.Draw(temp_img)
-        font = ImageFont.truetype(self.font_path, self.font_size)
-
-        # textbbox returns (left, top, right, bottom)
-        left, top, right, bottom = temp_draw.textbbox((0, 0), text, font=font)
-
-        text_width = right - left
-        text_height = bottom - top
-
-        # 2. Create the final image sized to the text plus padding
-        width = text_width + 2 * self.padding
-        height = text_height + 2 * self.padding
-        image = Image.new("RGB", (width, height), self.bg_color)
-        draw = ImageDraw.Draw(image)
-
-        # 3. Draw text at a negative offset, plus the padding
-        #    This ensures the text isn't clipped and is padded
-        draw.text(
-            (self.padding - left, self.padding - top),
-            text,
-            font=font,
-            fill=self.text_color
-        )
-
-        return image
-
-    def preprocess_text(self,text: str):
-        words = []
-        for line in text.split("\n"):
-            for word in line.split(" "):
-                words.append(word)
-        res = []
-        new_line = []
-        for word in words:
-            if len(new_line) == MAX_WORDS_PER_LINE__IMG:
-                res.append(" ".join(new_line))
-                new_line = []
-            
-            new_line.append(word)
-        
-        return "\n".join(res)
-
-
-
     
 class FilteredFixedSizeText2Image(FixedSizeText2Image):
     def __init__(self, filter: AbstractTextFilter, *args, **kwargs):

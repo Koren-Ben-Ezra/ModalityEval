@@ -1,6 +1,0 @@
-{
-    "test name": "E test",
-    "Model": "DummyLLaMA",
-    "Dataset": "GSM8k_5_sample",
-    "Save Predictions": true
-}
