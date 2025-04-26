@@ -28,7 +28,6 @@ class BenchmarkManager:
         )
         
         self._make_benchmark_dir()
-        self._make_summary_files()
     
     def register_job(self, text_f: AbstractTextFilter=None, img_f: AbstractImageFilter=None, inner_dir: str=""):
         if img_f is None and text_f is None:
@@ -61,7 +60,6 @@ class BenchmarkManager:
             idx += 1
             
         category.save_predictions()
-        self.append_res_to_summary(category)
     
     def _track_result(self, question: str, answer:  str, final_pred: str, full_pred: str, title: str):
         predictions_filename = os.path.join(self.benchmark_name, "track.txt")
@@ -145,36 +143,6 @@ class BenchmarkManager:
             os.makedirs(BENCHMARKS_DIR)
         if not os.path.exists(self.benchmark_name):
             os.makedirs(self.benchmark_name)
-    
-    def append_res_to_summary(self, category: Category):
-        new_row = pd.DataFrame([{}])
-        
-        new_row["Text Filter"] = ""
-        new_row["Text Correct"] = ""
-        new_row["Image Filter"] = ""
-        new_row["Image Correct"] = ""
-        
-        if category.text_f is not None:
-            new_row["Text Filter"] = category.text_f.filter_name
-            new_row["Text Correct"] = category.text_stats.success
-        if category.img_f is not None:
-            new_row["Image Filter"] = category.img_f.filter_name
-            new_row["Image Correct"] = category.img_stats.success
-        
-        new_row["Total Samples"] = category.text_stats.total
-
-        with open(self.summary_filename, "a") as f:
-            new_row.to_csv(f, index=False, header=False)
-
-    def _make_summary_files(self):
-        columns = ["Text Filter", "Text Correct", "Image Filter", "Image Correct", "Total Samples"]
-        summary_df = pd.DataFrame(columns=columns)
-        self.summary_filename = os.path.join(self.benchmark_name, self.metadata.get("test name", "summary").replace(" ", "_") + ".csv")
-        summary_df.to_csv(self.summary_filename, index=False)
-        
-        metadata_filename = self.summary_filename.replace(".csv", "_metadata.json")
-        with open(metadata_filename, "w") as f:
-            json.dump(self.metadata, f, indent=4)
     
     @staticmethod
     def clean_str_number(s: str) -> str:

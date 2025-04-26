@@ -83,7 +83,7 @@ def with_and_without_cot_instruction_eval():
         img_instruction = parameters['system']['image instruction']
         txt_instruction = parameters['system']['text instruction']
     else:
-        raise ValueError("execute with: 'sbatch run_slurm.sh A <1-4>'")
+        raise ValueError("execute with: 'sbatch run_slurm.sh A <1-2>'")
     
     logger.info("Starting evaluation...")
     multimodal_wrapper = LlamaWrapper(txt_instruction=txt_instruction, img_instruction=img_instruction)
