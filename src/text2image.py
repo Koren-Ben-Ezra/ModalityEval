@@ -31,12 +31,9 @@ class AbstractText2Image:
         to self.width, all lines (with line_spacing) fit within self.height.
         """
         pass
-        
-    
-
     
 class FixedSizeText2Image(AbstractText2Image):
-    def __init__(self, width: int = 1000, height: int = 600, font_path='arial.ttf' , text_color=(0, 0, 0), bg_color=(255, 255, 255), padding: int = 15, font_size: int = 20, longest_text=None):
+    def __init__(self, width: int = 1000, height: int = 600, font_path='DejaVuSans.ttf' , text_color=(0, 0, 0), bg_color=(255, 255, 255), padding: int = 15, default_font_size: int = 20, longest_text=None):
         super().__init__()
         self.width = width
         self.height = height
@@ -44,7 +41,7 @@ class FixedSizeText2Image(AbstractText2Image):
         self.text_color = text_color
         self.bg_color = bg_color
         self.padding = padding
-        self.font_size = self.set_font_size(longest_text) if longest_text else font_size
+        self.font_size = self.set_font_size(longest_text) if longest_text else default_font_size
 
 
     def set_font_size(

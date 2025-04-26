@@ -149,22 +149,22 @@ class LlamaWrapper(MultimodalWrapper):
     
     def extract_answer(self, text: str) -> str:
         # split off everything before the last “answer” token
+        # 1) split off everything before the last “answer”
         parts = re.split(r'(?i)\banswer[:\s]*', text)
-        tail = parts[-1]  # whatever follows the last “answer”
+        tail = parts[-1]
 
-        # now grab a number with optional commas, decimals, and optional leading $
-        num_re = r'([-+]?(?:\d{1,3}(?:,\d{3})*|\d+)(?:\.\d+)?)'
-        m = re.search(num_re, tail)
+        # 2) match one‐or‐more digits, then zero‐or‐more groups of “,ddd”, then optional fractional part
+        m = re.search(r'([-+]?\d+(?:,\d{3})*(?:\.\d+)?)', tail)
         if not m:
             return "no number"
 
         raw = m.group(1)
-        # strip out commas and dollar sign
+        # strip commas and dollar sign
         raw = raw.replace(',', '').lstrip('$')
 
-        # normalize via Decimal
-        return self.clean_str_number_ron(raw)
-    
+        # 3) normalize
+        return self.clean_str_number(raw)
+            
     def _clean_raw(self, raw: str) -> str:
         # 1) strip model tokens & newlines
         txt = re.sub(r"<\|.*?\|>", "", raw).replace("\n", " ").strip()
@@ -176,22 +176,21 @@ class LlamaWrapper(MultimodalWrapper):
 
         return txt
 
-    def clean_str_number_ron(self,s: str) -> str:
+    def clean_str_number(s: str) -> str:
         if not s:
             return s
-        
+
+        # strip commas and dollar signs just like the extractor does
+        s = s.replace(',', '').lstrip('$')
+
         try:
             d = Decimal(s)
         except InvalidOperation:
             return s
-        
+
         d_normalized = d.normalize()
-        s_formatted = format(d_normalized, 'f')
-        
-        if '.' in s_formatted:
-            s_formatted = s_formatted.rstrip('0').rstrip('.')
-        
-        return s_formatted
+        formatted = format(d_normalized, 'f')
+        return formatted.rstrip('0').rstrip('.') if '.' in formatted else formatted
 
     # def extract_answer_og(self, text: str, token: str="<|eot_id|>") -> str:
     #     if not isinstance(text, str):

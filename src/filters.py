@@ -80,12 +80,12 @@ class flip2LettersTextFilter(AbstractTextFilter):
     filter_name:str="flip2Letters_TF"
     def __init__(self, p: float=0.2):
         self.p = p
-        
+    
     def apply_filter(self, input: str , answer: str=None):
         #choose random word with at least 2 letters
         def flip_word_2_letters(word: str) -> str:
             if len(word) > 1 and random.random() < self.p:  
-                letters = list(word)  
+                letters = list(word)
                 i = random.randint(0, len(word)-2)
                 letters[i], letters[i+1] = letters[i+1], letters[i]
                 word = ''.join(letters)
@@ -94,6 +94,7 @@ class flip2LettersTextFilter(AbstractTextFilter):
         words = input.split()
         scrambled_words = [flip_word_2_letters(word) for word in words]
         return ' '.join(scrambled_words)
+    
 class SwapWordsTextFilter(AbstractTextFilter):
     filter_name:str="SwapWords_TF"
     def __init__(self, p: float=0.2):
@@ -156,7 +157,7 @@ class SurroundByCorrectAnsImageFilter(AbstractImageFilter):
         num_repeats: int = 5, 
         alpha: float = 0.2, 
         font_size: int = 40, 
-        font_path: str = "arial.ttf", 
+        font_path: str = "DejaVuSans.ttf", 
         font_color = "black"):
         
         self.num_repeats = num_repeats
@@ -213,7 +214,7 @@ class SurroundByPartialCorrectAnsImageFilter(AbstractImageFilter):
             num_repeats: int = 5, 
             alpha: float = 0.2, 
             font_size: int = 40, 
-            font_path: str = "arial.ttf", 
+            font_path: str = "DejaVuSans.ttf", 
             font_color = "black"):
         
         self.p = p

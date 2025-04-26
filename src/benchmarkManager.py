@@ -110,7 +110,7 @@ class BenchmarkManager:
     
     def _update_category_stats(self, sample, category: Category, final_pred_txt: str, final_pred_img: str, full_pred_txt: str, full_pred_img: str, txtf_title: str, imgf_title: str):
         answer = BenchmarkManager.clean_str_number(sample["answer"])
-        
+
         category.text_stats.total += 1
         category.img_stats.total += 1
 
