@@ -3,8 +3,8 @@
 #SBATCH --partition=studentkillable
 #SBATCH --mem=5G
 #SBATCH --cpus-per-task=1
-#SBATCH --output=test_amit.out
-#SBATCH --error=test_amit.err
+#SBATCH --output=debug.out
+#SBATCH --error=debug.err
 
 source /home/joberant/NLP_2425a/$(whoami)/anaconda3/etc/profile.d/conda.sh
 conda activate ModalityEval
