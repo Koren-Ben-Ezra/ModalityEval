@@ -76,17 +76,17 @@ def with_and_without_cot_instruction_eval():
     txt_instruction = ""
     img_instruction = ""
     if selected_task == "1":
-        img_instruction = parameters['system']['CoT image instruction']
-        txt_instruction = parameters['system']['CoT text instruction']
+        txt_instruction = parameters['system']['CoT_text_instruction']
+        img_instruction = parameters['system']['CoT_image_instruction']
         
     elif selected_task == "2":
-        img_instruction = parameters['system']['image instruction']
-        txt_instruction = parameters['system']['text instruction']
+        txt_instruction = parameters['system']['text_instruction']
+        img_instruction = parameters['system']['image_instruction']
     else:
         raise ValueError("execute with: 'sbatch run_slurm.sh A <1-2>'")
     
     logger.info("Starting evaluation...")
-    multimodal_wrapper = LlamaWrapper(txt_instruction=txt_instruction, img_instruction=img_instruction)
+    multimodal_wrapper = LlamaWrapper(img_instruction=img_instruction, txt_instruction=txt_instruction)
     text2image=FixedSizeText2Image(font_path=slurm_font_path) 
     datasetWrapper = GSM8KWrapper(text2image)
     
@@ -116,7 +116,7 @@ def flip2LettersTextFilter_TF_eval():
     multimodal_wrapper = LlamaWrapper()
     
     ## With slurm:
-    text2image=FixedSizeText2Image(font_path=slurm_font_path)
+    text2image = FixedSizeText2Image(font_path=slurm_font_path)
     
     datasetWrapper = GSM8KWrapper(text2image, cache_filename="gsm8k_dataset")
     

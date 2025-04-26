@@ -13,8 +13,8 @@ with open(PARAMETERS_PATH, 'r') as file:
     system = data.get('system', '')
 
 # default
-TXT_INSTRUCTION = system.get('CoT text instruction', '')
-IMG_INSTRUCTION = system.get('CoT image instruction', '')
+TXT_INSTRUCTION = system.get('CoT_image_instruction', '')
+IMG_INSTRUCTION = system.get('CoT_text_instruction', '')
 
 MAX_NEW_TOKENS = 1000
 
