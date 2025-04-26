@@ -115,7 +115,7 @@ class GSM8kWrapper_GSM8k_5_samples(AbstractDatasetWrapper):
     
 
 
-class GSM8kWrapper(AbstractDatasetWrapper):
+class GSM8KWrapper(AbstractDatasetWrapper):
 
     def __init__(self, text2image: AbstractText2Image = FixedSizeText2Image(), cache_filename: str=""):
         self.dataset_id = "GSM8k"

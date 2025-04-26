@@ -1,7 +1,7 @@
-from src.datasetWrapper import GSM8kWrapper, SQuADWrapper, TriviaQAWrapper
+from src.datasetWrapper import GSM8KWrapper, SQuADWrapper, TriviaQAWrapper
 
 
-gsm8k_data = GSM8kWrapper()
+gsm8k_data = GSM8KWrapper()
 with open("gsm8k_data.txt", "w") as gsm8k_file:
     for sample in gsm8k_data.dataset:
         # Assuming you want to write the question and answer to the file

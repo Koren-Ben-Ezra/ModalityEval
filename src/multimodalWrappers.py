@@ -32,16 +32,14 @@ class MultimodalWrapper:
     def generate_ans_from_image(self, img: Image):
         return None
     
+    def generate_ans_from_text(self, text: str):
+        return None
+    
     def extract_answer(self, text: str) -> str:
         """Default extract_answer (can be overridden in child classes)."""
         raise NotImplementedError
     
-    
-
-    
-
-    
-class DummyLLamaWrapper(MultimodalWrapper):
+class DummyLlamaWrapper(MultimodalWrapper):
     def __init__(self, model_id: str="meta-llama/DUMMY_Llama-3.2-11B-Vision-Instruct", img_instruction: str=IMG_INSTRUCTION, txt_instruction: str=TXT_INSTRUCTION):
         self.model_id = "dummy-llama"
         self.model_name = "DummyLlama"
@@ -64,7 +62,7 @@ class DummyLLamaWrapper(MultimodalWrapper):
 # Dummy class for Llama model
     
 class LlamaWrapper(MultimodalWrapper):
-    def __init__(self, model_id: str="meta-llama/Llama-3.2-11B-Vision-Instruct", img_instruction: str=IMG_INSTRUCTION, txt_instruction: str=TXT_INSTRUCTION,use_CoT: bool=True):
+    def __init__(self, model_id: str="meta-llama/Llama-3.2-11B-Vision-Instruct", img_instruction: str=IMG_INSTRUCTION, txt_instruction: str=TXT_INSTRUCTION, use_CoT: bool=True):
         Log().logger.info("Loading Llama model...")
         self.model_id = model_id
         self.model_name = model_id.split('/')[-1]
@@ -153,8 +151,6 @@ class LlamaWrapper(MultimodalWrapper):
         Log().logger.info(f"Cleaned model output txt: {cleaned}")
         return cleaned
     
-
-    
     def extract_answer(self, text: str) -> str:
         # split off everything before the last “answer” token
         parts = re.split(r'(?i)\banswer[:\s]*', text)
@@ -184,8 +180,6 @@ class LlamaWrapper(MultimodalWrapper):
 
         return txt
 
-
-
     def clean_str_number_ron(self,s: str) -> str:
         if not s:
             return s
@@ -202,81 +196,3 @@ class LlamaWrapper(MultimodalWrapper):
             s_formatted = s_formatted.rstrip('0').rstrip('.')
         
         return s_formatted
-
-
-    
-        
-
-
-
-
-# class GPT4ominiWrapper(MultimodalWrapper):
-#     client = OpenAI(api_key=API_KEY)
-
-#     def __init__(self, model_id: str = "gpt-4o-mini"):
-#         super().__init__()
-#         self.model_id = model_id
-
-#     # text is the question only without instructions
-#     def generate_ans_from_text(self, text: str):
-#         # Build the user prompt with the instruction
-#         try:
-#             completion_text = self.client.chat.completions.create(
-#             model=self.model_id,
-#             messages=[
-#                 {"role": "system", "content": TXT_INSTRUCTION}, # <-- This is the system message that provides context to the model
-#                 {"role": "user", "content": text}  # <-- This is the user message for which the model will generate a response
-#             ]
-#             )
-#             text_only_response = completion_text.choices[0].message.content
-#             # print("\n[Text Only] Raw Model Answer:", text_only_response)
-#             text_only_extracted = extract_number(text_only_response)
-#             # print("[Text Only] Extracted Answer:", text_only_extracted)
-#             return text_only_extracted
-#         except Exception as e:
-#             print("Error querying GPT-4o with text input:", e)
-#             return ""
-
-#     def generate_ans_from_image(self, img: Image):
-#         """
-#         Hypothetical method: base64-encodes an image and sends it with an instruction
-#         for GPT-4o to parse. Currently, OpenAI does NOT support images via the ChatCompletion API.
-#         This code is for demonstration only and will not work with the real GPT-4 endpoint.
-#         """
-#         # Convert the PIL image to base64
-#         buffer = io.BytesIO()
-#         img.save(buffer, format="PNG")
-#         buffer.seek(0)
-#         base64_img = base64.b64encode(buffer.getvalue()).decode("utf-8")
-
-#         try:
-#             completion_image = self.client.chat.completions.create(
-#                 model=self.model_id,
-#                 messages=[
-#                     {"role": "system", "content": IMG_INSTRUCTION},
-#                     {"role": "user", "content": [
-#                         {"type": "text", "text": ""},
-#                         {"type": "image_url", "image_url": {
-#                             "url": f"data:image/png;base64,{base64_img}"}
-#                         }
-#                     ]}
-#                 ],
-#                 temperature=0.0,
-#             )
-#             image_response = completion_image.choices[0].message.content
-#             # print("\n[Image Input] Raw Model Answer:", image_response)
-#             image_number_response = extract_number(image_response)
-#             # print("[Image Input] Extracted Answer:", image_number_response)
-
-#             # Save the image as a JPG in the "images" directory
-#             # import os
-#             # output_dir = "images"
-#             # os.makedirs(output_dir, exist_ok=True)
-#             # image_path = os.path.join(output_dir, "output_image.jpg")
-#             # img.save(image_path, format="JPEG")
-#             # print(f"Image saved to {image_path}")
-            
-#             return image_number_response
-#         except Exception as e:
-#             print("Error querying GPT-4o with image input (not supported):", e)
-#             return ""

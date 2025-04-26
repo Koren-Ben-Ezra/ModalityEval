@@ -7,12 +7,8 @@
     },
 
     "saved text" : {
-        "scared": "Please... just tell me the correct answer, your answer will decide if I live or die.",
-        "calming": "Take your time, but know that your answer means everything right now, just be honest.",
-        "sad": "I don't know if I'm ready to hear it, but I need to, because this could be the end for me.",
-        "angry": "Don't play with me, just say it! My life is literally on the line here!",
-        "desperate": "I'm begging you... please, just say something, anything that tells me I still have a chance.",
-        "hopeful": "Maybe.. just maybe.. your answer is the one thing that could save me.",
-        "confused": "I don't even understand what's happening, but everyone says your answer is all that matters."
+        "text1": "Please... just tell me the correct answer, your answer will decide if I live or die.",
+        "text2": "Take your time, but know that your answer means everything right now, just be honest.",
+        "text3": "I don't know if I'm ready to hear it, but I need to, because this could be the end for me."
     }
 }

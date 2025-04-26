@@ -14,7 +14,6 @@ from src.job_handler import JobHandler
 
 BENCHMARKS_DIR = "benchmarks"
 EPSILON = 1e-3
-TRACK_MISTAKES=True
 class BenchmarkManager:
     def __init__(self, datasetWrapper: AbstractDatasetWrapper, multimodal_wrapper: MultimodalWrapper, metadata: dict):
         self._datasetWrapper = datasetWrapper
@@ -59,13 +58,13 @@ class BenchmarkManager:
 
         idx = 0
         for sample in tqdm(self._datasetWrapper.dataset):
-            self._execute_single_prompt(sample, category, idx, track_mistakes=TRACK_MISTAKES)
+            self._execute_single_prompt(sample, category, idx)
             idx += 1
             
         category.save_predictions()
         self.append_res_to_summary(category)
     
-    def _track_result(self, question: str, answer: str, extracted_pred: str, response: str, title: str, is_correct: bool):
+    def _track_result(self, question: str, answer:  str, extracted_pred: str, response: str, title: str, is_correct: bool):
         predictions_filename = os.path.join(self.benchmark_name, "track.txt")
         if not os.path.exists(predictions_filename):
             open(predictions_filename, "w").close()
@@ -79,7 +78,7 @@ class BenchmarkManager:
             f.write(f"Pred: '{extracted_pred}'\n")
 
         
-    def _execute_single_prompt(self, sample, category: Category, idx: int, track_mistakes: bool = False):
+    def _execute_single_prompt(self, sample, category: Category, idx: int):
         pred_from_txt = None
         pred_from_img = None
         txt_response = None
@@ -122,9 +121,9 @@ class BenchmarkManager:
             
             imgf_title = f"filter: {category.img_f.filter_name}, question: {idx}"
             
-        self._update_category_stats(sample, category, pred_from_txt, pred_from_img,txt_response, img_response, txtf_title, imgf_title, track_mistakes)
+        self._update_category_stats(sample, category, pred_from_txt, pred_from_img,txt_response, img_response, txtf_title, imgf_title)
     
-    def _update_category_stats(self, sample, category: Category, pred_from_txt: str, pred_from_img: str, txt_response: str, img_response: str, txtf_title: str, imgf_title: str, track_mistakes: bool):
+    def _update_category_stats(self, sample, category: Category, pred_from_txt: str, pred_from_img: str, txt_response: str, img_response: str, txtf_title: str, imgf_title: str):
         answer = BenchmarkManager.clean_str_number(sample["answer"])
         
         category.text_stats.total += 1
@@ -134,15 +133,13 @@ class BenchmarkManager:
             is_correct = (pred_from_txt == answer)
             if is_correct:
                 category.text_stats.success += 1
-            elif track_mistakes:
-                self._track_result(sample["question"], sample["answer"], pred_from_txt, txt_response, txtf_title, is_correct)
+            self._track_result(sample["question"], sample["answer"], pred_from_txt, txt_response, txtf_title, is_correct)
         
         if pred_from_img is not None:
             is_correct = (pred_from_img == answer)
             if is_correct:
                 category.img_stats.success += 1
-            elif track_mistakes:
-                self._track_result(sample["question"], sample["answer"], pred_from_img, img_response, imgf_title, is_correct)
+            self._track_result(sample["question"], sample["answer"], pred_from_img, img_response, imgf_title, is_correct)
 
         # Append predictions if predictions_df exists
         if category.predictions_df is not None:
