@@ -44,23 +44,25 @@ class MultimodalWrapper:
     def generate_ans_from_text(self, text: str):
         return None
     
+    def extract_answer(self, text: str, token: str = "<|eot_id|>"):
+        return None
 
     
-class LlamaWrapper_4(MultimodalWrapper):
-    def __init__(self):
+class DummyLLamaWrapper(MultimodalWrapper):
+    def __init__(self, model_id: str="meta-llama/DUMMY_Llama-3.2-11B-Vision-Instruct", img_instruction: str=IMG_INSTRUCTION, txt_instruction: str=TXT_INSTRUCTION):
         self.model_id = "dummy-llama"
-        self.model_name = "DummyLLaMA"
-        self.img_instruction = "Solve the question from the image."
-        self.txt_instruction = "Solve the question from the text."
+        self.model_name = "DummyLlama"
+        self.img_instruction = img_instruction
+        self.txt_instruction = txt_instruction
         print("Initialized dummy LLaMA wrapper (no model loaded).")
 
     def generate_ans_from_image(self, image: Image.Image):
         print("Pretending to answer image question...")
-        return "42"  # Dummy answer
+        return "blalba answer: 42"  # Dummy answer
 
     def generate_ans_from_text(self, text: str):
         print(f"Received text: {text}")
-        return "42"  # Dummy answer
+        return "blalba answer: 42"  # Dummy answer
 
     def extract_answer(self, text: str, token: str = "<|eot_id|>") -> str:
         pattern = r"([-+]?\d+(?:\.\d+)?)(?:\s*" + re.escape(token) + ")"
@@ -125,13 +127,7 @@ class LlamaWrapper(MultimodalWrapper):
 
         output = self._model.generate(**inputs, max_new_tokens=MAX_NEW_TOKENS)
         decoded_output = self._processor.decode(output[0])
-        
-        try:
-            output = self.extract_answer(decoded_output)
-        except Exception as e:
-            Log().logger.error(f"Error extracting answer: {e}")
-            raise e
-        return output
+        return decoded_output
     
     def generate_ans_from_text(self, text: str):
         # Create a dummy 224x224 RGB image (NOT 1x1, not grayscale)
@@ -156,14 +152,7 @@ class LlamaWrapper(MultimodalWrapper):
 
         output = self._model.generate(**inputs, max_new_tokens=MAX_NEW_TOKENS)
         decoded_output = self._processor.decode(output[0])
-        
-        try:
-            output = self.extract_answer(decoded_output)
-        except Exception as e:
-            Log().logger.error(f"Error extracting answer: {e}")
-            raise e
-        
-        return output
+        return decoded_output
         
     def extract_answer(self, text: str, token: str="<|eot_id|>") -> str:
         if not isinstance(text, str):

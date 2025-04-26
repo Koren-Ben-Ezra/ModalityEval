@@ -17,68 +17,103 @@ class AbstractDatasetWrapper:
     def __init__(self, text2image: AbstractText2Image):
         self.dataset: Dataset = None  # Should be implemented in subclasses
         self.dataset_id = None
-        self.lognest_question = None
         self._text2image = text2image
-
-        
-    def find_font_size(self, text: str, longest_text: int = 500):
-        
-        W, H = self.width, self.height
-        font_path = "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf"
-        longest_text = text
-        lo, hi = 5, 300
-        best_font_size = lo
-
-        while lo <= hi:
-            mid = (lo + hi) // 2
-            font = ImageFont.truetype(font_path, mid) if font_path else ImageFont.load_default()
-            draw = ImageDraw.Draw(Image.new("RGB", (1, 1)))
-
-            avg_char_width = sum(draw.textsize(c, font=font)[0] for c in "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ") / 52
-            chars_per_line = max(1, int(W / avg_char_width))
-            wrapped = textwrap.wrap(longest_text, width=chars_per_line)
-
-            ascent, descent = font.getmetrics()
-            line_height = int((ascent + descent) * 1.15)
-            total_height = line_height * len(wrapped)
-
-            if total_height <= H:
-                best_font_size = mid
-                lo = mid + 1
-            else:
-                hi = mid - 1
-
-        return best_font_size
-
 
 
 class GSM8kWrapper(AbstractDatasetWrapper):
-    def __init__(self, text2image=None):
-        self.dataset_id = "GSM8k"
+    """
+    GSM8k wrapper that loads the full test set.
+    """
+    def __init__(self, text2image: AbstractText2Image = FixedSizeText2Image()):
+        super().__init__(text2image)
+        self.dataset_id = "GSM8k_full_test"
         self._text2image = text2image
 
-        self.data = [
-            {"question": "Tom has 3 pencils and buys 7 more. How many does he have now?"},
-            {"question": "A train travels at 60 km/h. How far does it travel in 4 hours?"},
-            {"question": "Janet’s ducks lay 16 eggs per day. She eats three for breakfast every morning and bakes muffins for her friends every day with four. She sells the remainder at the farmers' market daily for $2 per fresh duck egg. How much in dollars does she make every day at the farmers' market?"},
-            {"question": "If a square has side length 5 cm, what is its area?"},
-            {"question": "Sam reads 10 pages every day. How many pages does he read in a week?"}
-        ]
+        Log().logger.info(f"Loading full test set from {self.dataset_id}...")
+        try:
+            raw = load_dataset("gsm8k", "main", split="test")
+        except Exception as e:
+            Log().logger.error(f"Error loading GSM8k test set: {e}")
+            raise
 
-        self.longest_question = max(self.data, key=lambda x: len(x['question']))
-        self.font_size = self.find_font_size(self.longest_question)
-        print(f"Longest question found: {self.longest_question['question']} (length={len(self.longest_question['question'])})")
+        questions = [ex["question"] for ex in raw]
+        longest_question = max(questions, key=len)
 
-        # Dummy dataset creation
-        self.dataset = Dataset.from_list([self._map_sample(sample) for sample in self.data])
+        Log().logger.info(
+            f"Longest question (in test set): '{longest_question}' (len={len(longest_question)})"
+        )
+
+        self._text2image.find_font_size(longest_question)
+        Log().logger.info(f"Font size for longest question: {self._text2image.font_size}")
+
+        try:
+            self.dataset = raw.map(self._map_sample, load_from_cache_file=False, keep_in_memory=True)
+        except Exception as e:
+            Log().logger.error(f"Error mapping GSM8k test set: {e}")
+            raise
+
+        Log().logger.info(f"Loaded {len(self.dataset)} samples from {self.dataset_id}.")
 
     def _map_sample(self, sample):
-        sample["answer"] = "dummy_answer"
-        sample["question_image"] = self._text2image.create_image(sample["question"], self.font_size) if self._text2image else None
+        sample["answer"] = sample["answer"].split("####")[-1].strip()
+        try:
+            sample["question_image"] = self._text2image.create_image(sample["question"])
+        except Exception as e:
+            Log().logger.error(f"Error creating image: {e}")
+            raise e
+
+        return sample
+
+
+class GSM8kWrapper_GSM8k_5_samples(AbstractDatasetWrapper):
+    """
+    A slimmed-down GSM8k wrapper that loads only 5 examples.
+    """
+    def __init__(self, text2image: AbstractText2Image = FixedSizeText2Image()):
+        super().__init__(text2image)
+        self.dataset_id = "GSM8k_5_samples"
+        self._text2image = text2image
+
+        Log().logger.info(f"Loading 5 examples from {self.dataset_id}...")
+        try:
+            # load only the first 5 test samples
+            raw = load_dataset("gsm8k", "main", split="test[:5]")
+        except Exception as e:
+            Log().logger.error(f"Error loading 5-sample GSM8k: {e}")
+            raise
+
+        # find the question with the maximum length among these 5
+        questions = [ex["question"] for ex in raw]
+        longest_question = max(questions, key=len)
+
+        Log().logger.info(
+            f"Longest question (of 5): '{longest_question}' (len={len(longest_question)})"
+        )
+
+        self._text2image.find_font_size(longest_question)
+        Log().logger.info(f"Font size for longest question: {self._text2image.font_size}")
+
+        # apply mapping (answer cleanup + image creation)
+        try:
+            self.dataset = raw.map(self._map_sample,load_from_cache_file=False,keep_in_memory=True)
+        except Exception as e:
+            Log().logger.error(f"Error mapping 5-sample GSM8k: {e}")
+            raise
+
+        Log().logger.info(f"Loaded {len(self.dataset)} samples from {self.dataset_id}.")
+
+    def _map_sample(self, sample):
+        sample["answer"] = sample["answer"].split("####")[-1].strip()
+        try:
+            sample["question_image"] = self._text2image.create_image(sample["question"])
+        except Exception as e:
+            Log().logger.error(f"Error creating image: {e}")
+            raise e
+
         return sample
 
     
-class GSM8kWrapper_2(AbstractDatasetWrapper):
+class GSM8kWrapper_old(AbstractDatasetWrapper):
 
     def __init__(self, text2image: AbstractText2Image = FixedSizeText2Image(), cache_filename: str=""):
         self.dataset_id = "GSM8k"
@@ -132,6 +167,7 @@ class GSM8kWrapper_2(AbstractDatasetWrapper):
         sample["answer"] = sample["answer"].split("####")[-1].strip()
             
         try:
+
             sample["question_image"] = self._text2image.create_image(sample["question"])
         except Exception as e:
             Log().logger.error(f"Error creating image: {e}")

@@ -1,31 +1,40 @@
 #!/bin/bash
 #SBATCH --job-name=ModalityEval
-#SBATCH --partition=studentkillable
-#SBATCH --mem=5G
-#SBATCH --cpus-per-task=2
-#SBATCH --output=outputs/%x_%j.out
-#SBATCH --error=outputs/%x_%j.err
+#SBATCH --account=gpu-research
+#SBATCH --partition=killable
+#SBATCH --gres=gpu:1
+#SBATCH --mem=50000
+#SBATCH --constraint=geforce_rtx_3090
 
-# Optional: custom output files if args passed
-if [[ $# -ge 2 ]]; then
-  exec 1> outputs/${1}_${2}_Amit.out
-  exec 2> outputs/${1}_${2}_Amit.err
-fi
+exec 1> outputs/${1}_${2}.out
+exec 2> outputs/${1}_${2}.err
 
-# Parse input arguments
+# Load the cluster’s driver/toolkit before any nvidia-smi or torch.cuda calls
+module purge
+module load cuda/11.0
+
+# Now you can safely query the GPU
+echo "CUDA_VISIBLE_DEVICES = $CUDA_VISIBLE_DEVICES"
+nvidia-smi --query-gpu=name,memory.total --format=csv
+
 export SELECTED_EVAL=$1
 export SELECTED_TASK=$2
 
-# Print basic info for logs
-echo "Running on node: $(hostname)"
-echo "Date: $(date)"
-echo "Args: SELECTED_EVAL=$SELECTED_EVAL, SELECTED_TASK=$SELECTED_TASK"
-echo "CPU Count: $SLURM_CPUS_ON_NODE"
+# Initialize Conda and activate your environment
+source /home/joberant/NLP_2425a/$(whoami)/anaconda3/etc/profile.d/conda.sh
+conda activate ModalityEval
 
-# Hugging Face + scratch setup (if needed)
+# Sanity check PyTorch
+python -c "import torch; print('cuda available?', torch.cuda.is_available(), 'cuda version:', torch.version.cuda)"
+
 export HUGGING_FACE_HUB_TOKEN="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"
+
+# HuggingFace cache & tmp
 export HF_HOME=/vol/scratch/$(whoami)/hf_cache; mkdir -p "$HF_HOME"
 export TMPDIR=/vol/scratch/$(whoami)/tmp; mkdir -p "$TMPDIR"
 
-# Run your CPU-based script
+export PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
+export NUM_PARALLEL_JOBS=1
+
+# Finally run
 python -u main.py

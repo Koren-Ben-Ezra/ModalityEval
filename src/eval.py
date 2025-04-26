@@ -412,7 +412,6 @@ def with_and_without_cot_instruction_eval():
     logger = Log().logger
     with open(PARAMETERS_PATH, 'r') as file:
         parameters = json.load(file)
-
     if selected_task == "1":
         txt_instruction = parameters['system']['text instruction']
         img_instruction = parameters['system']['image instruction']
@@ -423,13 +422,10 @@ def with_and_without_cot_instruction_eval():
         raise ValueError("execute with: 'sbatch run_slurm.sh <eval> <task>'")
     
     logger.info("Starting evaluation...")
+    
     multimodal_wrapper = LlamaWrapper(txt_instruction=txt_instruction, img_instruction=img_instruction)
     
-    ## With slurm:
-    text2image=FixedSizeText2Image(font_path=slurm_font_path)
-    
-    ## Without slurm:
-    # text2image = FixedSizeText2Image()
+    text2image=FixedSizeText2Image() 
     
     datasetWrapper = GSM8kWrapper(text2image)
     
