@@ -93,7 +93,6 @@ class FixedSizeText2Image(AbstractText2Image):
         self.font_size = best
     
     def create_image(self, text):                  
-        print('create_image called with:', text)
         W, H = self.width, self.height
         padding = self.padding
         usable_width = W - 2 * padding

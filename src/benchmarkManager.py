@@ -79,6 +79,8 @@ class BenchmarkManager:
     def _execute_single_prompt(self, sample, category: Category, idx: int, track_mistakes: bool = False):
         pred_from_txt = None
         pred_from_image = None
+        txt_response = None
+        img_response = None
         if category.text_f is not None:
             try:
                 filtered_text = category.text_f.apply_filter(sample["question"], sample["answer"])

@@ -81,7 +81,7 @@ def basic_eval_all():
     multimodal_wrapper = LlamaWrapper()
     
     ## With slurm:
-    text2image=FixedSizeText2Image(font_path=slurm_font_path)
+    text2image=FixedSizeText2Image()
     
     ## Without slurm:
     # text2image = FixedSizeText2Image()
