@@ -12,16 +12,11 @@ with open(PARAMETERS_PATH, 'r') as file:
     data = json.load(file)
     system = data.get('system', '')
 
-# TXT_INSTRUCTION = system.get('text instruction', '')
-# IMG_INSTRUCTION = system.get('image instruction', '')
-
 # default
 TXT_INSTRUCTION = system.get('CoT text instruction', '')
 IMG_INSTRUCTION = system.get('CoT image instruction', '')
 
 MAX_NEW_TOKENS = 1000
-
-#for "gpt-4o-mini"
 
 
 class MultimodalWrapper:
@@ -29,14 +24,15 @@ class MultimodalWrapper:
         self.model_id: str = None
         self.model_name: str = None
     
-    def generate_ans_from_image(self, img: Image):
-        return None
+    def generate_ans_from_image(self, img: Image)->tuple[str, str]:
+        # return final_answer, full_answer
+        return None, None
     
-    def generate_ans_from_text(self, text: str):
-        return None
+    def generate_ans_from_text(self, text: str)->tuple[str, str]:
+        # return final_answer, full_answer
+        return None, None
     
     def extract_answer(self, text: str) -> str:
-        """Default extract_answer (can be overridden in child classes)."""
         raise NotImplementedError
     
 class DummyLlamaWrapper(MultimodalWrapper):
@@ -47,7 +43,7 @@ class DummyLlamaWrapper(MultimodalWrapper):
         self.txt_instruction = txt_instruction
         print("Initialized dummy LLaMA wrapper (no model loaded).")
 
-    def generate_ans_from_image(self, image: Image.Image):
+    def generate_ans_from_image(self, image: Image):
         print("Pretending to answer image question...")
         return "blalba answer: 42"  # Dummy answer
 
@@ -121,8 +117,8 @@ class LlamaWrapper(MultimodalWrapper):
         output = self._model.generate(**inputs, max_new_tokens=MAX_NEW_TOKENS)
         raw = self._processor.decode(output[0])
         cleaned = self._clean_raw(raw)
-        Log().logger.info(f"Cleaned model output img: {cleaned}")
-        return cleaned
+        extracted_answer = self.extract_answer(cleaned)
+        return extracted_answer, cleaned
     
     def generate_ans_from_text(self, text: str):
         # Create a dummy 224x224 RGB image (NOT 1x1, not grayscale)
@@ -148,8 +144,8 @@ class LlamaWrapper(MultimodalWrapper):
         output = self._model.generate(**inputs, max_new_tokens=MAX_NEW_TOKENS)
         raw = self._processor.decode(output[0])
         cleaned = self._clean_raw(raw)
-        Log().logger.info(f"Cleaned model output txt: {cleaned}")
-        return cleaned
+        extracted_answer = self.extract_answer(cleaned)
+        return extracted_answer, cleaned
     
     def extract_answer(self, text: str) -> str:
         # split off everything before the last “answer” token
@@ -196,3 +192,13 @@ class LlamaWrapper(MultimodalWrapper):
             s_formatted = s_formatted.rstrip('0').rstrip('.')
         
         return s_formatted
+
+    # def extract_answer_og(self, text: str, token: str="<|eot_id|>") -> str:
+    #     if not isinstance(text, str):
+    #         raise ValueError(f"Expected string, got {type(text)}: {text}")
+
+    #     pattern = r"([-+]?\d+(?:\.\d+)?)(?:\s*" + re.escape(token) + ")"
+
+    #     match = re.search(pattern, text)
+    #     return match.group(1) if match else None
+    

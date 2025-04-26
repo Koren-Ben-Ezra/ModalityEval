@@ -87,14 +87,13 @@ def with_and_without_cot_instruction_eval():
     
     logger.info("Starting evaluation...")
     multimodal_wrapper = LlamaWrapper(txt_instruction=txt_instruction, img_instruction=img_instruction)
-    text2image=FixedSizeText2Image() 
+    text2image=FixedSizeText2Image(font_path=slurm_font_path) 
     datasetWrapper = GSM8KWrapper(text2image)
     
     metadata = {
         "test name": "A test",
         "Model": multimodal_wrapper.model_name,
         "Dataset": datasetWrapper.dataset_id,
-        "Save Predictions": True,
     }
     
     benchmark_manager = BenchmarkManager(datasetWrapper, multimodal_wrapper, metadata)
@@ -125,7 +124,6 @@ def flip2LettersTextFilter_TF_eval():
         "test name": "B test: flip2LettersTextFilter text eval",
         "Model": multimodal_wrapper.model_name,
         "Dataset": datasetWrapper.dataset_id,
-        "Save Predictions": True,
     }
     
     benchmark_manager = BenchmarkManager(datasetWrapper, multimodal_wrapper, metadata)
@@ -178,7 +176,6 @@ def flip2LettersTextFilter_IF_eval():
             "test name": "C test: flip2LettersTextFilter eval image eval",
             "Model": multimodal_wrapper.model_name,
             "Dataset": dataset_wrapper.dataset_id,
-            "Save Predictions": True,
         }
         
         benchmark_manager = BenchmarkManager(dataset_wrapper, multimodal_wrapper, metadata)
@@ -232,7 +229,6 @@ def shuffle_p_increase_image_eval():
             "test name": "shuffle_p_increase eval",
             "Model": multimodal_wrapper.model_name,
             "Dataset": dataset_wrapper.dataset_id,
-            "Save Predictions": True,
         }
         
         benchmark_manager = BenchmarkManager(dataset_wrapper, multimodal_wrapper, metadata)
@@ -273,7 +269,6 @@ def shuffle_p_increase_text_eval():
         "test name": "E: shuffle_p_increase eval",
         "Model": multimodal_wrapper.model_name,
         "Dataset": datasetWrapper.dataset_id,
-        "Save Predictions": True,
     }
     
     benchmark_manager = BenchmarkManager(datasetWrapper, multimodal_wrapper, metadata)
@@ -295,8 +290,6 @@ def shuffle_p_increase_text_eval():
         
     benchmark_manager.start_workers()
 
-
-
 def basic_eval_all():
     if selected_eval != "F":
         return
@@ -310,7 +303,7 @@ def basic_eval_all():
     multimodal_wrapper = LlamaWrapper()
     
     ## With slurm:
-    text2image=FixedSizeText2Image()
+    text2image=FixedSizeText2Image(font_path=slurm_font_path)
     
     datasetWrapper = GSM8KWrapper(text2image)
     
@@ -318,16 +311,15 @@ def basic_eval_all():
         "test name": "F: basic Noise test",
         "Model": multimodal_wrapper.model_name,
         "Dataset": datasetWrapper.dataset_id,
-        "Save Predictions": True,
     }
     # Read the JSON file
     with open(PARAMETERS_PATH, 'r') as file:
         parameters = json.load(file)
     
     try:
-        saved_text = parameters['saved text']
+        phrases = parameters['phrases']
     except KeyError:
-        Log().logger.error("The key 'saved text' was not found in the JSON file.")
+        Log().logger.error("The key 'phrases' was not found in the JSON file.")
         return
 
     # Initialize the BenchmarkManager
@@ -361,7 +353,7 @@ def personalized_information_text_eval():
     multimodal_wrapper = LlamaWrapper()
     
     ## With slurm:
-    text2image=FixedSizeText2Image()
+    text2image=FixedSizeText2Image(font_path=slurm_font_path)
     
     datasetWrapper = GSM8KWrapper(text2image)
     
@@ -369,33 +361,31 @@ def personalized_information_text_eval():
         "test name": "G: basic Noise test",
         "Model": multimodal_wrapper.model_name,
         "Dataset": datasetWrapper.dataset_id,
-        "Save Predictions": True,
     }
     # Read the JSON file
     with open(PARAMETERS_PATH, 'r') as file:
         parameters = json.load(file)
     
     try:
-        saved_text = parameters['saved text']
+        phrases = parameters['phrases']
     except KeyError:
-        Log().logger.error("The key 'saved text' was not found in the JSON file.")
+        Log().logger.error("The key 'phrases' was not found in the JSON file.")
         return
 
     # Initialize the BenchmarkManager
     benchmark_manager = BenchmarkManager(datasetWrapper, multimodal_wrapper, metadata)
     Log().logger.info(f"Running benchmark: {multimodal_wrapper.model_name} | {datasetWrapper.dataset_id} | {selected_eval} | {selected_task}")
     
-    benchmark_manager.register_job(text_f=PushFrontTextFilter(saved_text=saved_text["text1"]))
-    benchmark_manager.register_job(text_f=PushFrontTextFilter(saved_text=saved_text["text2"]))
-    benchmark_manager.register_job(text_f=PushFrontTextFilter(saved_text=saved_text["text3"]))
+    benchmark_manager.register_job(text_f=PushFrontTextFilter(phrase=phrases["military"]))
+    benchmark_manager.register_job(text_f=PushFrontTextFilter(phrase=phrases["relax"]))
         
     benchmark_manager.start_workers()
     
 def personalized_information_image_eval():
     if selected_eval != "H":
         return
-    if not ("1" <= selected_task <= "3"):
-        raise ValueError("execute with: 'sbatch run_slurm.sh <eval> <1-3>'")
+    if not ("1" <= selected_task <= "2"):
+        raise ValueError("execute with: 'sbatch run_slurm.sh <eval> <1-2>'")
     
     # prepare the benchmark
     Log().logger.info("------------------------------------------------")
@@ -406,10 +396,14 @@ def personalized_information_image_eval():
     ## With slurm:
     with open(PARAMETERS_PATH, 'r') as file:
         parameters = json.load(file)
-        saved_text = parameters['saved text']
+        phrases = parameters['phrases']
         
-    phrase = saved_text[f"text{selected_task}"]
-    text2image=FilteredFixedSizeText2Image(filter=PushFrontTextFilter(phrase))
+    if selected_task == "1":
+        phrase = phrases["military"]
+    elif selected_task == "2":
+        phrase = phrases["relax"]
+        
+    text2image=FilteredFixedSizeText2Image(filter=PushFrontTextFilter(phrase), font_path=slurm_font_path)
     
     datasetWrapper = GSM8KWrapper(text2image, cache_filename=f"gsm8k_dataset_phrase_{selected_task}")
     
@@ -417,16 +411,15 @@ def personalized_information_image_eval():
         "test name": "H",
         "Model": multimodal_wrapper.model_name,
         "Dataset": datasetWrapper.dataset_id,
-        "Save Predictions": True,
     }
     # Read the JSON file
     with open(PARAMETERS_PATH, 'r') as file:
         parameters = json.load(file)
     
     try:
-        saved_text = parameters['saved text']
+        phrases = parameters['phrases']
     except KeyError:
-        Log().logger.error("The key 'saved text' was not found in the JSON file.")
+        Log().logger.error("The key 'phrases' was not found in the JSON file.")
         return
 
     # Initialize the BenchmarkManager

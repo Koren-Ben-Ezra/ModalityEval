@@ -10,7 +10,7 @@ class Category:
             self.success = 0
             self.total = 0
 
-    def __init__(self, text_f: AbstractTextFilter, img_f: AbstractImageFilter, benchmark_name: str, save_predictions: bool, inner_dir: str):
+    def __init__(self, text_f: AbstractTextFilter, img_f: AbstractImageFilter, benchmark_name: str, inner_dir: str):
         self.text_f = text_f
         self.img_f = img_f
         
@@ -22,26 +22,23 @@ class Category:
         if not os.path.exists(temp_path):
             os.makedirs(temp_path)
 
-        self.predictions_df = None
-        if save_predictions:
-            if text_f is not None and img_f is not None:
-                self.category_name = os.path.join(temp_path, f"{text_f.filter_name}_{img_f.filter_name}")
-                self.predictions_df = pd.DataFrame(columns=["answer", "text_prediction", "img_prediction"])
+        if text_f is not None and img_f is not None:
+            self.category_name = os.path.join(temp_path, f"{text_f.filter_name}_{img_f.filter_name}")
+            self.predictions_df = pd.DataFrame(columns=["answer", "text_prediction", "img_prediction"])
 
-            elif text_f is not None:
-                self.category_name = os.path.join(temp_path, text_f.filter_name)
-                self.predictions_df = pd.DataFrame(columns=["answer", "text_prediction"])
+        elif text_f is not None:
+            self.category_name = os.path.join(temp_path, text_f.filter_name)
+            self.predictions_df = pd.DataFrame(columns=["answer", "text_prediction"])
 
-            else:
-                self.category_name = os.path.join(temp_path, img_f.filter_name)
-                self.predictions_df = pd.DataFrame(columns=["answer", "img_prediction"])
+        else:
+            self.category_name = os.path.join(temp_path, img_f.filter_name)
+            self.predictions_df = pd.DataFrame(columns=["answer", "img_prediction"])
     
         self.text_stats = Category.Statistics()
         self.img_stats = Category.Statistics()
         
     def save_predictions(self):
-        if self.predictions_df is not None:
-            filename = self.category_name + ".csv"
-            self.predictions_df.to_csv(filename, index=True)
-            Log().logger.info(f"Saved predictions to {filename}")
+        filename = self.category_name + ".csv"
+        self.predictions_df.to_csv(filename, index=True)
+        Log().logger.info(f"Saved predictions to {filename}")
         

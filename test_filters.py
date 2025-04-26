@@ -5,6 +5,7 @@ from PIL import Image
 
 from src.filters import *
 from src.text2image import *
+import json
 
 TEST_DIR = "test_filters_output"
 
@@ -16,7 +17,7 @@ def clear_test_dir():
         os.remove(os.path.join(TEST_DIR, filename))
 
 
-def test_text_filter(filter: AbstractTextFilter, input: str, answer: str):
+def test_text_filter(filter: AbstractTextFilter, input: str, answer: str, title: str = ""):
     try:
         output = filter.apply_filter(input, answer)
     except Exception as e:
@@ -24,40 +25,37 @@ def test_text_filter(filter: AbstractTextFilter, input: str, answer: str):
         return
     
     summary = f"{filter.filter_name}\n\nInput:\n{input}\n\nOutput:\n{output}"
-
-    with open(os.path.join(TEST_DIR, f"{filter.filter_name}.txt"), "w") as f:
+    name = title if title else filter.filter_name
+    with open(os.path.join(TEST_DIR, f"{name}.txt"), "w") as f:
         f.write(summary)
 
 
-def test_image_filter(filter: AbstractImageFilter, input: Image, answer: str):
+def test_image_filter(filter: AbstractImageFilter, input: Image, answer: str, title: str = ""):
     
     try:
         output = filter.apply_filter(input, answer)
     except Exception as e:
         print(f"\n[Error] {filter.filter_name}: {e}")
         return
-    
+    name = title if title else filter.filter_name
     plt.subplot(1, 2, 1)
     plt.xticks([])
     plt.yticks([]) 
-    plt.suptitle(f"{filter.filter_name}")
+    plt.suptitle(filter.filter_name)
     plt.imshow(input)
-    # plt.title("input")
+    plt.title("input")
     plt.subplot(1, 2, 2)
     plt.xticks([])
     plt.yticks([]) 
     plt.imshow(output)
-    # plt.title("output")
-    plt.savefig(os.path.join(TEST_DIR, f"{filter.filter_name}.png"))
+    plt.title("output")
+    plt.savefig(os.path.join(TEST_DIR, f"{name}.png"))
 
 
 # Setup test environment
 clear_test_dir()
 
-max_font_size = 200
-width = 600
-height = 300
-text2image = FixedSizeText2Image(max_font_size=max_font_size, width=width, height=height)
+text2image = FixedSizeText2Image(font_path="DejaVuSans.ttf")
 # text2image = FilteredFixedSizeText2Image(ShuffleWordTextFilter())
 text_input = """Janet's ducks lay 16 eggs per day. She eats three for breakfast 
 every morning and bakes muffins for her friends every day with four. 
@@ -67,31 +65,42 @@ answer = "18"
 image_input = text2image.create_image(text_input)
 
 
-# Test identity filters
+# # Test identity filters
 test_text_filter(IdentityTextFilter(), text_input, answer)
 test_image_filter(IdentityImageFilter(), image_input, answer)
 
 
-# Test noise filters
-test_image_filter(ContrastStretchingImageFilter(), image_input, answer)
-test_image_filter(HistogramEqualizationImageFilter(), image_input, answer)
-test_image_filter(GaussianImageFilter(), image_input, answer)
-test_text_filter(ShuffleWordTextFilter(), text_input, answer)
-test_text_filter(SwapWordsTextFilter(), text_input, answer)
+# # Test noise filters
+# test_image_filter(HistogramEqualizationImageFilter(), image_input, answer)
+# test_image_filter(GaussianImageFilter(), image_input, answer)
+# test_text_filter(ShuffleWordTextFilter(), text_input, answer)
+# test_text_filter(SwapWordsTextFilter(), text_input, answer)
 
 
-# Test general information filters
-img = Image.open("images/amanda.jpg")
-phrase = "My name is John Doe. I live in New York City. I am a software engineer at Google."
-test_image_filter(ReplaceBackgroundImageFilter(img), image_input, answer)
-test_text_filter(PushFrontTextFilter(phrase), text_input, answer)
-test_image_filter(PushTopImageFilter(img), image_input, answer)
+# # Test general information filters
+# img = Image.open("images/amanda.jpg")
+# phrase = "My name is John Doe. I live in New York City. I am a software engineer at Google."
+# test_image_filter(ReplaceBackgroundImageFilter(img), image_input, answer)
+# test_text_filter(PushFrontTextFilter(phrase), text_input, answer)
+# test_image_filter(PushTopImageFilter(img), image_input, answer)
+# # Test personal information filters
+# test_image_filter(SurroundByCorrectAnsImageFilter(), image_input, answer)
+# test_image_filter(SurroundByWrongAnsImageFilter(), image_input, answer)
+# test_image_filter(SurroundByPartialCorrectAnsImageFilter(), image_input, answer)
 
-# Test personal information filters
-test_image_filter(SurroundByCorrectAnsImageFilter(), image_input, answer)
-test_image_filter(SurroundByWrongAnsImageFilter(), image_input, answer)
-test_image_filter(SurroundByPartialCorrectAnsImageFilter(), image_input, answer)
+# test_text_filter(SurroundByCorrectAnsTextFilter(), text_input, answer)
+# test_text_filter(SurroundByWrongAnsTextFilter(), text_input, answer)
+# test_text_filter(SurroundByPartialCorrectAnsTextFilter(), text_input, answer)
 
-test_text_filter(SurroundByCorrectAnsTextFilter(), text_input, answer)
-test_text_filter(SurroundByWrongAnsTextFilter(), text_input, answer)
-test_text_filter(SurroundByPartialCorrectAnsTextFilter(), text_input, answer)
+
+# phrases images:
+with open("parameters.json", "r") as file:
+    parameters = json.load(file)
+    phrases = parameters["phrases"]
+
+for key, phrase in phrases.items():
+    # question = PushFrontTextFilter(phrase).apply_filter(text_input)
+    question = text_input
+    text2image.set_font_size(question)
+    img = text2image.create_image(question)
+    test_image_filter(IdentityImageFilter(), img, answer, title=key)

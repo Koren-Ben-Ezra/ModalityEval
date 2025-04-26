@@ -19,7 +19,7 @@ class AbstractText2Image:
     def create_image(self, text: str):
         return None
 
-    def find_font_size(
+    def set_font_size(
         self,
         text: str,
         min_size: int = 5,
@@ -36,7 +36,7 @@ class AbstractText2Image:
 
     
 class FixedSizeText2Image(AbstractText2Image):
-    def __init__(self, width: int = 1000, height: int = 600, font_path='/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf', text_color=(0, 0, 0), bg_color=(255, 255, 255), padding: int = 10,font_size: int = 20, longest_text=None):
+    def __init__(self, width: int = 1000, height: int = 600, font_path='arial.ttf' , text_color=(0, 0, 0), bg_color=(255, 255, 255), padding: int = 15, font_size: int = 20, longest_text=None):
         super().__init__()
         self.width = width
         self.height = height
@@ -44,14 +44,14 @@ class FixedSizeText2Image(AbstractText2Image):
         self.text_color = text_color
         self.bg_color = bg_color
         self.padding = padding
-        self.font_size = self.find_font_size(longest_text) if longest_text else font_size
+        self.font_size = self.set_font_size(longest_text) if longest_text else font_size
 
 
-    def find_font_size(
+    def set_font_size(
         self,
         text: str,
         min_size: int = 5,
-        max_size: int = 30,
+        max_size: int = 60,
         line_spacing: float = 1.15
     ) -> None:
         """
@@ -141,9 +141,6 @@ class FixedSizeText2Image(AbstractText2Image):
 
         return img
 
-
-        
-    
 class FilteredFixedSizeText2Image(FixedSizeText2Image):
     def __init__(self, filter: AbstractTextFilter, *args, **kwargs):
         super().__init__(*args, **kwargs)
