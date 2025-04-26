@@ -78,9 +78,10 @@ class BenchmarkManager:
 
         
     def _execute_single_prompt(self, sample, category: Category, idx: int):
-        final_pred_txt, full_pred_txt = None, None
-        final_pred_img, full_pred_img = None, None
-        if category.text_f is not None:
+        final_pred_txt, full_pred_txt, txtf_title = None, None, None
+        final_pred_img, full_pred_img, imgf_title = None, None, None
+        
+        if category.text_f:
             txtf_title = f"filter: {category.text_f.filter_name}, question: {idx}"
             try:
                 filtered_text = category.text_f.apply_filter(sample["question"], sample["answer"])
@@ -93,7 +94,7 @@ class BenchmarkManager:
                 self.logger.error(f"Error generating answer from text: {e}")
                 raise e
 
-        if category.img_f is not None:
+        if category.img_f:
             imgf_title = f"filter: {category.img_f.filter_name}, question: {idx}"
             try:
                 filtered_image = category.img_f.apply_filter(sample["question_image"], sample["answer"])
