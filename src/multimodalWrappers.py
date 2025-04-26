@@ -176,7 +176,7 @@ class LlamaWrapper(MultimodalWrapper):
 
         return txt
 
-    def clean_str_number(s: str) -> str:
+    def clean_str_number(self, s: str) -> str:
         if not s:
             return s
 

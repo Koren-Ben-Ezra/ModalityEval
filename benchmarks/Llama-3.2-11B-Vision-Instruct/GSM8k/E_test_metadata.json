@@ -1,6 +1,0 @@
-{
-    "test name": "E test",
-    "Model": "Llama-3.2-11B-Vision-Instruct",
-    "Dataset": "GSM8k",
-    "Save Predictions": true
-}

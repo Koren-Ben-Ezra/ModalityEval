@@ -1,9 +1,0 @@
-Question: Who was the man behind The Chipmunks?
-Answer: David Seville
-
-Question: Which Lloyd Webber musical premiered in the US on 10th December 1993?
-Answer: Sunset Boulevard
-
-Question: Who was the next British Prime Minister after Arthur Balfour?
-Answer: Campbell-Bannerman
-

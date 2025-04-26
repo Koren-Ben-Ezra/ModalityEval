@@ -1,9 +1,0 @@
-Question: Which NFL team represented the AFC at Super Bowl 50?
-Answer: Denver Broncos
-
-Question: Which NFL team represented the NFC at Super Bowl 50?
-Answer: Carolina Panthers
-
-Question: Where did Super Bowl 50 take place?
-Answer: Santa Clara, California
-
