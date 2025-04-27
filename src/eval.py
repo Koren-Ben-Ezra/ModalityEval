@@ -280,23 +280,15 @@ def shuffle_p_increase_text_eval():
     if selected_task == "1":
         # Image #
         benchmark_manager.register_job(text_f=ShuffleWordTextFilter(p=0.05), inner_dir="shuffle_TF_p_0_05")
-    
-    if selected_task == "2":
         benchmark_manager.register_job(text_f=ShuffleWordTextFilter(p=0.1), inner_dir="shuffle_TF_p_0_1")
-    
-    if selected_task == "3":
         benchmark_manager.register_job(text_f=ShuffleWordTextFilter(p=0.15), inner_dir="shuffle_TF_p_0_15")
     
-    if selected_task == "4":
+    if selected_task == "2":
         benchmark_manager.register_job(text_f=ShuffleWordTextFilter(p=0.2), inner_dir="shuffle_TF_p_0_2")
-    
-    if selected_task == "5":
         benchmark_manager.register_job(text_f=ShuffleWordTextFilter(p=0.25), inner_dir="shuffle_TF_p_0.25")
         
-    if selected_task == "6":
+    if selected_task == "3":
         benchmark_manager.register_job(text_f=ShuffleWordTextFilter(p=0.3), inner_dir="shuffle_TF_p_0.3")
-    
-    if selected_task == "7":
         benchmark_manager.register_job(text_f=ShuffleWordTextFilter(p=0.35), inner_dir="shuffle_TF_p_0.35")
         
     benchmark_manager.start_workers()
@@ -304,8 +296,8 @@ def shuffle_p_increase_text_eval():
 def basic_eval_all():
     if selected_eval != "F":
         return
-    if not ("1" <= selected_task <= "3"):
-        raise ValueError("execute with: 'sbatch run_slurm.sh <eval> <1-3>'")
+    if not ("1" <= selected_task <= "8"):
+        raise ValueError("execute with: 'sbatch run_slurm.sh <eval> <1-8>'")
     
     # prepare the benchmark
     Log().logger.info("------------------------------------------------")
@@ -340,15 +332,20 @@ def basic_eval_all():
     # -- Noise filters -- #
     if selected_task == "1":
         benchmark_manager.register_job(img_f=HistogramEqualizationImageFilter())
+    if selected_task == "2":
         benchmark_manager.register_job(img_f=GaussianImageFilter()) # kernel_size = 5 sigms = 1.0
     # -- Personalized information filters -- #
-    if selected_task == "2":
-        benchmark_manager.register_job(text_f=SurroundByCorrectAnsTextFilter()) # padding_symbol: str = "*", num_repeats: int = 6
-        benchmark_manager.register_job(text_f=SurroundByWrongAnsTextFilter()) # padding_symbol: str = "*", num_repeats: int = 6)
-        benchmark_manager.register_job(text_f=SurroundByPartialCorrectAnsTextFilter()) #  p: float = 0.2, padding_symbol: str = "*", num_repeats: int = 6
     if selected_task == "3":
+        benchmark_manager.register_job(text_f=SurroundByCorrectAnsTextFilter()) # padding_symbol: str = "*", num_repeats: int = 6
+    if selected_task == "4":
+        benchmark_manager.register_job(text_f=SurroundByWrongAnsTextFilter()) # padding_symbol: str = "*", num_repeats: int = 6)
+    if selected_task == "5":
+        benchmark_manager.register_job(text_f=SurroundByPartialCorrectAnsTextFilter()) #  p: float = 0.2, padding_symbol: str = "*", num_repeats: int = 6
+    if selected_task == "6":
         benchmark_manager.register_job(img_f=SurroundByCorrectAnsImageFilter(font_path=slurm_font_path)) # num_repeats: int = 5, alpha: float = 0.2,  font_size: int = 40, font_type: str = "arial.ttf", font_color = "black"
+    if selected_task == "7":
         benchmark_manager.register_job(img_f=SurroundByWrongAnsImageFilter(font_path=slurm_font_path)) # same
+    if selected_task == "8":
         benchmark_manager.register_job(img_f=SurroundByPartialCorrectAnsImageFilter(font_path=slurm_font_path)) # p = 0.2, the rest as SurroundByCorrectAnsImageFilter
 
     benchmark_manager.start_workers()
