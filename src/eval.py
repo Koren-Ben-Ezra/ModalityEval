@@ -99,7 +99,7 @@ def with_and_without_cot_instruction_eval():
     benchmark_manager = BenchmarkManager(datasetWrapper, multimodal_wrapper, metadata)
     
     dir_name = "with_cot" if selected_task == "2" else "without_cot"
-    benchmark_manager.register_job(img_f=IdentityImageFilter(), inner_dir=dir_name)
+    benchmark_manager.register_job(text_f=IdentityTextFilter(), img_f=IdentityImageFilter(), inner_dir=dir_name)
     benchmark_manager.start_workers()
 
 def flip2LettersTextFilter_TF_eval():
@@ -276,17 +276,17 @@ def shuffle_p_increase_text_eval():
     
     if selected_task == "1":
         # Image #
-        benchmark_manager.register_job(text_f=ShuffleWordTextFilter(p=0.05), inner_dir="SW_p_0_05")
-        benchmark_manager.register_job(text_f=ShuffleWordTextFilter(p=0.1), inner_dir="SW_p_0_1")
-        benchmark_manager.register_job(text_f=ShuffleWordTextFilter(p=0.15), inner_dir="SW_p_0_15")
+        benchmark_manager.register_job(text_f=ShuffleWordTextFilter(p=0.05), inner_dir="shuffle_TF_p_0_05")
+        benchmark_manager.register_job(text_f=ShuffleWordTextFilter(p=0.1), inner_dir="shuffle_TF_p_0_1")
+        benchmark_manager.register_job(text_f=ShuffleWordTextFilter(p=0.15), inner_dir="shuffle_TF_p_0_15")
     
     if selected_task == "2":
-        benchmark_manager.register_job(text_f=ShuffleWordTextFilter(p=0.2), inner_dir="SW_p_0_2")
-        benchmark_manager.register_job(text_f=ShuffleWordTextFilter(p=0.25), inner_dir="SW_p_0.25")
+        benchmark_manager.register_job(text_f=ShuffleWordTextFilter(p=0.2), inner_dir="shuffle_TF_p_0_2")
+        benchmark_manager.register_job(text_f=ShuffleWordTextFilter(p=0.25), inner_dir="shuffle_TF_p_0.25")
         
     if selected_task == "3":
-        benchmark_manager.register_job(text_f=ShuffleWordTextFilter(p=0.3), inner_dir="SW_p_0.3")
-        benchmark_manager.register_job(text_f=ShuffleWordTextFilter(p=0.35), inner_dir="SW_p_0.35")
+        benchmark_manager.register_job(text_f=ShuffleWordTextFilter(p=0.3), inner_dir="shuffle_TF_p_0.3")
+        benchmark_manager.register_job(text_f=ShuffleWordTextFilter(p=0.35), inner_dir="shuffle_TF_p_0.35")
         
     benchmark_manager.start_workers()
 
@@ -343,8 +343,6 @@ def basic_eval_all():
 def personalized_information_text_eval():
     if selected_eval != "G":
         return
-    if not ("1" <= selected_task <= "3"):
-        raise ValueError("execute with: 'sbatch run_slurm.sh <eval> <1-3>'")
     
     # prepare the benchmark
     Log().logger.info("------------------------------------------------")
@@ -376,8 +374,8 @@ def personalized_information_text_eval():
     benchmark_manager = BenchmarkManager(datasetWrapper, multimodal_wrapper, metadata)
     Log().logger.info(f"Running benchmark: {multimodal_wrapper.model_name} | {datasetWrapper.dataset_id} | {selected_eval} | {selected_task}")
     
-    benchmark_manager.register_job(text_f=PushFrontTextFilter(phrase=phrases["military"]))
-    benchmark_manager.register_job(text_f=PushFrontTextFilter(phrase=phrases["relax"]))
+    benchmark_manager.register_job(text_f=PushFrontTextFilter(phrase=phrases["military"]), inner_dir="military")
+    benchmark_manager.register_job(text_f=PushFrontTextFilter(phrase=phrases["relax"]), inner_dir="relax")
         
     benchmark_manager.start_workers()
     
