@@ -98,8 +98,9 @@ def with_and_without_cot_instruction_eval():
     
     benchmark_manager = BenchmarkManager(datasetWrapper, multimodal_wrapper, metadata)
     
-    dir_name = "with_cot_IF" if selected_task == "2" else "without_cot_IF"
+    dir_name = "with_cot" if selected_task == "2" else "without_cot"
     benchmark_manager.register_job(img_f=IdentityImageFilter(), inner_dir=dir_name)
+    benchmark_manager.register_job(text_f=IdentityTextFilter(), inner_dir=dir_name)
     benchmark_manager.start_workers()
 
 def flip2LettersTextFilter_TF_eval():
