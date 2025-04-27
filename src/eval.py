@@ -75,15 +75,15 @@ def with_and_without_cot_instruction_eval():
         
     txt_instruction = ""
     img_instruction = ""
-    if selected_task == "1":
+    if selected_task in ["1", "2"]:
         txt_instruction = parameters['system']['CoT_text_instruction']
         img_instruction = parameters['system']['CoT_image_instruction']
         
-    elif selected_task == "2":
+    elif selected_task in ["3", "4"]:
         txt_instruction = parameters['system']['text_instruction']
         img_instruction = parameters['system']['image_instruction']
     else:
-        raise ValueError("execute with: 'sbatch run_slurm.sh A <1-2>'")
+        raise ValueError("execute with: 'sbatch run_slurm.sh A <1-4>'")
     
     logger.info("Starting evaluation...")
     multimodal_wrapper = LlamaWrapper(img_instruction=img_instruction, txt_instruction=txt_instruction)
@@ -98,9 +98,11 @@ def with_and_without_cot_instruction_eval():
     
     benchmark_manager = BenchmarkManager(datasetWrapper, multimodal_wrapper, metadata)
     
-    dir_name = "with_cot" if selected_task == "2" else "without_cot"
-    benchmark_manager.register_job(img_f=IdentityImageFilter(), inner_dir=dir_name)
-    benchmark_manager.register_job(text_f=IdentityTextFilter(), inner_dir=dir_name)
+    dir_name = "with_cot" if selected_task in ["1", "2"] else "without_cot"
+    if selected_task in ["1", "3"]:
+        benchmark_manager.register_job(img_f=IdentityImageFilter(), inner_dir=dir_name)
+    if selected_task in ["2", "4"]:
+        benchmark_manager.register_job(text_f=IdentityTextFilter(), inner_dir=dir_name)
     benchmark_manager.start_workers()
 
 def flip2LettersTextFilter_TF_eval():
