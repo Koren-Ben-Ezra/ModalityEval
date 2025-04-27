@@ -343,6 +343,8 @@ def basic_eval_all():
         benchmark_manager.register_job(img_f=SurroundByWrongAnsImageFilter(font_path=slurm_font_path)) # same
         benchmark_manager.register_job(img_f=SurroundByPartialCorrectAnsImageFilter(font_path=slurm_font_path)) # p = 0.2, the rest as SurroundByCorrectAnsImageFilter
 
+    benchmark_manager.start_workers()
+    
 def personalized_information_text_eval():
     if selected_eval != "G":
         return
