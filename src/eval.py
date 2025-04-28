@@ -400,8 +400,8 @@ def general_information_text_eval():
 def general_information_image_eval():
     if selected_eval != "H":
         return
-    if not ("1" <= selected_task <= "2"):
-        raise ValueError("execute with: 'sbatch run_slurm.sh <eval> <1-2>'")
+    if not ("1" <= selected_task <= "4"):
+        raise ValueError("execute with: 'sbatch run_slurm.sh <eval> <1-4>'")
     
     # prepare the benchmark
     Log().logger.info("------------------------------------------------")
