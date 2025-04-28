@@ -350,7 +350,7 @@ def basic_eval_all():
 
     benchmark_manager.start_workers()
     
-def personalized_information_text_eval():
+def general_information_text_eval():
     if selected_eval != "G":
         return
     
@@ -389,7 +389,7 @@ def personalized_information_text_eval():
         
     benchmark_manager.start_workers()
     
-def personalized_information_image_eval():
+def general_information_image_eval():
     if selected_eval != "H":
         return
     if not ("1" <= selected_task <= "2"):

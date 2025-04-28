@@ -98,9 +98,16 @@ with open("parameters.json", "r") as file:
     parameters = json.load(file)
     phrases = parameters["phrases"]
 
+# text2image.height *= 5
+# text2image.width *= 5
 for key, phrase in phrases.items():
-    # question = PushFrontTextFilter(phrase).apply_filter(text_input)
-    question = text_input
+    question = PushFrontTextFilter(phrase).apply_filter(text_input)
     text2image.set_font_size(question)
+    
     img = text2image.create_image(question)
-    test_image_filter(IdentityImageFilter(), img, answer, title=key)
+    plt.figure(figsize=(10, 10))
+    plt.imshow(img)
+    plt.title(key)
+    plt.savefig(os.path.join(TEST_DIR, f"{key}.png"))
+    plt.close()
+    
