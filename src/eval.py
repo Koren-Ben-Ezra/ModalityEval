@@ -353,6 +353,8 @@ def basic_eval_all():
 def general_information_text_eval():
     if selected_eval != "G":
         return
+    if not ("1" <= selected_task <= "4"):
+        raise ValueError("execute with: 'sbatch run_slurm.sh <eval> <1-4>'")
     
     # prepare the benchmark
     Log().logger.info("------------------------------------------------")
@@ -384,8 +386,14 @@ def general_information_text_eval():
     benchmark_manager = BenchmarkManager(datasetWrapper, multimodal_wrapper, metadata)
     Log().logger.info(f"Running benchmark: {multimodal_wrapper.model_name} | {datasetWrapper.dataset_id} | {selected_eval} | {selected_task}")
     
-    benchmark_manager.register_job(text_f=PushFrontTextFilter(phrase=phrases["military"]), inner_dir="military")
-    benchmark_manager.register_job(text_f=PushFrontTextFilter(phrase=phrases["relax"]), inner_dir="relax")
+    if selected_task == "1":
+        benchmark_manager.register_job(text_f=PushFrontTextFilter(phrase=phrases["military"]), inner_dir="military")
+    if selected_task == "2":
+        benchmark_manager.register_job(text_f=PushFrontTextFilter(phrase=phrases["relax"]), inner_dir="relax")
+    if selected_task == "3":
+        benchmark_manager.register_job(text_f=PushFrontTextFilter(phrase=phrases["military_short"]), inner_dir="military_short")
+    if selected_task == "4":
+        benchmark_manager.register_job(text_f=PushFrontTextFilter(phrase=phrases["relax_short"]), inner_dir="relax_short")
         
     benchmark_manager.start_workers()
     
@@ -410,6 +418,10 @@ def general_information_image_eval():
         phrase = phrases["military"]
     elif selected_task == "2":
         phrase = phrases["relax"]
+    elif selected_task == "3":
+        phrase = phrases["military_short"]
+    elif selected_task == "4":
+        phrase = phrases["relax_short"]
         
     text2image=FilteredFixedSizeText2Image(filter=PushFrontTextFilter(phrase), font_path=slurm_font_path)
     
