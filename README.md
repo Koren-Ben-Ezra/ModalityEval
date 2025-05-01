@@ -30,10 +30,6 @@ pip install --upgrade transformer
 huggingface-cli login
 ```
 
-
-## Miro (view only)
-https://miro.com/app/board/uXjVIWQC1F8=/
-
 ## Evaluation
 All evaluation code resides in eval_model/. Below is how to use each script:
 1. eval_results.py Aggregates per-file evaluation metrics into a summary CSV (e.g., eval_summary.csv). Reads raw result .csv files in eval_model/results/ and writes a consolidated CSV.
