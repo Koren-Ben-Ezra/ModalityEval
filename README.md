@@ -29,10 +29,7 @@ pip install --upgrade transformer
 ```
 huggingface-cli login
 ```
-5. Token: 
-```
-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
-```
+
 
 ## Miro (view only)
 https://miro.com/app/board/uXjVIWQC1F8=/
