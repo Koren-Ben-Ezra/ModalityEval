@@ -1,0 +1,3 @@
+TF_filter,TF_accuracy,IF_filter,IF_accuracy
+Identity_with_CoT_TF.csv,0.82,Identity_with_CoT_IF.csv,0.55
+Identity_without_CoT_TF.csv,0.31,Identity_without_CoT_IF.csv,0.04

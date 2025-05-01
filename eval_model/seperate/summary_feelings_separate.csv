@@ -1,0 +1,6 @@
+TF_filter,TF_accuracy,IF_filter,IF_accuracy
+Identity_TF.csv,0.82,Identity_IF.csv,0.55
+PushFront_relax_TF.csv,0.74,PushFront_relax_IF.csv,0.44
+PushFront_relax_short_TF.csv,0.74,PushFront_relax_short_IF.csv,0.48
+PushFront_stress_TF.csv,0.65,PushFront_stress_IF.csv,0.4
+PushFront_stress_short_TF.csv,0.72,PushFront_stress_short_IF.csv,0.44

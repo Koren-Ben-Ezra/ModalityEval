@@ -1,0 +1,5 @@
+TF_filter,TF_accuracy,IF_filter,IF_accuracy
+Identity_TF.csv,0.82,Identity_IF.csv,0.55
+SurroundByCorrectAns_TF.csv,0.82,SurroundByCorrectAns_IF.csv,0.6
+SurroundByPartialCorrectAns_TF.csv,0.81,SurroundByPartialCorrectAns_IF.csv,0.59
+SurroundByWrongAns_TF.csv,0.79,SurroundByWrongAns_IF.csv,0.56
