@@ -14,14 +14,6 @@ slurm_font_path = "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf"
 selected_eval = os.getenv("SELECTED_EVAL", "0")
 selected_task = os.getenv("SELECTED_TASK", "0")
 
-image_path_amanda = os.path.join("images", "amanda.jpg")
-image_path_angry = os.path.join("images", "angry.jpg")
-image_path_relax = os.path.join("images", "relax.jpg")
-
-image_amanda = Image.open(image_path_amanda)
-image_angry = Image.open(image_path_angry)
-image_relax = Image.open(image_path_relax)
-
 
 # Summary of the tests
 # A: Basic evaluation
@@ -60,9 +52,15 @@ image_relax = Image.open(image_path_relax)
 #     # JOB 3: Personalized information filters- Text
 
 # G: personalized_information_text_eval
-#     # JOB 1: PushFrontImageFilter(text1), PushFrontImageFilter(text2), PushFrontImageFilter(text3)
+#     # JOB 1: PushFrontTextFilter(military)
+#     # JOB 2: PushFrontTextFilter(relax)
+#     # JOB 3: PushFrontTextFilter(military_short)
+#     # JOB 4: PushFrontTextFilter(relax_short)
 # H: personalized_information_image_eval
-#     # JOB 1: PushFrontImageFilter(text1), PushFrontImageFilter(text2), PushFrontImageFilter(text3)
+#     # JOB 1: PushFrontImageFilter(military)
+#     # JOB 2: PushFrontImageFilter(relax)
+#     # JOB 3: PushFrontImageFilter(military_short)
+#     # JOB 4: PushFrontImageFilter(relax_short)
 
 
 def with_and_without_cot_instruction_eval():
