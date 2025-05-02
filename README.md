@@ -37,7 +37,7 @@ Each component in the pipeline is implemented as a **modular plugin**. You can r
 - **Data Loaders:** Swap in different dataset ingestion scripts by following the `DatasetLoader` interface.
 - **Filters:** Add or customize text/image filters by implementing new subclasses of the `Filter` base class.
 - **Model Wrappers:** Integrate other LLMs or vision models by creating a new wrapper conforming to the `MultimodalWrapper` API.
-- 
+  
 
 ## Installation
 
