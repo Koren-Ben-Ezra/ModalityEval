@@ -1,0 +1,11 @@
+filter,correct,total,accuracy
+Identity_IF.csv,732,1320,0.55
+Identity_TF.csv,1076,1320,0.82
+PushFront_relax_IF.csv,578,1320,0.44
+PushFront_relax_TF.csv,982,1320,0.74
+PushFront_relax_short_IF.csv,636,1320,0.48
+PushFront_relax_short_TF.csv,981,1320,0.74
+PushFront_stress_IF.csv,531,1320,0.40
+PushFront_stress_TF.csv,864,1320,0.65
+PushFront_stress_short_IF.csv,587,1320,0.44
+PushFront_stress_short_TF.csv,946,1320,0.72

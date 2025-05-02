@@ -1,0 +1,7 @@
+TF_filter,TF_accuracy,IF_filter,IF_accuracy
+flip2Letters_0.05_TF.csv,0.75,flip2_0.05_IF.csv,0.49
+flip2Letters_0.15_TF.csv,0.64,flip2_0.15_IF.csv,0.35
+flip2Letters_0.1_TF.csv,0.68,flip2_0.1_IF.csv,0.41
+flip2Letters_0.25_TF.csv,0.57,flip2_0.25_IF.csv,0.23
+flip2Letters_0.2_TF.csv,0.6,flip2_0.2_IF.csv,0.36
+flip2Letters_0.3_TF.csv,0.5,flip2_0.3_IF.csv,0.18

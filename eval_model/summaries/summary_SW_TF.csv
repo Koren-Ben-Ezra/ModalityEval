@@ -1,0 +1,8 @@
+filter,correct,total,accuracy
+ShuffleWord_0.05_TF.csv,955,1320,0.72
+ShuffleWord_0.15_TF.csv,797,1320,0.60
+ShuffleWord_0.1_TF.csv,863,1320,0.65
+ShuffleWord_0.25_TF.csv,600,1320,0.45
+ShuffleWord_0.2_TF.csv,673,1320,0.51
+ShuffleWord_0.35_TF.csv,455,1320,0.34
+ShuffleWord_0.3_TF.csv,523,1320,0.40

@@ -1,0 +1,13 @@
+filter,correct,total,accuracy
+ShuffleWord_0.05_TF.csv,955,1320,0.72
+ShuffleWord_0.15_TF.csv,797,1320,0.60
+ShuffleWord_0.1_TF.csv,863,1320,0.65
+ShuffleWord_0.25_TF.csv,600,1320,0.45
+ShuffleWord_0.2_TF.csv,673,1320,0.51
+ShuffleWord_0.3_TF.csv,523,1320,0.40
+shuffle_0.05_IF.csv,678,1320,0.51
+shuffle_0.15_IF.csv,440,1320,0.33
+shuffle_0.1_IF.csv,549,1320,0.42
+shuffle_0.25_IF.csv,315,1320,0.24
+shuffle_0.2_IF.csv,470,1320,0.36
+shuffle_0.3_IF.csv,262,1320,0.20

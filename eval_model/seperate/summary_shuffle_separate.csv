@@ -1,0 +1,7 @@
+TF_filter,TF_accuracy,IF_filter,IF_accuracy
+ShuffleWord_0.05_TF.csv,0.72,shuffle_0.05_IF.csv,0.51
+ShuffleWord_0.15_TF.csv,0.6,shuffle_0.15_IF.csv,0.33
+ShuffleWord_0.1_TF.csv,0.65,shuffle_0.1_IF.csv,0.42
+ShuffleWord_0.25_TF.csv,0.45,shuffle_0.25_IF.csv,0.24
+ShuffleWord_0.2_TF.csv,0.51,shuffle_0.2_IF.csv,0.36
+ShuffleWord_0.3_TF.csv,0.4,shuffle_0.3_IF.csv,0.2

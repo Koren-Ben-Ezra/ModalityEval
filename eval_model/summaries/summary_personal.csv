@@ -1,0 +1,9 @@
+filter,correct,total,accuracy
+Identity_IF.csv,732,1320,0.55
+Identity_TF.csv,1076,1320,0.82
+SurroundByCorrectAns_IF.csv,798,1320,0.60
+SurroundByCorrectAns_TF.csv,1077,1320,0.82
+SurroundByPartialCorrectAns_IF.csv,780,1320,0.59
+SurroundByPartialCorrectAns_TF.csv,1073,1320,0.81
+SurroundByWrongAns_IF.csv,736,1320,0.56
+SurroundByWrongAns_TF.csv,1038,1320,0.79

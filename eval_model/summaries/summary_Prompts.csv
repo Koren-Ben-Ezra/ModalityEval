@@ -1,0 +1,5 @@
+filter,correct,total,accuracy
+Identity_with_CoT_IF.csv,732,1320,0.55
+Identity_with_CoT_TF.csv,1076,1320,0.82
+Identity_without_CoT_IF.csv,50,1320,0.04
+Identity_without_CoT_TF.csv,412,1320,0.31

@@ -1,0 +1,13 @@
+filter,correct,total,accuracy
+flip2Letters_0.05_TF.csv,985,1320,0.75
+flip2Letters_0.15_TF.csv,847,1320,0.64
+flip2Letters_0.1_TF.csv,894,1320,0.68
+flip2Letters_0.25_TF.csv,755,1320,0.57
+flip2Letters_0.2_TF.csv,795,1320,0.60
+flip2Letters_0.3_TF.csv,655,1320,0.50
+flip2_0.05_IF.csv,643,1320,0.49
+flip2_0.15_IF.csv,468,1320,0.35
+flip2_0.1_IF.csv,542,1320,0.41
+flip2_0.25_IF.csv,300,1320,0.23
+flip2_0.2_IF.csv,473,1320,0.36
+flip2_0.3_IF.csv,244,1320,0.18

@@ -1,0 +1,4 @@
+filter,correct,total,accuracy
+PushFront_TF.csv,974,1320,0.74
+push_front_1_IF.csv,551,1320,0.42
+push_front_2_IF.csv,568,1320,0.43
