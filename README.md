@@ -5,6 +5,7 @@ A **modular benchmarking framework** for multimodal evaluation of large language
 ## Table of Contents
 
 - [Key Features](#key-features)
+- [Methodology](#methodology)
 - [Installation](#installation)
 - [Virtual Environment Setup](#virtual-environment-setup)
 - [Running](#running)
@@ -18,6 +19,14 @@ A **modular benchmarking framework** for multimodal evaluation of large language
 - **Case Study Ready**: Built-in support for benchmarking Meta’s LLaMA 3.2 Vision-Instruct on GSM8K.
 - **Modular Architecture**: Swap models, datasets, and filters via a simple wrapper design.
 - **Comprehensive Reports**: Generate per-filter summaries, consolidated CSVs, and publication-quality plots.
+
+## Methodology
+
+<p align="center">
+  <img src="NLP Project.jpg" alt="Benchmark Manager Architecture" width="800"/>
+</p>
+
+*Figure 1.* End-to-end flow of the Benchmark Manager: dataset ingestion, text & image filtering, multimodal wrapper execution, category extraction, and summary report generation.
 
 ## Installation
 
@@ -60,7 +69,7 @@ Before evaluating, launch any test on your cluster via SLURM:
 
 ## Evaluation
 
-All evaluation scripts reside in the `eval_model/` directory. 
+All evaluation scripts reside in the `eval_model/` directory. By default, outputs go to `eval_model/results/` and generated plots to `reports/`.
 
 - **Aggregate results:**
   ```bash
@@ -91,6 +100,7 @@ All evaluation scripts reside in the `eval_model/` directory.
   python eval_model/plot2csv.py csv1.csv csv2.csv --output reports/combined_plot.pdf
   ```
   Creates a combined plot from two CSV files in a single figure.
+
 
 ## License
 
