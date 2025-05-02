@@ -107,7 +107,7 @@ All evaluation scripts reside in the `eval_model/` directory. By default, output
 
 ## Article
 
-The full article PDF is located in the `paper/` directory. Download it here: [ModalityEval Article](paper/ModalityEval_Article.pdf).
+The full article PDF is located in the `paper/` directory. Download it here: [ModalityEval Article](paper/Article.pdf).
 
 ## License
 
