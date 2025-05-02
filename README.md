@@ -10,6 +10,7 @@ A **modular benchmarking framework** for multimodal evaluation of large language
 - [Virtual Environment Setup](#virtual-environment-setup)
 - [Running](#running)
 - [Evaluation](#evaluation)
+- [Article](#article)
 - [License](#license)
 
 ## Key Features
@@ -22,8 +23,12 @@ A **modular benchmarking framework** for multimodal evaluation of large language
 
 ## Methodology
 
+> **Note:** Place the diagram file `NLP Project.jpg` at the repository root (or update the `src` path if you store it elsewhere).
+
 <p align="center">
-  <img src="NLP Project.jpg" alt="Benchmark Manager Architecture" width="800"/>
+
+<p align="center">
+  <img src="paper/NLP_Project.jpg" alt="Benchmark Manager Architecture" width="800"/>
 </p>
 
 *Figure 1.* End-to-end flow of the Benchmark Manager: dataset ingestion, text & image filtering, multimodal wrapper execution, category extraction, and summary report generation.
@@ -101,6 +106,9 @@ All evaluation scripts reside in the `eval_model/` directory. By default, output
   ```
   Creates a combined plot from two CSV files in a single figure.
 
+## Article
+
+The full article PDF is located in the `paper/` directory. Download it here: [ModalityEval Article](paper/ModalityEval_Article.pdf).
 
 ## License
 
