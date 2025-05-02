@@ -23,7 +23,6 @@ A **modular benchmarking framework** for multimodal evaluation of large language
 
 ## Methodology
 
-> **Note:** Place the diagram file `NLP Project.jpg` at the repository root (or update the `src` path if you store it elsewhere).
 
 <p align="center">
 
