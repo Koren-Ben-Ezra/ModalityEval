@@ -32,6 +32,13 @@ A **modular benchmarking framework** for multimodal evaluation of large language
 
 *Figure 1.* End-to-end flow of the Benchmark Manager: dataset ingestion, text & image filtering, multimodal wrapper execution, category extraction, and summary report generation.
 
+Each component in the pipeline is implemented as a **modular plugin**. You can replace or extend:
+
+- **Data Loaders:** Swap in different dataset ingestion scripts by following the `DatasetLoader` interface.
+- **Filters:** Add or customize text/image filters by implementing new subclasses of the `Filter` base class.
+- **Model Wrappers:** Integrate other LLMs or vision models by creating a new wrapper conforming to the `MultimodalWrapper` API.
+- 
+
 ## Installation
 
 1. **Clone the repository:**
