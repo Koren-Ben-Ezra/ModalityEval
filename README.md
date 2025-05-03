@@ -56,27 +56,67 @@ https://www.anaconda.com/download/success
 
 ```bash
 # Create the environment
-echo "Creating Conda environment…"
 conda env create -f environment/environment.yml
 
 # Activate it
 conda activate ModalityEval
-
-# (Optional) Install or upgrade dependencies
-pip install -r environment/requirements.txt
-pip install --upgrade transformers
-
-# Authenticate with Hugging Face
-huggingface-cli login
 ```
 
 ## Running
 
-Before evaluating, launch any test on your cluster via SLURM:
+Before evaluating, launch any test on your cluster via SLURM from out project directory:
 
 ```bash
 ./run_slurm <Test Section (A–H)> <Test Number>
 ```
+### **Summary of the Tests:**
+
+**Section A: Basic Evaluation**  
+   1. Test Number 1: Identity Image Filter + Identity Text Filter + CoT  
+   2. Test Number 2: Identity Image Filter + Identity Text Filter (without CoT)  
+
+**Section B: Character-Level Noise (flip2LettersTextFilter) — Text Eval**  
+   1. Test Number 1: p = 0.05, 0.10, 0.15  
+   2. Test Number 2: p = 0.20, 0.25  
+   3. Test Number 3: p = 0.30, 0.35  
+
+**Section C: Character-Level Noise (flip2LettersTextFilter) — Image Eval**  
+   1. Test Number 1: p = 0.05  
+   2. Test Number 2: p = 0.10  
+   3. Test Number 3: p = 0.15  
+   4. Test Number 4: p = 0.25  
+   5. Test Number 5: p = 0.30  
+   6. Test Number 6: p = 0.35  
+
+**Section D: Word-Level Noise (shuffle_p_increase) — Image Eval**  
+   1. Test Number 1: p = 0.05  
+   2. Test Number 2: p = 0.10  
+   3. Test Number 3: p = 0.15  
+   4. Test Number 4: p = 0.25  
+   5. Test Number 5: p = 0.30  
+   6. Test Number 6: p = 0.35  
+
+**Section E: Word-Level Noise (shuffle_p_increase) — Text Eval**  
+   1. Test Number 1: p = 0.05, 0.10, 0.15  
+   2. Test Number 2: p = 0.20, 0.25  
+   3. Test Number 3: p = 0.30, 0.35  
+
+**Section F: Simple Noise & Personalized Info Filters**  
+   1. Test Number 1: Noise filters (Histogram & Gaussian on image)  
+   2. Test Number 2: Personalized-info filters — Image  
+   3. Test Number 3: Personalized-info filters — Text  
+
+**Section G: Push-Front Contextual Filters — Text Eval**  
+   1. Test Number 1: Text input - Long stressed description  
+   2. Test Number 2: `Text input - Long relaxed description 
+   3. Test Number 3: Text input - Short stressed description  
+   4. Test Number 4: Text input - Short relaxed description  
+
+**Section H: Push-Front Contextual Filters — Image Eval**  
+   1. Test Number 1: Text input - Long stressed description  
+   2. Test Number 2: Text input - Long relaxed description  
+   3. Test Number 3: Text input - Short stressed description  
+   4. Test Number 4: Text input - Short relaxed description  
 
 ## Evaluation
 
@@ -120,3 +160,58 @@ The full article PDF is located in the `paper/` directory. Download it here: [Mo
 
 This project is licensed under the MIT License. See [LICENSE](LICENSE) for details.
 
+
+## Example Image Inputs
+
+Below are examples of the filtered image inputs generated for the question example:  
+"Janet's ducks lay 16 eggs per day. She eats three for breakfast every morning and bakes muffins for her friends every day with four. She sells the remainder at the farmers' market daily for $2 per fresh duck egg. How much in dollars does she make every day at the farmers' market?"
+
+### Identity & Noise Filters
+
+| Identity | Histogram Equalization | Gaussian |
+|:--------:|:----------------------:|:--------:|
+| ![Identity](paper/filtered_text_images/A_identity.png) | ![Histogram](paper/filtered_text_images/F1_histogram.png) | ![Gaussian](paper/filtered_text_images/F1_gaussian.png) |
+
+### Surround-by-Answer Filters
+
+| Correct Answer | Wrong Answer | Partial Answer |
+|:--------------:|:------------:|:--------------:|
+| ![Correct](paper/filtered_text_images/F2_correct_ans.png) | ![Wrong](paper/filtered_text_images/F2_wrong_ans.png) | ![Partial](paper/filtered_text_images/F2_partial_ans.png) |
+
+### Character-Level Noise (Flip 2 Letters)
+
+| p=0.05 | p=0.10 |
+|:------:|:------:|
+| ![](paper/filtered_text_images/C_flip2Letters_0.05.png) | ![](paper/filtered_text_images/C_flip2Letters_0.1.png) |
+
+| p=0.15 | p=0.25 |
+|:------:|:------:|
+| ![](paper/filtered_text_images/C_flip2Letters_0.15.png) | ![](paper/filtered_text_images/C_flip2Letters_0.25.png) |
+
+| p=0.30 | p=0.35 |
+|:------:|:------:|
+| ![](paper/filtered_text_images/C_flip2Letters_0.3.png) | ![](paper/filtered_text_images/C_flip2Letters_0.35.png) |
+
+### Word-Level Noise (Shuffle Words)
+
+| p=0.05 | p=0.10 |
+|:------:|:------:|
+| ![](paper/filtered_text_images/D_shuffle_0.05.png) | ![](paper/filtered_text_images/D_shuffle_0.1.png) |
+
+| p=0.15 | p=0.25 |
+|:------:|:------:|
+| ![](paper/filtered_text_images/D_shuffle_0.15.png) | ![](paper/filtered_text_images/D_shuffle_0.25.png) |
+
+| p=0.30 | p=0.35 |
+|:------:|:------:|
+| ![](paper/filtered_text_images/D_shuffle_0.3.png) | ![](paper/filtered_text_images/D_shuffle_0.35.png) |
+
+### PushFront Contextual Filters
+
+| Military | Relax |
+|:--------:|:-----:|
+| ![](paper/filtered_text_images/H_pushfront_military.png) | ![](paper/filtered_text_images/H_pushfront_relax.png) |
+
+| Military Short | Relax Short |
+|:--------------:|:-----------:|
+| ![](paper/filtered_text_images/H_pushfront_military_short.png) | ![](paper/filtered_text_images/H_pushfront_relax_short.png) |
