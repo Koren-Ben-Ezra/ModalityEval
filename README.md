@@ -64,59 +64,20 @@ conda activate ModalityEval
 
 ## Running
 
-Before evaluating, launch any test on your cluster via SLURM from out project directory:
+One can run a premade evaluation through 
+```bash
+python ./main.py <Test Section (A-H)> <Test Number>
+```
+Where test section and number are chosen accordingly to eval.py.
+
+You can also create custom eval files by defining your own custom (1) multimodal wrapper, (2) dataset wrapper, (3)   
+TODO: EDIT
+
 
 ```bash
 ./run_slurm <Test Section (A–H)> <Test Number>
 ```
-### **Summary of the Tests:**
 
-**Section A: Basic Evaluation**  
-   1. Test Number 1: Identity Image Filter + Identity Text Filter + CoT  
-   2. Test Number 2: Identity Image Filter + Identity Text Filter (without CoT)  
-
-**Section B: Character-Level Noise (flip2LettersTextFilter) — Text Eval**  
-   1. Test Number 1: p = 0.05, 0.10, 0.15  
-   2. Test Number 2: p = 0.20, 0.25  
-   3. Test Number 3: p = 0.30, 0.35  
-
-**Section C: Character-Level Noise (flip2LettersTextFilter) — Image Eval**  
-   1. Test Number 1: p = 0.05  
-   2. Test Number 2: p = 0.10  
-   3. Test Number 3: p = 0.15  
-   4. Test Number 4: p = 0.25  
-   5. Test Number 5: p = 0.30  
-   6. Test Number 6: p = 0.35  
-
-**Section D: Word-Level Noise (shuffle_p_increase) — Image Eval**  
-   1. Test Number 1: p = 0.05  
-   2. Test Number 2: p = 0.10  
-   3. Test Number 3: p = 0.15  
-   4. Test Number 4: p = 0.25  
-   5. Test Number 5: p = 0.30  
-   6. Test Number 6: p = 0.35  
-
-**Section E: Word-Level Noise (shuffle_p_increase) — Text Eval**  
-   1. Test Number 1: p = 0.05, 0.10, 0.15  
-   2. Test Number 2: p = 0.20, 0.25  
-   3. Test Number 3: p = 0.30, 0.35  
-
-**Section F: Simple Noise & Personalized Info Filters**  
-   1. Test Number 1: Noise filters (Histogram & Gaussian on image)  
-   2. Test Number 2: Personalized-info filters — Image  
-   3. Test Number 3: Personalized-info filters — Text  
-
-**Section G: Push-Front Contextual Filters — Text Eval**  
-   1. Test Number 1: Text input - Long stressed description  
-   2. Test Number 2: `Text input - Long relaxed description 
-   3. Test Number 3: Text input - Short stressed description  
-   4. Test Number 4: Text input - Short relaxed description  
-
-**Section H: Push-Front Contextual Filters — Image Eval**  
-   1. Test Number 1: Text input - Long stressed description  
-   2. Test Number 2: Text input - Long relaxed description  
-   3. Test Number 3: Text input - Short stressed description  
-   4. Test Number 4: Text input - Short relaxed description  
 
 ## Evaluation
 
