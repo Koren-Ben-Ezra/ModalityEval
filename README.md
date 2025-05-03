@@ -23,11 +23,8 @@ A **modular benchmarking framework** for multimodal evaluation of large language
 
 ## Methodology
 
-
 <p align="center">
-
-<p align="center">
-  <img src="paper/Methodology.jpg" alt="Benchmark Manager Architecture" width="800"/>
+  <img src="https://github.com/user-attachments/assets/ade2cd2d-82ad-433e-b3c8-39eeed1530da" alt="Benchmark Manager Architecture" width="800"/>
 </p>
 
 *Figure 1.* End-to-end flow of the Benchmark Manager: dataset ingestion, text & image filtering, multimodal wrapper execution, category extraction, and summary report generation.
@@ -44,7 +41,6 @@ Each component in the pipeline is implemented as a **modular plugin**. You can r
 1. **Clone the repository:**
    ```bash
    git clone https://github.com/Koren-Ben-Ezra/ModalityEval.git
-   cd ModalityEval
    ```
 
 2. **Set up virtual environment** (see below).
@@ -70,9 +66,9 @@ python ./main.py <Test Section (A-H)> <Test Number>
 ```
 Where test section and number are chosen accordingly to eval.py.
 
-You can also create custom eval files by defining your own custom (1) multimodal wrapper, (2) dataset wrapper, (3)   
-TODO: EDIT
-
+You can also create custom eval files by defining your own custom (1) [multimodal wrapper](src/multimodalWrappers.py), (2) [dataset wrapper](src/datasetWrapper.py), (3) [Text/Image Filters](src/filters.py).
+For each one of those there is an abstract you can freely implement to suffice the framework's pipeline.
+Then, you can define your own benchmark manager and execute tests, similary to how its done in eval.py.
 
 ```bash
 ./run_slurm <Test Section (A–H)> <Test Number>
